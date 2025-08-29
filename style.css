@@ -1,0 +1,477 @@
+body,
+html {
+    margin: 0;
+    padding: 0;
+}
+
+* {
+    box-sizing: border-box;
+
+}
+
+html {
+    font-size: calc(0.625rem + 0.41666666666666663vw);
+}
+
+@media screen and (max-width:1920px) {
+    html {
+        font-size: calc(0.625rem + 0.41666666666666674vw);
+    }
+}
+
+@media screen and (max-width:1440px) {
+    html {
+        font-size: calc(0.8126951092611863rem + 0.20811654526534862vw);
+    }
+}
+
+@media screen and (max-width:479px) {
+    html {
+        font-size: calc(0.7494769874476988rem + 0.8368200836820083vw);
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #FFF;
+    font-family: "PP Mori";
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 100%;
+    /* 1rem */
+}
+
+h2 {
+    color: #FFF;
+    font-family: "PP Mori";
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 100%;
+    /* 0.875rem */
+}
+
+.light {
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%;
+    /* 0.75rem */
+}
+
+h3 {
+    color: #FFF;
+    font-family: "PP Mori";
+    font-size: 0.625rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 100%;
+    /* 0.625rem */
+}
+
+label {
+    color: rgba(255, 255, 255, 0.40);
+    font-family: "PP Neue Machina - Inktrap Medium";
+    font-size: 0.5625rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 100%;
+    /* 0.5625rem */
+}
+
+.gradient1 {
+    width: 29.8125rem;
+    height: 26rem;
+    z-index: 0;
+    position: absolute;
+    left: -11rem;
+    top: -15rem;
+    background: #860169;
+    background-blend-mode: overlay;
+    filter: blur(250px);
+}
+
+.gradient2 {
+    width: 46.6875rem;
+    height: 40.75rem;
+    z-index: 0;
+    position: absolute;
+    right: -14.625rem;
+    bottom: -18.75rem;
+    background: #572760;
+    background-blend-mode: overlay;
+    filter: blur(450px);
+}
+
+.content {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100svh;
+    background: #000;
+}
+
+.wrapper {
+    display: flex;
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.nav {
+    display: flex;
+    padding: 0.5rem;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.logo {
+    display: flex;
+    padding-left: 1rem;
+    align-items: flex-end;
+    gap: 0.375rem;
+}
+
+.logo-text {
+    color: #FFF;
+    font-family: "PP Neue Montreal";
+    font-size: 1.28569rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 100%;
+    /* 1.28569rem */
+}
+
+.nav-links {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav-profile {
+    width: 2.5rem;
+    height: 2.5rem;
+    aspect-ratio: 1/1;
+    border-radius: 2.5rem;
+}
+
+.nav-btn {
+    display: flex;
+    width: 2rem;
+    height: 2rem;
+    justify-content: center;
+    align-items: center;
+    border-radius: 625rem;
+    background: rgba(217, 197, 255, 0.20);
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    align-self: stretch;
+}
+
+.main {
+    display: flex;
+    height: 100%;
+    align-items: flex-start;
+    gap: 1rem;
+    align-self: stretch;
+}
+
+.details {
+    display: flex;
+    width: 18.5625rem;
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.details-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.details-profile {
+    width: 3rem;
+    height: 3rem;
+}
+
+.details-name {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.details-stars {
+    width: 3.75rem;
+    height: 1rem;
+    aspect-ratio: 15/4;
+}
+
+.details-grid {
+    display: grid;
+    gap: 0.5rem;
+    align-self: stretch;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.details-item {
+    display: flex;
+    width: 8.03125rem;
+    height: 2.5rem;
+    padding: 0.25rem;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.details-box {
+    display: flex;
+    width: 2rem;
+    height: 2rem;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    border-radius: 0.5rem;
+    background: rgba(217, 197, 255, 0.10);
+}
+
+.details-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    aspect-ratio: 1/1;
+}
+
+.details-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0.25rem;
+}
+
+.saved {
+    display: flex;
+    overflow: hidden;
+    width: 18.5625rem;
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    flex: 1 0 0;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.saved-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    flex: 1 0 0;
+    align-self: stretch;
+}
+
+.saved-item {
+    display: flex;
+    padding: 0.75rem 0.5rem;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.saved-item__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.saved-item__profile {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+}
+
+.middle {
+    display: flex;
+    position: relative;
+    align-items: flex-start;
+    flex: 1 0 0;
+    align-self: stretch;
+    border-radius: 1rem;
+    background: linear-gradient(180deg, rgba(134, 1, 105, 0.00) 52.76%, #860169 100%);
+    overflow: hidden;
+}
+
+.resonator-bg {
+    position: absolute;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.resonator {
+    display: flex;
+    padding: 1rem;
+    position: relative;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 0.5rem;
+    flex: 1 0 0;
+    align-self: stretch;
+    border-radius: 0.5rem;
+}
+
+
+
+.resonator-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    align-self: stretch;
+}
+
+.resonator-details {
+    display: flex;
+    position: relative;
+    z-index: 1;
+    align-items: flex-start;
+    gap: 0.5rem;
+    align-self: stretch;
+}
+
+.resonator-score {
+    display: flex;
+    width: 7rem;
+    height: 3.625rem;
+    padding: 0.5rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 0.5rem;
+    border-radius: 0.5rem;
+    background: rgba(0, 0, 0, 0.60);
+    backdrop-filter: blur(16px);
+}
+
+.resonator-score__score {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.resonator-weapon {
+    display: flex;
+    height: 3.625rem;
+    padding: 0.5rem;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1 0 0;
+    border-radius: 0.5rem;
+    background: rgba(0, 0, 0, 0.30);
+    backdrop-filter: blur(16px);
+}
+
+.resonator-weapon__img {
+    display: flex;
+    width: 2rem;
+    height: 2.625rem;
+    align-items: center;
+}
+
+.resonator-weapon__header {
+    display: flex;
+    padding: 0.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    flex: 1 0 0;
+}
+
+.weapon-details {
+    display: flex;
+    height: 0.75rem;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.weapon-stats {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.stat-icon {
+    width: 1rem;
+    height: 1rem;
+    aspect-ratio: 1/1;
+}
+
+.stat-icon.small {
+    width: 0.75rem;
+    height: 0.75rem;
+    aspect-ratio: 1/1;
+}
+
+.resonator-stats {
+    display: grid;
+    padding: 0.5rem;
+    align-self: stretch;
+    grid-template-rows: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-radius: 0.5rem;
+    background: rgba(0, 0, 0, 0.30);
+    backdrop-filter: blur(16px);
+}
+
+.resonator-stat {
+    display: flex;
+    width: 100%;
+    height: 1.375rem;
+    padding: 1rem 1rem;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
