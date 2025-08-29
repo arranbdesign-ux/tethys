@@ -179,5 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const char = resonators[charIndex];
         bgImg.src = char.background;
         bgImg.alt = `${char.name} Background`;
+
+        charNameElement.textContent = char.name;
     });
 });
