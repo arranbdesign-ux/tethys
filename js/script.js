@@ -8,26 +8,26 @@ const weapons = [
 
 const weaponsByType = {
     Broadblade: [
-        { name: "Lustrous Razor", atk: 587, atkp: 36.4, image: "images/sword_night.png" },
-        { name: "Verdant Summit", atk: 587, cd: 24.3, "images/sunblade.png" }
+        { name: "Lustrous Razor", atk: 587, atkp: 36.4, image: "" },
+        { name: "Verdant Summit", atk: 587, cd: 24.3, "" }
     ],
     Gauntlets: [
-        { name: "Iron Fists", damage: 40, image: "images/iron_fists.png" },
-        { name: "Thunder Gloves", damage: 55, image: "images/thunder_gloves.png" }
+        { name: "Iron Fists", damage: 40, image: "" },
+        { name: "Thunder Gloves", damage: 55, image: "" }
     ],
     Pistols: [
-        { name: "Static Mist", atk: 587, cr: 24.3, image: "images/twin_pistols.png" },
-        { name: "The Last Dance", atk: 500, cd: 72, image: "images/flare_gun.png" }
+        { name: "Static Mist", atk: 587, cr: 24.3, image: "" },
+        { name: "The Last Dance", atk: 500, cd: 72, image: "" }
     ],
     Sword: [
-        { name: "Twin Pistols", damage: 45, image: "images/twin_pistols.png" },
-        { name: "Flare Gun", damage: 50, image: "images/flare_gun.png" }
+        { name: "Twin Pistols", damage: 45, image: "" },
+        { name: "Flare Gun", damage: 50, image: "" }
     ],
     Rectifier: [
-        { name: "Cosmic Ripples", atk: 500, atkp: 54, image: "images/photon_ray.png" },
-        { name: "Stellar Symphony", atk: 412, er: 77, image: "images/photon_ray.png" },
-        { name: "Variation", atk: 337, er: 51.8, image: "images/photon_ray.png" },
-        { name: "Lethean Elegy", atk: 588, cr: 24.3, image: "images/photon_ray.png" }
+        { name: "Cosmic Ripples", atk: 500, atkp: 54, image: "" },
+        { name: "Stellar Symphony", atk: 412, er: 77, image: "" },
+        { name: "Variation", atk: 337, er: 51.8, image: "" },
+        { name: "Lethean Elegy", atk: 588, cr: 24.3, image: "" }
     ]
 };
 
