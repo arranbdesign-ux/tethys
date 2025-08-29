@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const weaponsByType = {
         Broadblade: [
             { name: "Lustrous Razor", atk: 587, atkp: 36.4, image: "" },
-            { name: "Verdant Summit", atk: 587, cd: 24.3, "" }
+            { name: "Verdant Summit", atk: 587, cd: 24.3, image: "" }
         ],
         Gauntlets: [
             { name: "Iron Fists", damage: 40, image: "" },
@@ -157,42 +157,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const characterDropdown = document.getElementById("characterDropdown");
+    const bgImg = document.querySelector(".resonator-bg");
 
+    // Populate character dropdown
     resonators.forEach((char, index) => {
         const option = document.createElement("option");
-        option.value = index;  // reference in JS
+        option.value = index;
         option.textContent = char.name;
         characterDropdown.appendChild(option);
     });
 
-    const weaponDropdown = document.getElementById("weaponDropdown");
-    const characterDisplay = document.getElementById("characterDisplay");
-
+    // Change background when a character is selected
     characterDropdown.addEventListener("change", (e) => {
         const charIndex = e.target.value;
-        if (charIndex === "") return;
+        if (charIndex === "") {
+            bgImg.src = ""; // clear background if none selected
+            bgImg.alt = "No character selected";
+            return;
+        }
 
         const char = resonators[charIndex];
-
-        // Populate Weapon Dropdown based on character weapon type
-        weaponDropdown.disabled = false;
-        weaponDropdown.innerHTML = "<option value=''>--Select Weapon--</option>";
-        const availableWeapons = weaponsByType[char.weaponType];
-        availableWeapons.forEach((weapon, index) => {
-            const option = document.createElement("option");
-            option.value = index;
-            option.textContent = weapon.name;
-            weaponDropdown.appendChild(option);
-        });
-
-        // Update character info in HTML
-        document.getElementById("charName").textContent = char.name;
-        document.getElementById("charElement").textContent = `Element: ${char.element}`;
-        document.getElementById("charHP").textContent = `HP: ${char.stats.hp}`;
-        document.getElementById("charATK").textContent = `ATK: ${char.stats.atk}`;
-        document.getElementById("charImage").src = char.profile;
-        document.getElementById("charImage").alt = char.name;
-
-        characterDisplay.classList.remove("hidden");
+        bgImg.src = char.background;
+        bgImg.alt = `${char.name} Background`;
     });
 });
