@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ]
 
 
-
+    const charNameElement = document.getElementById("charName");
     const characterDropdown = document.getElementById("characterDropdown");
     const bgImg = document.querySelector(".resonator-bg");
 
@@ -173,6 +173,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (charIndex === "") {
             bgImg.src = ""; // clear background if none selected
             bgImg.alt = "No character selected";
+            charNameElement.textContent = ""; // clear name if nothing selected
             return;
         }
 
