@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+
     const weapons = [
         { name: "Broadblade", image: "" },
         { name: "Gauntlets", image: "" },
@@ -33,137 +34,96 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const elements = [
-        { name: "Aero", image: "" },
-        { name: "Electro", image: "" },
-        { name: "Fusion", image: "" },
-        { name: "Glacio", image: "" },
-        { name: "Havoc", image: "" },
-        { name: "Spectro", image: "" }
+        { name: "Aero", image: "images/elements/aero.webp" },
+        { name: "Electro", image: "images/elements/electro.webp" },
+        { name: "Fusion", image: "images/elements/fusion.webp" },
+        { name: "Glacio", image: "images/elements/glacio.webp" },
+        { name: "Havoc", image: "images/elements/havoc.webp" },
+        { name: "Spectro", image: "images/elements/spectro.webp" }
     ];
-
 
     const resonators = [
         {
             name: "Augusta",
             color1: '#861B01',
             color2: '#603827',
-            profile: "images\resonators\augusta.webp",
-            background: "images\backgrounds\augusta-splash.webp",
+            profile: "images/resonators/augusta.webp",
+            background: "images/backgrounds/augusta-splash.webp",
             element: elements[1],
             weaponType: "Broadblade",
-            stats: {
-                hp: 10300,
-                atk: 518,
-                def: 1112,
-                er: 100,
-                cr: 13,
-                cd: 150,
-                basicdmg: 0,
-                skilldmg: 0,
-                heavydmg: 0,
-                libdmg: 0,
-                aerodmg: 0,
-                electrodmg: 0,
-                fusiondmg: 0,
-                glaciodmg: 0,
-                havocdmg: 0,
-                spectrodmg: 0,
-                healing: 0,
-            },
         },
         {
             name: "Carlotta",
             color1: '#AA01A4',
             color2: '#6D6D6D',
-            profile: "images\resonators\carlotta.webp",
-            background: "images\backgrounds\carlotta-splash.webp",
+            profile: "images/resonators/carlotta.webp",
+            background: "images/backgrounds/carlotta-splash.webp",
             element: elements[3],
             weaponType: "Pistols",
-            stats: {
-                hp: 12450,
-                atk: 518,
-                def: 1198,
-                er: 100,
-                cr: 13,
-                cd: 150,
-                basicdmg: 0,
-                skilldmg: 0,
-                heavydmg: 0,
-                libdmg: 0,
-                aerodmg: 0,
-                electrodmg: 0,
-                fusiondmg: 0,
-                glaciodmg: 0,
-                havocdmg: 0,
-                spectrodmg: 0,
-                healing: 0,
-            },
-
         },
         {
             name: "Phrolova",
             color1: '#860124',
             color2: '#602738',
-            profile: "images\resonators\phrolova.webp",
-            background: "images\backgrounds\phrolova-splash.webp",
-            element: elements[3],
+            profile: "images/resonators/phrolova.webp",
+            background: "images/backgrounds/phrolova-splash.webp",
+            element: elements[4],
             weaponType: "Rectifier",
-            stats: {
-                hp: 10775,
-                atk: 490,
-                def: 1137,
-                er: 100,
-                cr: 13,
-                cd: 150,
-                basicdmg: 0,
-                skilldmg: 0,
-                heavydmg: 0,
-                libdmg: 0,
-                aerodmg: 0,
-                electrodmg: 0,
-                fusiondmg: 0,
-                glaciodmg: 0,
-                havocdmg: 0,
-                spectrodmg: 0,
-                healing: 0,
-            },
         },
         {
             name: "Shorekeeper",
             color1: '#011AAA',
             color2: '#5A5341',
-            profile: "images\resonators\shorekeeper.webp",
-            background: "images\backgrounds\shorekeeper-splash.webp",
-            element: elements[3],
+            profile: "images/resonators/shorekeeper.webp",
+            background: "images/backgrounds/shorekeeper-splash.webp",
+            element: elements[5],
             weaponType: "Rectifier",
-            stats: {
-                hp: 18718,
-                atk: 288,
-                def: 1100,
-                er: 100,
-                cr: 5,
-                cd: 150,
-                basicdmg: 0,
-                skilldmg: 0,
-                heavydmg: 0,
-                libdmg: 0,
-                aerodmg: 0,
-                electrodmg: 0,
-                fusiondmg: 0,
-                glaciodmg: 0,
-                havocdmg: 0,
-                spectrodmg: 0,
-                healing: 12,
-            },
         },
-    ]
-
+    ];
 
     const charNameElement = document.getElementById("charName");
     const characterDropdown = document.getElementById("characterDropdown");
     const bgImg = document.querySelector(".resonator-bg");
+    const profileImg = document.querySelector(".details-profile");
+    const elementImg = document.querySelector(".details-icon");
+    const elementName = document.querySelector(".details-content h2");
 
-    // Populate character dropdown
+    // Helper function to convert hex to rgb
+    function hexToRgb(hex) {
+        hex = hex.replace(/^#/, "");
+        const bigint = parseInt(hex, 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return `${r}, ${g}, ${b}`;
+    }
+
+    // Function to show placeholder
+    function showPlaceholder() {
+        bgImg.src = "images/backgrounds/placeholder-background.webp";
+        bgImg.alt = "Placeholder Background";
+        bgImg.classList.add("placeholder"); // grayscale via CSS
+
+        profileImg.style.opacity = 0;
+        profileImg.style.display = "none";
+        profileImg.removeAttribute("src");
+        profileImg.removeAttribute("alt");
+
+        charNameElement.textContent = "Select Resonator";
+
+        elementImg.style.display = "none";
+        elementImg.removeAttribute("src"); // clears the image
+        elementImg.removeAttribute("alt");
+        elementName.textContent = "-";       // placeholder text
+
+        // Reset colors
+        document.documentElement.style.setProperty("--color1", "#484848");
+        document.documentElement.style.setProperty("--color2", "#373737");
+        document.documentElement.style.setProperty("--color1-rgb", "72, 72, 72");
+        document.documentElement.style.setProperty("--color2-rgb", "55, 55, 55");
+    }
+
+    // Populate dropdown
     resonators.forEach((char, index) => {
         const option = document.createElement("option");
         option.value = index;
@@ -171,49 +131,45 @@ document.addEventListener("DOMContentLoaded", () => {
         characterDropdown.appendChild(option);
     });
 
-    function hexToRgb(hex) {
-        // Remove #
-        hex = hex.replace(/^#/, "");
+    // Initial load
+    showPlaceholder();
 
-        let bigint = parseInt(hex, 16);
-        let r = (bigint >> 16) & 255;
-        let g = (bigint >> 8) & 255;
-        let b = bigint & 255;
-
-        return `${r}, ${g}, ${b}`;
-    }
-
-    // Change background when a character is selected
+    // Handle character selection
     characterDropdown.addEventListener("change", (e) => {
         const charIndex = e.target.value;
         if (charIndex === "") {
-            bgImg.src = "";
-            bgImg.alt = "No character selected";
-            charNameElement.textContent = "";
-            document.documentElement.style.setProperty("--color1", "#484848");
-            document.documentElement.style.setProperty("--color2", "#373737");
-            document.documentElement.style.setProperty("--color1-rgb", "72, 72, 72");
-            document.documentElement.style.setProperty("--color2-rgb", "55, 55, 55");
+            showPlaceholder();
             return;
         }
 
         const char = resonators[charIndex];
 
-        // Update background
+        // Background
+        bgImg.classList.remove("placeholder");
         bgImg.src = char.background;
         bgImg.alt = `${char.name} Background`;
 
-        // Update name
+        // Profile image fade-in
+        profileImg.style.display = "block";
+        profileImg.src = char.profile;
+        profileImg.alt = `${char.name} Profile`;
+        profileImg.style.transition = "opacity 0.5s ease";
+        setTimeout(() => profileImg.style.opacity = 1, 50);
+
+        // Name
         charNameElement.textContent = char.name;
 
-        // Update hex colors
+        //Element
+        elementImg.style.display = "block";
+        elementImg.src = char.element.image || ""; // Set image (empty if none)
+        elementImg.alt = char.element.name || "Element";
+
+        elementName.textContent = char.element.name || ""; // Set element name
+
+        // Update colors
         document.documentElement.style.setProperty("--color1", char.color1);
         document.documentElement.style.setProperty("--color2", char.color2);
-
-        // Update rgb colors
-        const rgb1 = hexToRgb(char.color1);
-        const rgb2 = hexToRgb(char.color2);
-        document.documentElement.style.setProperty("--color1-rgb", rgb1);
-        document.documentElement.style.setProperty("--color2-rgb", rgb2);
+        document.documentElement.style.setProperty("--color1-rgb", hexToRgb(char.color1));
+        document.documentElement.style.setProperty("--color2-rgb", hexToRgb(char.color2));
     });
 });
