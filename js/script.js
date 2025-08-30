@@ -60,6 +60,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     { key: "cd", value: 48.6 }
                 ]
             },
+        ],
+        Sword: [
+            {
+                name: "Emerald of Genesis", image: "images/weapons/emerald-of-genesis.webp", stats: [
+                    { key: "atk", value: 587 },
+                    { key: "cr", value: 24.3 }
+                ]
+            },
         ]
     };
 
@@ -152,6 +160,21 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         },
         {
+            name: "Danjin", color1: "#860124", color2: "#AA01A4",
+            profile: "images/resonators/danjin.webp",
+            background: "images/backgrounds/danjin-splash.jpg",
+            element: elements[4], weaponType: "Sword", rarity: 1, tier: 1,
+            minorFortes: [
+                { key: "atkp", value: 12 },
+                { key: "havocdmg", value: 12 },
+            ],
+            stats: {
+                hp: 9438, atk: 263, def: 1149, er: 100, cr: 5, cd: 150,
+                basicdmg: 0, skilldmg: 0, heavydmg: 0, libdmg: 0,
+                aerodmg: 0, electrodmg: 0, fusiondmg: 0, glaciodmg: 0, havocdmg: 0, spectrodmg: 0, healing: 0
+            }
+        },
+        {
             name: "Phrolova", color1: "#860124", color2: "#602738",
             profile: "images/resonators/phrolova.webp",
             background: "images/backgrounds/phrolova-splash.webp",
@@ -213,6 +236,31 @@ document.addEventListener("DOMContentLoaded", () => {
         const b = bigint & 255;
         return `${r}, ${g}, ${b}`;
     }
+
+    // Chevron helpers
+    function createChevronSVG() {
+        const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("viewBox", "0 0 24 24");
+        svg.setAttribute("class", "chevron");
+        svg.setAttribute("aria-hidden", "true");
+        svg.innerHTML = `<path d="M6 9l6 6 6-6" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+        return svg;
+    }
+    function setupChevron(selectedEl) {
+        if (!selectedEl) return { label: null, chevron: null };
+        let label = selectedEl.querySelector(".dropdown-label");
+        let chevron = selectedEl.querySelector(".chevron");
+        if (label && chevron) return { label, chevron };
+
+        label = document.createElement("div");
+        label.className = "dropdown-label";
+        while (selectedEl.firstChild) label.appendChild(selectedEl.firstChild);
+        chevron = createChevronSVG();
+        selectedEl.appendChild(label);
+        selectedEl.appendChild(chevron);
+        return { label, chevron };
+    }
+
     // Which weapon stat keys should show a '%' suffix
     const WEAPON_PERCENT_KEYS = ["atkp", "hpp", "defp", "cr", "cd", "er"];
 
@@ -243,18 +291,14 @@ document.addEventListener("DOMContentLoaded", () => {
         for (const { key, value } of bonuses) {
             if (typeof value !== "number") continue;
 
-            // flat base adds (counted inside the multiplicative bracket)
             if (key === "atk" || key === "hp" || key === "def") {
                 prePctFlat[key] += value;
                 continue;
             }
-            // percent-to-base (e.g., atkp -> atk, hpp -> hp)
             if (PERCENT_TO_BASE[key]) {
                 pctSum[PERCENT_TO_BASE[key]] += value;
                 continue;
             }
-            // additive percent stats tracked in UI (CR/CD/ER/DMG bonuses/Healing)
-            // only add if 'out' carries that key (so we don't invent keys)
             if (key in out) {
                 out[key] += value;
             }
@@ -265,17 +309,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const base = normalizedBaseStats(char);
         const out = { ...base };
 
-        // accumulate flat contributions (go inside multiplicative bracket) and % sums
         const prePctFlat = { atk: 0, hp: 0, def: 0 };
         const pctSum = { atk: 0, hp: 0, def: 0 };
 
-        // 1) apply minor fortes
         applyBonusArray(char?.minorFortes, prePctFlat, pctSum, out);
-
-        // 2) apply weapon stats
         applyBonusArray(weapon?.stats, prePctFlat, pctSum, out);
 
-        // 3) apply % to (base + flat)
         out.atk = Math.round((base.atk + prePctFlat.atk) * (1 + pctSum.atk / 100));
         out.hp = Math.round((base.hp + prePctFlat.hp) * (1 + pctSum.hp / 100));
         out.def = Math.round((base.def + prePctFlat.def) * (1 + pctSum.def / 100));
@@ -283,12 +322,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return out;
     }
 
-    // feed merged to your existing UI updater
     function renderMainStatsFrom(char, weaponOrNull) {
         const merged = computeStatsWithBonuses(char, weaponOrNull);
         updateStats({ ...char, stats: merged });
     }
-
 
     // --- DOM refs -------------------------------------------------------------
     const charNameElement = document.getElementById("charName");
@@ -309,14 +346,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const weaponDropdownOptions = document.getElementById("weaponDropdownOptions");
     const weaponDropdownHidden = document.getElementById("weaponDropdown");
 
-    // These are optional (guarded below if you removed the big weapon header)
     const weaponImg = document.querySelector(".resonator-weapon__img");
     const weaponName = document.querySelector(".weapon-details h3");
     const weaponStats = document.querySelector(".weapon-stats");
 
+    // --- Setup chevrons on both selected headers ------------------------------
+    const characterSelectedUI = setupChevron(dropdownSelected);
+    const weaponSelectedUI = setupChevron(weaponDropdownSelected);
 
     function initStatIcons() {
-        // Set icons for all fixed stats (HP/ATK/DEF/…)
         Object.keys(statIds).forEach(key => {
             const valueEl = document.getElementById(statIds[key]);
             if (!valueEl) return;
@@ -328,11 +366,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // Elemental row default (until a resonator is selected)
         const elemIconEl = document.getElementById("stat-elemental-icon");
         const elemNameEl = document.getElementById("stat-elemental-name");
         if (elemIconEl) {
-            elemIconEl.src = "images/stats/unknown.png"; // or a neutral element icon you have
+            elemIconEl.src = "images/stats/unknown.png";
             elemIconEl.alt = "Element";
         }
         if (elemNameEl) {
@@ -342,15 +379,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Weapon details grid controls ----------------------------------------
     function clearWeaponDetailsGrid() {
-        // Hide the entire grid so it takes no space
         const grid = document.getElementById("weaponDetailsGrid");
         if (grid) grid.style.display = "none";
 
-        // Show the placeholder
         const ph = document.getElementById("weaponDetailsPlaceholder");
         if (ph) ph.style.display = "block";
 
-        // (Optional) also clear the inner tiles, in case you keep them around
         ["1", "2"].forEach(i => {
             const wrap = document.getElementById(`weaponStat${i}`);
             const icon = document.getElementById(`weaponStat${i}Icon`);
@@ -367,13 +401,11 @@ document.addEventListener("DOMContentLoaded", () => {
         clearWeaponDetailsGrid();
         if (!weapon || !Array.isArray(weapon.stats) || weapon.stats.length === 0) return;
 
-        // Show grid, hide placeholder
         const grid = document.getElementById("weaponDetailsGrid");
         const ph = document.getElementById("weaponDetailsPlaceholder");
         if (grid) grid.style.display = "grid";
         if (ph) ph.style.display = "none";
 
-        // Fill stat 1
         const s1 = weapon.stats[0];
         if (s1) {
             const wrap = document.getElementById("weaponStat1");
@@ -386,7 +418,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (value) value.textContent = formatWeaponStatValue(s1.key, s1.value);
         }
 
-        // Fill stat 2
         const s2 = weapon.stats[1];
         if (s2) {
             const wrap = document.getElementById("weaponStat2");
@@ -401,7 +432,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function populateWeaponDetails(weapon) {
-        // Optional header (guarded)
         if (weaponImg) { weaponImg.src = weapon.image; weaponImg.alt = weapon.name; }
         if (weaponName) { weaponName.textContent = weapon.name; }
 
@@ -430,16 +460,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         weaponDropdownHidden.innerHTML = "";
         weaponDropdownOptions.innerHTML = "";
-        weaponDropdownSelected.textContent = "Select Weapon";
+
+        // Set the selected label text (keeps chevron)
+        if (weaponSelectedUI.label) {
+            weaponSelectedUI.label.innerHTML = "<span>Select Weapon</span>";
+        }
 
         availableWeapons.forEach((weapon, index) => {
-            // hidden <select> option (for logic)
             const option = document.createElement("option");
             option.value = index;
             option.textContent = weapon.name;
             weaponDropdownHidden.appendChild(option);
 
-            // custom option
             const optionDiv = document.createElement("div");
             optionDiv.classList.add("dropdown-option");
             optionDiv.dataset.index = index;
@@ -456,14 +488,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
             optionDiv.addEventListener("click", (ev) => {
                 ev.stopPropagation();
-                weaponDropdownSelected.innerHTML = "";
-                const selectedImg = img.cloneNode();
-                const selectedSpan = document.createElement("span");
-                selectedSpan.textContent = weapon.name;
-                weaponDropdownSelected.appendChild(selectedImg);
-                weaponDropdownSelected.appendChild(selectedSpan);
+
+                if (weaponSelectedUI.label) {
+                    weaponSelectedUI.label.innerHTML = "";
+                    const selectedImg = img.cloneNode();
+                    const selectedSpan = document.createElement("span");
+                    selectedSpan.textContent = weapon.name;
+                    weaponSelectedUI.label.appendChild(selectedImg);
+                    weaponSelectedUI.label.appendChild(selectedSpan);
+                }
 
                 weaponDropdownOptions.classList.add("hidden");
+                weaponDropdownSelected.classList.remove("open");
 
                 weaponDropdownHidden.value = index;
                 weaponDropdownHidden.dispatchEvent(new Event("change"));
@@ -472,7 +508,6 @@ document.addEventListener("DOMContentLoaded", () => {
             weaponDropdownOptions.appendChild(optionDiv);
         });
 
-        // Do NOT auto-select the first weapon; keep grid cleared until user picks
         clearWeaponDetailsGrid();
     }
 
@@ -480,13 +515,24 @@ document.addEventListener("DOMContentLoaded", () => {
     weaponDropdownSelected.addEventListener("click", (e) => {
         e.stopPropagation();
         weaponDropdownOptions.classList.toggle("hidden");
+        weaponDropdownSelected.classList.toggle("open");
     });
+
+    dropdownSelected.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dropdownOptions.classList.toggle("hidden");
+        dropdownSelected.classList.toggle("open");
+    });
+
+    // Close both on outside click
     document.addEventListener("click", () => {
         weaponDropdownOptions.classList.add("hidden");
+        dropdownOptions.classList.add("hidden");
+        weaponDropdownSelected.classList.remove("open");
+        dropdownSelected.classList.remove("open");
     });
 
     initStatIcons();
-    showPlaceholder();
 
     // --- Stats + placeholder --------------------------------------------------
     function showPlaceholder() {
@@ -521,16 +567,20 @@ document.addEventListener("DOMContentLoaded", () => {
         document.documentElement.style.setProperty("--color1-rgb", "72, 72, 72");
         document.documentElement.style.setProperty("--color2-rgb", "55, 55, 55");
 
-        if (dropdownSelected) dropdownSelected.innerHTML = "<span>Select your resonator</span>";
+        if (characterSelectedUI.label) {
+            characterSelectedUI.label.innerHTML = "<span>Select your resonator</span>";
+        }
+        if (weaponSelectedUI.label) {
+            weaponSelectedUI.label.innerHTML = "<span>Select Weapon</span>";
+        }
 
         clearWeaponDetailsGrid();
-        initStatIcons(); // <-- keep icons visible in placeholder state
+        initStatIcons();
     }
 
     function updateStats(char) {
         const stats = char.stats || {};
 
-        // Fill non-elemental stats
         for (const key in statIds) {
             const elemId = statIds[key];
             const statElem = document.getElementById(elemId);
@@ -550,7 +600,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // Elemental DMG (one row that changes name + icon)
         const elementKey = (char.element?.name?.toLowerCase() || "") + "dmg";
         const elemVal = stats[elementKey] || 0;
         const elemValueEl = document.getElementById("stat-elemental-value");
@@ -565,7 +614,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Resonator dropdown (custom) -----------------------------------------
-    // (Assumes you have #dropdownSelected / #dropdownOptions and a hidden #characterDropdown)
     resonators.forEach((char, index) => {
         const opt = document.createElement("option");
         opt.value = index;
@@ -581,25 +629,24 @@ document.addEventListener("DOMContentLoaded", () => {
         span.textContent = char.name;
         optDiv.appendChild(img); optDiv.appendChild(span);
         optDiv.addEventListener("click", () => {
-            dropdownSelected.innerHTML = "";
-            const selectedImg = img.cloneNode();
-            const selectedSpan = document.createElement("span");
-            selectedSpan.textContent = char.name;
-            dropdownSelected.appendChild(selectedImg);
-            dropdownSelected.appendChild(selectedSpan);
+            if (characterSelectedUI.label) {
+                characterSelectedUI.label.innerHTML = "";
+                const selectedImg = img.cloneNode();
+                const selectedSpan = document.createElement("span");
+                selectedSpan.textContent = char.name;
+                characterSelectedUI.label.appendChild(selectedImg);
+                characterSelectedUI.label.appendChild(selectedSpan);
+            }
             dropdownOptions.classList.add("hidden");
+            dropdownSelected.classList.remove("open");
             characterDropdown.value = index;
             characterDropdown.dispatchEvent(new Event("change"));
         });
         dropdownOptions.appendChild(optDiv);
     });
 
-    dropdownSelected.addEventListener("click", () => {
-        dropdownOptions.classList.toggle("hidden");
-    });
-
     // --- Selection state ------------------------------------------------------
-    let currentCharacter = null; // IMPORTANT: define once, used by weapon change
+    let currentCharacter = null;
     let currentWeapon = null;
 
     // Weapon hidden select -> details
@@ -613,7 +660,6 @@ document.addEventListener("DOMContentLoaded", () => {
         renderMainStatsFrom(currentCharacter, currentWeapon);
     });
 
-
     // Initial placeholder
     showPlaceholder();
 
@@ -626,29 +672,31 @@ document.addEventListener("DOMContentLoaded", () => {
         currentCharacter = char;
         currentWeapon = null;
 
-        // Background
         bgImg.classList.remove("placeholder");
         bgImg.src = char.background;
         bgImg.alt = `${char.name} Background`;
 
-        // Profile
         profileImg.style.display = "block";
         profileImg.src = char.profile;
         profileImg.alt = `${char.name} Profile`;
         profileImg.style.transition = "opacity 0.5s ease";
         setTimeout(() => (profileImg.style.opacity = 1), 50);
 
-        // Name
+        profileImg.classList.remove("glow-5star", "glow-4star");
+        if (char.rarity === 0) {
+            profileImg.classList.add("glow-5star");
+        } else if (char.rarity === 1) {
+            profileImg.classList.add("glow-4star");
+        }
+
         charNameElement.style.display = "block";
         charNameElement.textContent = char.name;
 
-        // Element
         elementImg.style.display = "block";
         elementImg.src = char.element.image || "";
         elementImg.alt = char.element.name || "Element";
         elementName.textContent = char.element.name || "-";
 
-        // Rarity / Tier
         const charRarity = rarity[char.rarity];
         const charTier = tier[char.tier];
         rarityImg.style.display = "block";
@@ -659,17 +707,14 @@ document.addEventListener("DOMContentLoaded", () => {
         tierImg.alt = charTier.name;
         tierName.textContent = charTier.name;
 
-        // Colors
         document.documentElement.style.setProperty("--color1", char.color1);
         document.documentElement.style.setProperty("--color2", char.color2);
         document.documentElement.style.setProperty("--color1-rgb", hexToRgb(char.color1));
         document.documentElement.style.setProperty("--color2-rgb", hexToRgb(char.color2));
 
-        // Reset weapon UI and build options for this character
         clearWeaponDetailsGrid();
         populateWeaponDropdown(char);
 
-        // Stats: show character base + minorFortes (no weapon yet)
         renderMainStatsFrom(currentCharacter, null);
     });
 });

@@ -5,6 +5,23 @@
     --color2-rgb: 55, 55, 55;
 }
 
+
+@font-face {
+    font-family: "PP Mori";
+    src: url("/fonts/PPMori-SemiBold.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "PP Neue Machina";
+    src: url("fonts/PPNeueMachina-InktrapMedium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
 body,
 html {
     margin: 0;
@@ -14,6 +31,13 @@ html {
 * {
     box-sizing: border-box;
 
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
 }
 
 html {
@@ -150,6 +174,27 @@ html {
     border-radius: 0.5rem;
     background: rgba(255, 255, 255, 0.10);
     cursor: pointer;
+}
+
+.dropdown-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    /* exactly what you asked for */
+    min-width: 0;
+    /* avoids overflow with long names */
+}
+
+.dropdown-selected .chevron {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    transition: transform .2s ease;
+}
+
+/* Flip when open */
+.dropdown-selected.open .chevron {
+    transform: rotate(180deg);
 }
 
 .dropdown-selected img {
@@ -326,10 +371,10 @@ label {
 
 .logo-text {
     color: #FFF;
-    font-family: "PP Neue Montreal";
+    font-family: "PP Neue Machina";
     font-size: 1.28569rem;
     font-style: normal;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 100%;
     /* 1.28569rem */
 }
