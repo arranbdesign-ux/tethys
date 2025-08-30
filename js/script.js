@@ -47,8 +47,8 @@ document.addEventListener("DOMContentLoaded", () => {
             name: "Augusta",
             color1: '#861B01',
             color2: '#603827',
-            profile: "",
-            background: "https://images.rpgsite.net/articles/thumbnail/da49c9a1/18074/original/wuwa-augusta-iuno-2-6-thumb.png",
+            profile: "images\resonators\augusta.webp",
+            background: "images\backgrounds\augusta-splash.webp",
             element: elements[1],
             weaponType: "Broadblade",
             stats: {
@@ -75,8 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
             name: "Carlotta",
             color1: '#AA01A4',
             color2: '#6D6D6D',
-            profile: "",
-            background: "https://pbs.twimg.com/media/GgWasGHawAA8D4l?format=jpg&name=4096x4096",
+            profile: "images\resonators\carlotta.webp",
+            background: "images\backgrounds\carlotta-splash.webp",
             element: elements[3],
             weaponType: "Pistols",
             stats: {
@@ -104,8 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
             name: "Phrolova",
             color1: '#860124',
             color2: '#602738',
-            profile: "",
-            background: "https://pbs.twimg.com/media/GtzuDRLWQAAsolO?format=jpg&name=4096x4096",
+            profile: "images\resonators\phrolova.webp",
+            background: "images\backgrounds\phrolova-splash.webp",
             element: elements[3],
             weaponType: "Rectifier",
             stats: {
@@ -132,8 +132,8 @@ document.addEventListener("DOMContentLoaded", () => {
             name: "Shorekeeper",
             color1: '#011AAA',
             color2: '#5A5341',
-            profile: "",
-            background: "https://cdn-www.bluestacks.com/bs-images/01j8pxjwp99h55vn3a3k.webp",
+            profile: "images\resonators\shorekeeper.webp",
+            background: "images\backgrounds\shorekeeper-splash.webp",
             element: elements[3],
             weaponType: "Rectifier",
             stats: {

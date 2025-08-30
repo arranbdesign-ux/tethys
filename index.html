@@ -61,6 +61,16 @@
             <div class="main">
                 <!-- Left Dash -->
                 <section class="left">
+                    <!-- Resonator Dropdown -->
+                    <div class="saved">
+                        <h1>Saved Builds</h1>
+                        <div class="saved-list">
+                            <!-- Resonator Item -->
+                            <select id="characterDropdown">
+                                <option value="">Select Resonator</option>
+                            </select>
+                        </div>
+                    </div>
                     <!-- Resonator Details -->
                     <div class="details">
                         <h1>Resonator Details</h1>
@@ -112,24 +122,47 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Resonator Builds -->
-                    <div class="saved">
-                        <h1>Saved Builds</h1>
-                        <div class="saved-list">
-                            <!-- Resonator Item -->
-                            <div class="saved-item">
-                                <div class="saved-item__header">
-                                    <img class="saved-item__profile" src="ling.png">
-                                    <h2>Lingyang</h2>
+                    <!-- Resonator Weapon -->
+                    <div class="details-weapon">
+                        <!-- Weapon Stats -->
+                        <h1>Resonator Weapon</h1>
+                        <div class="resonator-weapon">
+                            <img class="resonator-weapon__img" src="elegy.png">
+                            <div class="resonator-weapon__header">
+                                <div class="weapon-details">
+                                    <h3>Lethean Elegy</h3>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="0.125rem" height="0.125rem"
+                                        viewBox="0 0 2 2" fill="none">
+                                        <circle cx="1" cy="1" r="1" fill="white" fill-opacity="0.5" />
+                                    </svg>
+                                    <h3>Lvl. 90</h3>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="0.125rem" height="0.125rem"
+                                        viewBox="0 0 2 2" fill="none">
+                                        <circle cx="1" cy="1" r="1" fill="white" fill-opacity="0.5" />
+                                    </svg>
+                                    <h3>R1</h3>
+                                </div>
+                                <div class="weapon-stats">
+                                    <div class="stat-chip">
+                                        <img class="stat-icon" src="crit.png">
+                                        <h2>22%</h2>
+                                    </div>
+                                    <div class="stat-chip">
+                                        <img class="stat-icon" src="crit.png">
+                                        <h2>22%</h2>
+                                    </div>
                                 </div>
                             </div>
-                            <!-- Resonator Item -->
-                            <label for="characterDropdown">Select Character:</label>
-                            <select id="characterDropdown">
-                                <option value="">--Choose Character--</option>
-                            </select>
                         </div>
                     </div>
+                    <!-- Resonator Sequences -->
+                    <div class="details-sequences">
+                        <h1>Resonator Sequences</h1>
+                        <select id="sequencesDropdown">
+                            <option value="">Add sequences</option>
+                        </select>
+                    </div>
+
                 </section>
 
                 <!-- Middle - Main Resonator Build -->
@@ -149,35 +182,7 @@
                                         <h1>46.4</h1>
                                     </div>
                                 </div>
-                                <!-- Weapon Stats -->
-                                <div class="resonator-weapon">
-                                    <img class="resonator-weapon__img" src="elegy.png">
-                                    <div class="resonator-weapon__header">
-                                        <div class="weapon-details">
-                                            <h3>Lethean Elegy</h3>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="0.125rem" height="0.125rem"
-                                                viewBox="0 0 2 2" fill="none">
-                                                <circle cx="1" cy="1" r="1" fill="white" fill-opacity="0.5" />
-                                            </svg>
-                                            <h3>Lvl. 90</h3>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="0.125rem" height="0.125rem"
-                                                viewBox="0 0 2 2" fill="none">
-                                                <circle cx="1" cy="1" r="1" fill="white" fill-opacity="0.5" />
-                                            </svg>
-                                            <h3>R1</h3>
-                                        </div>
-                                        <div class="weapon-stats">
-                                            <div class="stat-chip">
-                                                <img class="stat-icon" src="crit.png">
-                                                <h2>22%</h2>
-                                            </div>
-                                            <div class="stat-chip">
-                                                <img class="stat-icon" src="crit.png">
-                                                <h2>22%</h2>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+
                             </div>
                             <!-- All Calculated Stats -->
                             <div class="resonator-stats">

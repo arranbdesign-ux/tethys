@@ -1,3 +1,10 @@
+:root {
+    --color1: #484848;
+    --color2: #373737;
+    --color1-rgb: 72, 72, 72;
+    --color2-rgb: 55, 55, 55;
+}
+
 body,
 html {
     margin: 0;
@@ -29,6 +36,52 @@ html {
     html {
         font-size: calc(0.7494769874476988rem + 0.8368200836820083vw);
     }
+}
+
+#characterDropdown {
+    display: flex;
+    height: 4rem;
+    padding: 0.5rem 0.75rem;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    font-size: 1rem;
+    color: #FFF;
+    border-radius: 0.5rem;
+    background: linear-gradient(to right,
+            rgba(var(--color1-rgb, 134, 27, 1), 0.9),
+            rgba(var(--color2-rgb, 96, 56, 39), 0.9));
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    /* removes the native arrow on most browsers */
+}
+
+#characterDropdown option {
+    background-color: #222;
+    color: #fff;
+}
+
+#sequencesDropdown {
+    display: flex;
+    height: 4rem;
+    padding: 0.5rem 0.75rem;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+    font-size: 1rem;
+    color: #FFF;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.10);
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    /* removes the native arrow on most browsers */
+}
+
+#sequencesDropdown option {
+    background-color: #222;
+    color: #fff;
 }
 
 h1,
@@ -214,18 +267,17 @@ label {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    align-self: stretch;
 }
 
 .details-profile {
-    width: 3rem;
-    height: 3rem;
+    width: 1.5rem;
+    height: 1.5rem;
 }
 
 .details-name {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.5rem;
 }
 
@@ -245,12 +297,10 @@ label {
 
 .details-item {
     display: flex;
-    width: 8.03125rem;
-    height: 2.5rem;
-    padding: 0.25rem;
     align-items: center;
     gap: 0.5rem;
-    flex-shrink: 0;
+    flex: 1 0 0;
+    align-self: stretch;
     border-radius: 0.5rem;
     background: rgba(255, 255, 255, 0.10);
 }
@@ -279,6 +329,28 @@ label {
     justify-content: center;
     align-items: flex-start;
     gap: 0.25rem;
+}
+
+.details-weapon {
+    display: flex;
+    width: 18.5625rem;
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.details-sequences {
+    display: flex;
+    width: 18.5625rem;
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.10);
 }
 
 .saved {
@@ -400,11 +472,11 @@ label {
 
 .resonator-weapon {
     display: flex;
-    height: 3.625rem;
+    height: 4rem;
     padding: 0.5rem;
     align-items: center;
     gap: 0.5rem;
-    flex: 1 0 0;
+    align-self: stretch;
     border-radius: 0.5rem;
     background: rgba(0, 0, 0, 0.30);
     backdrop-filter: blur(16px);
