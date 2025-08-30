@@ -320,8 +320,8 @@ label {
 }
 
 .details-icon {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 2rem;
+    height: 2rem;
     flex-shrink: 0;
     aspect-ratio: 1/1;
 }
