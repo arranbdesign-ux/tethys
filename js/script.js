@@ -45,7 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const resonators = [
         {
             name: "Augusta",
-            color: '#861B01',
+            color1: '#861B01',
+            color2: '#603827',
             profile: "",
             background: "https://images.rpgsite.net/articles/thumbnail/da49c9a1/18074/original/wuwa-augusta-iuno-2-6-thumb.png",
             element: elements[1],
@@ -72,7 +73,8 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         {
             name: "Carlotta",
-            color: '#AA01A4',
+            color1: '#AA01A4',
+            color2: '#6D6D6D',
             profile: "",
             background: "https://pbs.twimg.com/media/GgWasGHawAA8D4l?format=jpg&name=4096x4096",
             element: elements[3],
@@ -100,7 +102,8 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         {
             name: "Phrolova",
-            color: '#860124',
+            color1: '#860124',
+            color2: '#602738',
             profile: "",
             background: "https://pbs.twimg.com/media/GtzuDRLWQAAsolO?format=jpg&name=4096x4096",
             element: elements[3],
@@ -127,7 +130,8 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         {
             name: "Shorekeeper",
-            color: '#011AAA',
+            color1: '#011AAA',
+            color2: '#5A5341',
             profile: "",
             background: "https://cdn-www.bluestacks.com/bs-images/01j8pxjwp99h55vn3a3k.webp",
             element: elements[3],
@@ -174,13 +178,22 @@ document.addEventListener("DOMContentLoaded", () => {
             bgImg.src = ""; // clear background if none selected
             bgImg.alt = "No character selected";
             charNameElement.textContent = ""; // clear name if nothing selected
+            document.documentElement.style.setProperty("--color1", "#484848");
+            document.documentElement.style.setProperty("--color2", "#373737");
             return;
         }
 
         const char = resonators[charIndex];
+
+        // Update background
         bgImg.src = char.background;
         bgImg.alt = `${char.name} Background`;
 
+        // Update name
         charNameElement.textContent = char.name;
+
+        // Update colors
+        document.documentElement.style.setProperty("--color1", char.color);
+        document.documentElement.style.setProperty("--color2", char.color);
     });
 });
