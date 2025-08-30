@@ -63,12 +63,12 @@
                 <section class="left">
                     <!-- Resonator Dropdown -->
                     <div class="saved">
-                        <h1>Saved Builds</h1>
+                        <h1>Resonator</h1>
                         <div class="saved-list">
 
                             <!-- Resonator Select -->
                             <div class="custom-dropdown" id="characterDropdownWrapper">
-                                <div class="dropdown-selected" id="dropdownSelected"> Select Resonator </div>
+                                <div class="dropdown-selected" id="dropdownSelected"> Select Your Resonator </div>
                                 <div class="dropdown-options hidden" id="dropdownOptions">
                                     <!-- Options will be populated dynamically -->
                                 </div>
@@ -94,7 +94,7 @@
                             <!-- Resonator Details Item -->
                             <div class="details-item" id="resElem">
                                 <div class="details-box">
-                                    <img class="details-icon" src="icon.png">
+                                    <img class="details-icon" src="">
                                 </div>
                                 <div class="details-content">
                                     <label>Element</label>
@@ -103,7 +103,7 @@
                             </div>
                             <div class="details-item" id="resTiers">
                                 <div class="details-box">
-                                    <img class="details-icon" src="icon.png">
+                                    <img class="details-icon" src="">
                                 </div>
                                 <div class="details-content">
                                     <label>Tier</label>
@@ -112,46 +112,55 @@
                             </div>
                         </div>
                     </div>
+
                     <!-- Resonator Weapon -->
                     <div class="details-weapon">
                         <!-- Weapon Stats -->
                         <h1>Resonator Weapon</h1>
-                        <div class="resonator-weapon">
-                            <img class="resonator-weapon__img" src="elegy.png">
-                            <div class="resonator-weapon__header">
-                                <div class="weapon-details">
-                                    <h3>Lethean Elegy</h3>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="0.125rem" height="0.125rem"
-                                        viewBox="0 0 2 2" fill="none">
-                                        <circle cx="1" cy="1" r="1" fill="white" fill-opacity="0.5" />
-                                    </svg>
-                                    <h3>Lvl. 90</h3>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="0.125rem" height="0.125rem"
-                                        viewBox="0 0 2 2" fill="none">
-                                        <circle cx="1" cy="1" r="1" fill="white" fill-opacity="0.5" />
-                                    </svg>
-                                    <h3>R1</h3>
+                        <div class="custom-dropdown" id="weaponDropdownWrapper">
+                            <div class="dropdown-selected" id="weaponDropdownSelected">Select Weapon</div>
+                            <div class="dropdown-options hidden" id="weaponDropdownOptions">
+                                <!-- Weapon options will be populated dynamically -->
+                            </div>
+                        </div>
+                        <!-- Hidden select for logic (optional) -->
+                        <select id="weaponDropdown" class="hidden"></select>
+                    </div>
+
+                    <!-- Weapon Details -->
+                    <div class="details" id="weaponDetails">
+                        <h1>Weapon Details</h1>
+
+                        <div class="details-grid" id="weaponDetailsGrid">
+                            <!-- Stat 1 -->
+                            <div class="details-item" id="weaponStat1">
+                                <div class="details-box">
+                                    <img class="details-icon" id="weaponStat1Icon" src="" alt="">
                                 </div>
-                                <div class="weapon-stats">
-                                    <div class="stat-chip">
-                                        <img class="stat-icon" src="crit.png">
-                                        <h2>22%</h2>
-                                    </div>
-                                    <div class="stat-chip">
-                                        <img class="stat-icon" src="crit.png">
-                                        <h2>22%</h2>
-                                    </div>
+                                <div class="details-content">
+                                    <label id="weaponStat1Label">—</label>
+                                    <h2 id="weaponStat1Value">—</h2>
+                                </div>
+                            </div>
+
+                            <!-- Stat 2 -->
+                            <div class="details-item" id="weaponStat2">
+                                <div class="details-box">
+                                    <img class="details-icon" id="weaponStat2Icon" src="" alt="">
+                                </div>
+                                <div class="details-content">
+                                    <label id="weaponStat2Label">—</label>
+                                    <h2 id="weaponStat2Value">—</h2>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Optional: a small placeholder when nothing is selected -->
+                        <p id="weaponDetailsPlaceholder">Select a weapon to see
+                            its details.</p>
                     </div>
-                    <!-- Resonator Sequences -->
-                    <div class="details-sequences">
-                        <h1>Resonator Sequences</h1>
-                        <select id="sequencesDropdown">
-                            <option value="">Add sequences</option>
-                        </select>
-                    </div>
+
+
 
                 </section>
 
@@ -177,95 +186,112 @@
                             <!-- All Calculated Stats -->
                             <div class="resonator-stats">
 
-                                <div class="resonator-stat">
+                                <!-- HP -->
+                                <div class="resonator-stat" id="stat-hp-wrapper">
                                     <div class="stat-chip">
-                                        <img class="stat-icon"
-                                            src="https://static.wikia.nocookie.net/wutheringwaves/images/5/56/Icon_Attribute_Health.png/revision/latest?cb=20240524151945">
-                                        <h2>HP</h2>
+                                        <img class="stat-icon" src="">
+                                        <h2 class="stat-name">HP</h2>
                                     </div>
-                                    <h2>6.4%</h2>
+                                    <h2 id="stat-hp"></h2>
                                 </div>
-                                <div class="resonator-stat">
+
+                                <!-- Skill Dmg -->
+                                <div class="resonator-stat" id="stat-skilldmg-wrapper">
                                     <div class="stat-chip">
-                                        <img class="stat-icon" src="crit.png">
-                                        <h2>Res. Skill DMG</h2>
+                                        <img class="stat-icon" src="">
+                                        <h2 class="stat-name">Res. Skill DMG</h2>
                                     </div>
-                                    <h2>6.4%</h2>
+                                    <h2 id="stat-skilldmg"></h2>
                                 </div>
-                                <div class="resonator-stat">
+
+                                <!-- ATK -->
+                                <div class="resonator-stat" id="stat-atk-wrapper">
                                     <div class="stat-chip">
-                                        <img class="stat-icon"
-                                            src="https://static.wikia.nocookie.net/wutheringwaves/images/7/71/Icon_Attribute_Attack.png/revision/latest?cb=20240524152004">
-                                        <h2>ATK</h2>
+                                        <img class="stat-icon" src="">
+                                        <h2 class="stat-name">ATK</h2>
                                     </div>
-                                    <h2>6.4%</h2>
+                                    <h2 id="stat-atk"></h2>
                                 </div>
-                                <div class="resonator-stat">
+
+                                <!-- Basic Dmg -->
+                                <div class="resonator-stat" id="stat-basicdmg-wrapper">
                                     <div class="stat-chip">
-                                        <img class="stat-icon" src="crit.png">
+                                        <img class="stat-icon" src="">
                                         <h2>Basic Attack DMG</h2>
                                     </div>
-                                    <h2>6.4%</h2>
+                                    <h2 id="stat-basicdmg"></h2>
                                 </div>
-                                <div class="resonator-stat">
+
+                                <!-- DEF -->
+                                <div class="resonator-stat" id="stat-def-wrapper">
                                     <div class="stat-chip">
-                                        <img class="stat-icon"
-                                            src="https://static.wikia.nocookie.net/wutheringwaves/images/8/82/Icon_Attribute_Defense.png/revision/latest?cb=20240524152031">
-                                        <h2>DEF</h2>
+                                        <img class="stat-icon" src="">
+                                        <h2 class="stat-name">DEF</h2>
                                     </div>
-                                    <h2>6.4%</h2>
+                                    <h2 id="stat-def"></h2>
                                 </div>
-                                <div class="resonator-stat">
+
+                                <!-- Heavy Dmg -->
+                                <div class="resonator-stat" id="stat-heavydmg-wrapper">
                                     <div class="stat-chip">
-                                        <img class="stat-icon" src="crit.png">
-                                        <h2>Heavy Attack DMG</h2>
+                                        <img class="stat-icon" src="">
+                                        <h2 class="stat-name">Heavy Attack DMG</h2>
                                     </div>
-                                    <h2>6.4%</h2>
+                                    <h2 id="stat-heavydmg"></h2>
                                 </div>
-                                <div class="resonator-stat">
+
+                                <!-- Energy Regen -->
+                                <div class="resonator-stat" id="stat-er-wrapper">
                                     <div class="stat-chip">
-                                        <img class="stat-icon"
-                                            src="https://static.wikia.nocookie.net/wutheringwaves/images/3/39/Icon_Attribute_Energy_Regen.png/revision/latest?cb=20240524152214">
-                                        <h2>Energy Regen</h2>
+                                        <img class="stat-icon" src="">
+                                        <h2 class="stat-name">Energy Regen</h2>
                                     </div>
-                                    <h2>6.4%</h2>
+                                    <h2 id="stat-er"></h2>
                                 </div>
-                                <div class="resonator-stat">
+
+                                <!-- Lib Dmg -->
+                                <div class="resonator-stat" id="stat-libdmg-wrapper">
                                     <div class="stat-chip">
-                                        <img class="stat-icon" src="crit.png">
-                                        <h2>Res. Liberation DMG</h2>
+                                        <img class="stat-icon" src="">
+                                        <h2 class="stat-name">Res. Liberation DMG</h2>
                                     </div>
-                                    <h2>6.4%</h2>
+                                    <h2 id="stat-libdmg"></h2>
                                 </div>
-                                <div class="resonator-stat">
+
+                                <!-- Crit Rate -->
+                                <div class="resonator-stat" id="stat-cr-wrapper">
                                     <div class="stat-chip">
-                                        <img class="stat-icon"
-                                            src="https://static.wikia.nocookie.net/wutheringwaves/images/6/6a/Icon_Attribute_Crit_Rate.png/revision/latest?cb=20240524152130">
-                                        <h2>Crit Rate</h2>
+                                        <img class="stat-icon" src="">
+                                        <h2 class="stat-name">Crit Rate</h2>
                                     </div>
-                                    <h2>6.4%</h2>
+                                    <h2 id="stat-cr"></h2>
                                 </div>
-                                <div class="resonator-stat">
+
+                                <!-- Elem Dmg -->
+                                <div class="resonator-stat" id="stat-elemental-wrapper">
                                     <div class="stat-chip">
-                                        <img class="stat-icon" src="crit.png">
-                                        <h2>Havoc DMG Bonus</h2>
+                                        <img class="stat-icon" id="stat-elemental-icon" src="">
+                                        <h2 class="stat-name" id="stat-elemental-name">DMG</h2>
                                     </div>
-                                    <h2>6.4%</h2>
+                                    <h2 class="stat-value" id="stat-elemental-value"></h2>
                                 </div>
-                                <div class="resonator-stat">
+
+                                <!-- Crit Damage -->
+                                <div class="resonator-stat" id="stat-cd-wrapper">
                                     <div class="stat-chip">
-                                        <img class="stat-icon"
-                                            src="https://static.wikia.nocookie.net/wutheringwaves/images/7/7a/Icon_Attribute_Crit_DMG.png/revision/latest?cb=20240524152151">
-                                        <h2>Crit DMG</h2>
+                                        <img class="stat-icon" src="">
+                                        <h2 class="stat-name">Crit DMG</h2>
                                     </div>
-                                    <h2>6.4%</h2>
+                                    <h2 id="stat-cd"></h2>
                                 </div>
-                                <div class="resonator-stat">
+
+                                <!-- Healing Bonus -->
+                                <div class="resonator-stat" id="stat-healing-wrapper">
                                     <div class="stat-chip">
-                                        <img class="stat-icon" src="crit.png">
-                                        <h2>Healing Bonus</h2>
+                                        <img class="stat-icon" src="">
+                                        <h2 class="stat-name">Healing Bonus</h2>
                                     </div>
-                                    <h2>6.4%</h2>
+                                    <h2 id="stat-healing"></h2>
                                 </div>
 
                             </div>

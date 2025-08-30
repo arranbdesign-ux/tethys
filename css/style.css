@@ -84,26 +84,77 @@ html {
     color: #fff;
 }
 
+#weaponDropdownWrapper {
+    position: relative;
+}
+
+#weaponDropdownOptions {
+    position: absolute;
+    top: auto;
+    /* override any default */
+    bottom: 100%;
+    /* open upwards */
+    margin-top: 0;
+    margin-bottom: 5px;
+    /* spacing between selected and options */
+    width: 100%;
+    max-height: 24rem;
+    overflow-y: auto;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(32px);
+    z-index: 10;
+}
+
+#weaponDetailsPlaceholder {
+    display: block;
+    color: #fff;
+    font-family: "PP Mori";
+    width: 100%;
+    justify-content: center;
+    opacity: 0.8;
+    margin-top: 0.75rem;
+    padding: 1rem;
+    border: 2px dashed rgba(255, 255, 255, 0.5);
+    border-radius: 0.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.05);
+    /* subtle background so it looks like a box */
+}
+
+#weaponDetailsGrid {
+    display: none;
+    /* shown as grid when weapon selected */
+}
+
 .custom-dropdown {
     position: relative;
-    width: 250px;
-    font-family: sans-serif;
+    width: 100%;
+    font-family: "PP Mori";
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 100%;
+    /* 0.875rem */
+    color: #FFF;
 }
 
 .dropdown-selected {
-    background: #222;
-    color: #fff;
-    padding: 10px;
-    border-radius: 8px;
-    cursor: pointer;
     display: flex;
+    height: 4rem;
+    padding: 0.5rem 0.75rem;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    align-self: stretch;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.10);
+    cursor: pointer;
 }
 
 .dropdown-selected img {
-    width: 40px;
-    height: 40px;
+    width: 3rem;
+    height: 3rem;
     border-radius: 50%;
     object-fit: cover;
 }
@@ -113,32 +164,33 @@ html {
     top: 100%;
     left: 0;
     width: 100%;
-    background: #333;
-    border-radius: 8px;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.10);
     margin-top: 5px;
-    max-height: 200px;
+    max-height: 24rem;
     overflow-y: auto;
     z-index: 10;
+    backdrop-filter: blur(32px);
 }
 
 .dropdown-option {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px;
+    gap: 0.75rem;
+    padding: 1rem;
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .dropdown-option img {
-    width: 40px;
-    height: 40px;
+    width: 2.5rem;
+    height: 2.5rem;
     border-radius: 50%;
     object-fit: cover;
 }
 
 .dropdown-option:hover {
-    background: #555;
+    background: rgba(255, 255, 255, 0.20);
 }
 
 .hidden {
@@ -203,7 +255,7 @@ h3 {
 
 label {
     color: rgba(255, 255, 255, 0.40);
-    font-family: "PP Neue Machina - Inktrap Medium";
+    font-family: "PP Mori";
     font-size: 0.5625rem;
     font-style: normal;
     font-weight: 500;
@@ -428,7 +480,6 @@ label {
 
 .saved {
     display: flex;
-    overflow: hidden;
     width: 18.5625rem;
     padding: 1rem;
     flex-direction: column;
