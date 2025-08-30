@@ -171,6 +171,18 @@ document.addEventListener("DOMContentLoaded", () => {
         characterDropdown.appendChild(option);
     });
 
+    function hexToRgb(hex) {
+        // Remove #
+        hex = hex.replace(/^#/, "");
+
+        let bigint = parseInt(hex, 16);
+        let r = (bigint >> 16) & 255;
+        let g = (bigint >> 8) & 255;
+        let b = bigint & 255;
+
+        return `${r}, ${g}, ${b}`;
+    }
+
     // Change background when a character is selected
     characterDropdown.addEventListener("change", (e) => {
         const charIndex = e.target.value;
@@ -193,7 +205,11 @@ document.addEventListener("DOMContentLoaded", () => {
         charNameElement.textContent = char.name;
 
         // Update colors
-        document.documentElement.style.setProperty("--color1", char.color);
-        document.documentElement.style.setProperty("--color2", char.color);
+        document.documentElement.style.setProperty("--color1", char.color1);
+        document.documentElement.style.setProperty("--color2", char.color2);
+
+        // Update gradient color
+        const rgb = hexToRgb(char.color);
+        document.documentElement.style.setProperty("--color1-rgb", rgb);
     });
 });
