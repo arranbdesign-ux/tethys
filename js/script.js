@@ -100,22 +100,18 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     const charNameElement = document.getElementById("charName");
-
     const characterDropdown = document.getElementById("characterDropdown");
-
     const bgImg = document.querySelector(".resonator-bg");
-
     const profileImg = document.querySelector(".details-profile");
-
     const elementImg = document.querySelector("#resElem .details-icon");
     const elementName = document.querySelector("#resElem h2");
-
     const rarityImg = document.querySelector(".details-stars");
-
     const tierImg = document.querySelector("#resTiers .details-icon");
     const tierName = document.querySelector("#resTiers h2");
 
-    // Helper function to convert hex to rgb
+    const dropdownSelected = document.getElementById("dropdownSelected");
+    const dropdownOptions = document.getElementById("dropdownOptions");
+
     function hexToRgb(hex) {
         hex = hex.replace(/^#/, "");
         const bigint = parseInt(hex, 16);
@@ -125,11 +121,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return `${r}, ${g}, ${b}`;
     }
 
-    // Function to show placeholder
     function showPlaceholder() {
         bgImg.src = "images/backgrounds/placeholder-background.webp";
         bgImg.alt = "Placeholder Background";
-        bgImg.classList.add("placeholder"); // grayscale via CSS
+        bgImg.classList.add("placeholder");
 
         profileImg.style.opacity = 0;
         profileImg.style.display = "none";
@@ -139,39 +134,77 @@ document.addEventListener("DOMContentLoaded", () => {
         charNameElement.textContent = "Select Resonator";
 
         elementImg.style.display = "none";
-        elementImg.removeAttribute("src"); // clears the image
+        elementImg.removeAttribute("src");
         elementImg.removeAttribute("alt");
-        elementName.textContent = "-";       // placeholder text
+        elementName.textContent = "-";
 
         tierImg.style.display = "none";
-        tierImg.removeAttribute("src"); // clears the image
+        tierImg.removeAttribute("src");
         tierImg.removeAttribute("alt");
-        tierName.textContent = "-";       // placeholder text
+        tierName.textContent = "-";
 
-        //Rarity
         rarityImg.style.display = "none";
         rarityImg.src = "";
         rarityImg.alt = "No rarity";
 
-        // Reset colors
         document.documentElement.style.setProperty("--color1", "#484848");
         document.documentElement.style.setProperty("--color2", "#373737");
         document.documentElement.style.setProperty("--color1-rgb", "72, 72, 72");
         document.documentElement.style.setProperty("--color2-rgb", "55, 55, 55");
+
+        dropdownSelected.innerHTML = "<span>--Choose Character--</span>";
     }
 
-    // Populate dropdown
+    // Populate hidden select and custom dropdown
     resonators.forEach((char, index) => {
+        // Hidden select
         const option = document.createElement("option");
         option.value = index;
         option.textContent = char.name;
         characterDropdown.appendChild(option);
+
+        // Custom dropdown option
+        const optionDiv = document.createElement("div");
+        optionDiv.classList.add("dropdown-option");
+        optionDiv.dataset.index = index;
+
+        const img = document.createElement("img");
+        img.src = char.profile || "images/resonators/placeholder.webp";
+        img.alt = char.name;
+
+        const span = document.createElement("span");
+        span.textContent = char.name;
+
+        optionDiv.appendChild(img);
+        optionDiv.appendChild(span);
+
+        optionDiv.addEventListener("click", () => {
+            dropdownSelected.innerHTML = "";
+            const selectedImg = img.cloneNode();
+            const selectedSpan = document.createElement("span");
+            selectedSpan.textContent = char.name;
+            dropdownSelected.appendChild(selectedImg);
+            dropdownSelected.appendChild(selectedSpan);
+
+            dropdownOptions.classList.add("hidden");
+
+            // Trigger existing select change logic
+            characterDropdown.value = index;
+            characterDropdown.dispatchEvent(new Event("change"));
+        });
+
+        dropdownOptions.appendChild(optionDiv);
     });
 
-    // Initial load
+    // Toggle custom dropdown
+    dropdownSelected.addEventListener("click", () => {
+        dropdownOptions.classList.toggle("hidden");
+    });
+
+    // Initial placeholder
     showPlaceholder();
 
-    // Handle character selection
+    // Keep existing logic for updating page
     characterDropdown.addEventListener("change", (e) => {
         const charIndex = e.target.value;
         if (charIndex === "") {
@@ -198,13 +231,13 @@ document.addEventListener("DOMContentLoaded", () => {
         // Name
         charNameElement.textContent = char.name;
 
-        //Element
+        // Element
         elementImg.style.display = "block";
-        elementImg.src = char.element.image || ""; // Set image (empty if none)
+        elementImg.src = char.element.image || "";
         elementImg.alt = char.element.name || "Element";
-        elementName.textContent = char.element.name || ""; // Set element name
+        elementName.textContent = char.element.name || "-";
 
-        //Rarity
+        // Rarity
         rarityImg.style.display = "block";
         rarityImg.src = charRarity.image;
         rarityImg.alt = charRarity.name;
@@ -215,7 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tierImg.alt = charTier.name;
         tierName.textContent = charTier.name;
 
-        // Update colors
+        // Colors
         document.documentElement.style.setProperty("--color1", char.color1);
         document.documentElement.style.setProperty("--color2", char.color2);
         document.documentElement.style.setProperty("--color1-rgb", hexToRgb(char.color1));

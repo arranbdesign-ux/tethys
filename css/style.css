@@ -84,6 +84,76 @@ html {
     color: #fff;
 }
 
+.custom-dropdown {
+    position: relative;
+    width: 250px;
+    font-family: sans-serif;
+}
+
+.dropdown-selected {
+    background: #222;
+    color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dropdown-selected img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.dropdown-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #333;
+    border-radius: 8px;
+    margin-top: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.dropdown-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.dropdown-option img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.dropdown-option:hover {
+    background: #555;
+}
+
+.hidden {
+    display: none;
+}
+
+#characterDropdown {
+    display: none;
+    /* completely hides the select */
+    visibility: hidden;
+    /* optional, just extra safety */
+    position: absolute;
+    /* prevents it from affecting layout */
+}
+
 h1,
 h2,
 h3,

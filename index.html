@@ -65,10 +65,18 @@
                     <div class="saved">
                         <h1>Saved Builds</h1>
                         <div class="saved-list">
-                            <!-- Resonator Item -->
-                            <select id="characterDropdown">
-                                <option value="">Select Resonator</option>
-                            </select>
+
+                            <!-- Resonator Select -->
+                            <div class="custom-dropdown" id="characterDropdownWrapper">
+                                <div class="dropdown-selected" id="dropdownSelected"> Select Resonator </div>
+                                <div class="dropdown-options hidden" id="dropdownOptions">
+                                    <!-- Options will be populated dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Hidden, used for existing logic -->
+                            <select id="characterDropdown" class="hidden"></select>
+
                         </div>
                     </div>
                     <!-- Resonator Details -->
