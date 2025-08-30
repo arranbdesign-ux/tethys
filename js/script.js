@@ -126,8 +126,12 @@ document.addEventListener("DOMContentLoaded", () => {
             profile: "images/resonators/augusta.webp",
             background: "images/backgrounds/augusta-splash.webp",
             element: elements[1], weaponType: "Broadblade", rarity: 0, tier: 0,
+            minorFortes: [
+                { key: "atkp", value: 12 },
+                { key: "cr", value: 8 },
+            ],
             stats: {
-                hp: 10300, atk: 518, def: 1112, er: 100, cr: 13, cd: 150,
+                hp: 10300, atk: 463, def: 1112, er: 100, cr: 5, cd: 150,
                 basicdmg: 0, skilldmg: 0, heavydmg: 0, libdmg: 0,
                 aerodmg: 0, electrodmg: 0, fusiondmg: 0, glaciodmg: 0, havocdmg: 0, spectrodmg: 0, healing: 0
             }
@@ -137,8 +141,12 @@ document.addEventListener("DOMContentLoaded", () => {
             profile: "images/resonators/carlotta.webp",
             background: "images/backgrounds/carlotta-splash.webp",
             element: elements[3], weaponType: "Pistols", rarity: 0, tier: 0,
+            minorFortes: [
+                { key: "atkp", value: 12 },
+                { key: "cr", value: 8 },
+            ],
             stats: {
-                hp: 12450, atk: 518, def: 1198, er: 100, cr: 13, cd: 150,
+                hp: 12450, atk: 463, def: 1198, er: 100, cr: 5, cd: 150,
                 basicdmg: 0, skilldmg: 0, heavydmg: 0, libdmg: 0,
                 aerodmg: 0, electrodmg: 0, fusiondmg: 0, glaciodmg: 0, havocdmg: 0, spectrodmg: 0, healing: 0
             }
@@ -148,8 +156,12 @@ document.addEventListener("DOMContentLoaded", () => {
             profile: "images/resonators/phrolova.webp",
             background: "images/backgrounds/phrolova-splash.webp",
             element: elements[4], weaponType: "Rectifier", rarity: 0, tier: 1,
+            minorFortes: [
+                { key: "atkp", value: 12 },
+                { key: "cr", value: 8 },
+            ],
             stats: {
-                hp: 10775, atk: 490, def: 1137, er: 100, cr: 13, cd: 150,
+                hp: 10775, atk: 438, def: 1137, er: 100, cr: 5, cd: 150,
                 basicdmg: 0, skilldmg: 0, heavydmg: 0, libdmg: 0,
                 aerodmg: 0, electrodmg: 0, fusiondmg: 0, glaciodmg: 0, havocdmg: 0, spectrodmg: 0, healing: 0
             }
@@ -159,10 +171,14 @@ document.addEventListener("DOMContentLoaded", () => {
             profile: "images/resonators/shorekeeper.webp",
             background: "images/backgrounds/shorekeeper-splash.webp",
             element: elements[5], weaponType: "Rectifier", rarity: 0, tier: 0,
+            minorFortes: [
+                { key: "hpp", value: 12 },
+                { key: "healing", value: 12 },
+            ],
             stats: {
-                hp: 18718, atk: 288, def: 1100, er: 100, cr: 5, cd: 150,
+                hp: 16713, atk: 288, def: 1100, er: 100, cr: 5, cd: 150,
                 basicdmg: 0, skilldmg: 0, heavydmg: 0, libdmg: 0,
-                aerodmg: 0, electrodmg: 0, fusiondmg: 0, glaciodmg: 0, havocdmg: 0, spectrodmg: 0, healing: 12
+                aerodmg: 0, electrodmg: 0, fusiondmg: 0, glaciodmg: 0, havocdmg: 0, spectrodmg: 0, healing: 0
             }
         },
         {
@@ -170,8 +186,12 @@ document.addEventListener("DOMContentLoaded", () => {
             profile: "images/resonators/zani.webp",
             background: "images/backgrounds/zani-splash.webp",
             element: elements[5], weaponType: "Gauntlets", rarity: 0, tier: 0,
+            minorFortes: [
+                { key: "atkp", value: 12 },
+                { key: "cr", value: 8 },
+            ],
             stats: {
-                hp: 10775, atk: 490, def: 1137, er: 100, cr: 13, cd: 150,
+                hp: 10775, atk: 438, def: 1137, er: 100, cr: 5, cd: 150,
                 basicdmg: 0, skilldmg: 0, heavydmg: 0, libdmg: 0,
                 aerodmg: 0, electrodmg: 0, fusiondmg: 0, glaciodmg: 0, havocdmg: 0, spectrodmg: 0, healing: 0
             }
@@ -202,6 +222,73 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof value !== "number") return String(value);
         return WEAPON_PERCENT_KEYS.includes(key) ? `${value}%` : `${value}`;
     }
+
+    // map % keys to their base counterparts
+    const PERCENT_TO_BASE = { atkp: "atk", hpp: "hp", defp: "def" };
+
+    function normalizedBaseStats(char) {
+        const s = { ...(char?.stats || {}) };
+        const fields = [
+            "hp", "atk", "def", "er", "cr", "cd",
+            "basicdmg", "skilldmg", "heavydmg", "libdmg",
+            "aerodmg", "electrodmg", "fusiondmg", "glaciodmg", "havocdmg", "spectrodmg",
+            "healing"
+        ];
+        fields.forEach(k => { if (typeof s[k] !== "number") s[k] = 0; });
+        return s;
+    }
+
+    function applyBonusArray(bonuses, prePctFlat, pctSum, out) {
+        if (!Array.isArray(bonuses)) return;
+        for (const { key, value } of bonuses) {
+            if (typeof value !== "number") continue;
+
+            // flat base adds (counted inside the multiplicative bracket)
+            if (key === "atk" || key === "hp" || key === "def") {
+                prePctFlat[key] += value;
+                continue;
+            }
+            // percent-to-base (e.g., atkp -> atk, hpp -> hp)
+            if (PERCENT_TO_BASE[key]) {
+                pctSum[PERCENT_TO_BASE[key]] += value;
+                continue;
+            }
+            // additive percent stats tracked in UI (CR/CD/ER/DMG bonuses/Healing)
+            // only add if 'out' carries that key (so we don't invent keys)
+            if (key in out) {
+                out[key] += value;
+            }
+        }
+    }
+
+    function computeStatsWithBonuses(char, weapon) {
+        const base = normalizedBaseStats(char);
+        const out = { ...base };
+
+        // accumulate flat contributions (go inside multiplicative bracket) and % sums
+        const prePctFlat = { atk: 0, hp: 0, def: 0 };
+        const pctSum = { atk: 0, hp: 0, def: 0 };
+
+        // 1) apply minor fortes
+        applyBonusArray(char?.minorFortes, prePctFlat, pctSum, out);
+
+        // 2) apply weapon stats
+        applyBonusArray(weapon?.stats, prePctFlat, pctSum, out);
+
+        // 3) apply % to (base + flat)
+        out.atk = Math.round((base.atk + prePctFlat.atk) * (1 + pctSum.atk / 100));
+        out.hp = Math.round((base.hp + prePctFlat.hp) * (1 + pctSum.hp / 100));
+        out.def = Math.round((base.def + prePctFlat.def) * (1 + pctSum.def / 100));
+
+        return out;
+    }
+
+    // feed merged to your existing UI updater
+    function renderMainStatsFrom(char, weaponOrNull) {
+        const merged = computeStatsWithBonuses(char, weaponOrNull);
+        updateStats({ ...char, stats: merged });
+    }
+
 
     // --- DOM refs -------------------------------------------------------------
     const charNameElement = document.getElementById("charName");
@@ -437,8 +524,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (dropdownSelected) dropdownSelected.innerHTML = "<span>Select your resonator</span>";
 
         clearWeaponDetailsGrid();
-
-        clearWeaponDetailsGrid();
         initStatIcons(); // <-- keep icons visible in placeholder state
     }
 
@@ -515,14 +600,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // --- Selection state ------------------------------------------------------
     let currentCharacter = null; // IMPORTANT: define once, used by weapon change
+    let currentWeapon = null;
 
     // Weapon hidden select -> details
-    weaponDropdownHidden.addEventListener("change", (e) => {
+    weaponDropdownHidden.addEventListener("change", e => {
         if (!currentCharacter) return;
-        const list = weaponsByType[currentCharacter.weaponType] || [];
-        const weapon = list[e.target.value];
-        if (weapon) populateWeaponDetails(weapon);
+        const weaponIndex = e.target.value;
+        const weapon = weaponsByType[currentCharacter.weaponType][weaponIndex];
+
+        currentWeapon = weapon;
+        populateWeaponDetails(weapon);
+        renderMainStatsFrom(currentCharacter, currentWeapon);
     });
+
 
     // Initial placeholder
     showPlaceholder();
@@ -532,8 +622,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const charIndex = e.target.value;
         if (charIndex === "") { showPlaceholder(); return; }
 
-        currentCharacter = resonators[charIndex];
-        const char = currentCharacter;
+        const char = resonators[charIndex];
+        currentCharacter = char;
+        currentWeapon = null;
 
         // Background
         bgImg.classList.remove("placeholder");
@@ -574,14 +665,11 @@ document.addEventListener("DOMContentLoaded", () => {
         document.documentElement.style.setProperty("--color1-rgb", hexToRgb(char.color1));
         document.documentElement.style.setProperty("--color2-rgb", hexToRgb(char.color2));
 
-        // Stats
-        updateStats(char);
-
         // Reset weapon UI and build options for this character
         clearWeaponDetailsGrid();
-        if (weaponImg) { weaponImg.src = ""; weaponImg.alt = ""; }
-        if (weaponName) { weaponName.textContent = ""; }
-        if (weaponStats) { weaponStats.innerHTML = ""; }
         populateWeaponDropdown(char);
+
+        // Stats: show character base + minorFortes (no weapon yet)
+        renderMainStatsFrom(currentCharacter, null);
     });
 });
