@@ -95,7 +95,7 @@ label {
     position: absolute;
     left: -11rem;
     top: -15rem;
-    background: var(--color1);
+    background: rgba(var(--color1-rgb), 1);
     background-blend-mode: overlay;
     filter: blur(250px);
 }
@@ -107,7 +107,7 @@ label {
     position: absolute;
     right: -14.625rem;
     bottom: -18.75rem;
-    background: var(--color2);
+    background: rgba(var(--color2-rgb), 1);
     background-blend-mode: overlay;
     filter: blur(450px);
 }

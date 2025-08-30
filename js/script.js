@@ -187,11 +187,13 @@ document.addEventListener("DOMContentLoaded", () => {
     characterDropdown.addEventListener("change", (e) => {
         const charIndex = e.target.value;
         if (charIndex === "") {
-            bgImg.src = ""; // clear background if none selected
+            bgImg.src = "";
             bgImg.alt = "No character selected";
-            charNameElement.textContent = ""; // clear name if nothing selected
+            charNameElement.textContent = "";
             document.documentElement.style.setProperty("--color1", "#484848");
             document.documentElement.style.setProperty("--color2", "#373737");
+            document.documentElement.style.setProperty("--color1-rgb", "72, 72, 72");
+            document.documentElement.style.setProperty("--color2-rgb", "55, 55, 55");
             return;
         }
 
@@ -204,12 +206,14 @@ document.addEventListener("DOMContentLoaded", () => {
         // Update name
         charNameElement.textContent = char.name;
 
-        // Update colors
+        // Update hex colors
         document.documentElement.style.setProperty("--color1", char.color1);
         document.documentElement.style.setProperty("--color2", char.color2);
 
-        // Update gradient color
-        const rgb = hexToRgb(char.color);
-        document.documentElement.style.setProperty("--color1-rgb", rgb);
+        // Update rgb colors
+        const rgb1 = hexToRgb(char.color1);
+        const rgb2 = hexToRgb(char.color2);
+        document.documentElement.style.setProperty("--color1-rgb", rgb1);
+        document.documentElement.style.setProperty("--color2-rgb", rgb2);
     });
 });
