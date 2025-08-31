@@ -6,7 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tethys</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/script.js" defer></script>
+    <script defer src="js/data/echo-sets.js"></script>
+    <script defer src="js/data/echo-types.js"></script>
+    <script defer src="js/data/echo-main-values.js"></script>
+    <script defer src="js/data/echo-sub-values.js"></script>
+
+    <!-- your main app -->
+    <script defer src="js/script.js"></script>
 </head>
 
 
@@ -74,6 +80,28 @@
                                 </div>
                             </div>
 
+                            <div class="details-grid">
+                                <!-- Resonator Details Item -->
+                                <div class="details-item" id="resElem">
+                                    <div class="details-box">
+                                        <img class="details-icon" src="">
+                                    </div>
+                                    <div class="details-content">
+                                        <label>Element</label>
+                                        <h2></h2>
+                                    </div>
+                                </div>
+                                <div class="details-item" id="resTiers">
+                                    <div class="details-box">
+                                        <img class="details-icon" src="">
+                                    </div>
+                                    <div class="details-content">
+                                        <label>Tier</label>
+                                        <h2></h2>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Hidden, used for existing logic -->
                             <select id="characterDropdown" class="hidden"></select>
 
@@ -90,27 +118,7 @@
                             </div>
                         </div>
                         <!-- Resonator Details 4 Grid -->
-                        <div class="details-grid">
-                            <!-- Resonator Details Item -->
-                            <div class="details-item" id="resElem">
-                                <div class="details-box">
-                                    <img class="details-icon" src="">
-                                </div>
-                                <div class="details-content">
-                                    <label>Element</label>
-                                    <h2></h2>
-                                </div>
-                            </div>
-                            <div class="details-item" id="resTiers">
-                                <div class="details-box">
-                                    <img class="details-icon" src="">
-                                </div>
-                                <div class="details-content">
-                                    <label>Tier</label>
-                                    <h2></h2>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
 
                     <!-- Resonator Weapon -->
@@ -125,12 +133,6 @@
                         </div>
                         <!-- Hidden select for logic (optional) -->
                         <select id="weaponDropdown" class="hidden"></select>
-                    </div>
-
-                    <!-- Weapon Details -->
-                    <div class="details" id="weaponDetails">
-                        <h1>Weapon Details</h1>
-
                         <div class="details-grid" id="weaponDetailsGrid">
                             <!-- Stat 1 -->
                             <div class="details-item" id="weaponStat1">
@@ -156,11 +158,8 @@
                         </div>
 
                         <!-- Optional: a small placeholder when nothing is selected -->
-                        <p id="weaponDetailsPlaceholder">Select a weapon to see
-                            its details.</p>
+
                     </div>
-
-
 
                 </section>
 
@@ -329,31 +328,57 @@
 
                             <!-- Body -->
                             <div class="modal__body">
-                                <!-- ADD: Echo Set dropdown -->
-                                <div class="form-row">
-                                    <label>Echo Set</label>
-                                    <div class="custom-dropdown" id="echoSetDropdownWrapper">
-                                        <div class="dropdown-selected" id="echoSetDropdownSelected"><span>Select Echo
-                                                Set</span></div>
-                                        <div class="dropdown-options hidden" id="echoSetDropdownOptions"></div>
-                                    </div>
-                                    <select id="echoSetKey" class="hidden"></select>
-                                </div>
-
                                 <!-- Cost -->
                                 <div class="modal__section">
                                     <label for="echoCost">Cost</label>
                                     <!-- CHANGE: cost selector now radios -->
                                     <div class="radio-group" id="echoCostGroup">
-                                        <label class="radio"><input type="radio" name="echoCost" value="4"> 4
-                                            Cost</label>
-                                        <label class="radio"><input type="radio" name="echoCost" value="3"> 3
-                                            Cost</label>
-                                        <label class="radio"><input type="radio" name="echoCost" value="1"> 1
-                                            Cost</label>
+                                        <label class="radio">
+                                            <input type="radio" name="echoCost" value="4">
+                                            <span>4 Cost</span>
+                                        </label>
+                                        <label class="radio">
+                                            <input type="radio" name="echoCost" value="3">
+                                            <span>3 Cost</span>
+                                        </label>
+                                        <label class="radio">
+                                            <input type="radio" name="echoCost" value="1">
+                                            <span>1 Cost</span>
+                                        </label>
                                     </div>
 
                                 </div>
+
+
+                                <!-- ADD: Echo Type dropdown (with typeahead) -->
+                                <div class="form-row inline">
+                                    <!-- ADD: Echo Set dropdown -->
+                                    <div class="form-field">
+                                        <label>Echo Set</label>
+                                        <div class="custom-dropdown" id="echoSetDropdownWrapper">
+                                            <div class="dropdown-selected" id="echoSetDropdownSelected"><span>Select
+                                                    Echo
+                                                    Set</span></div>
+                                            <div class="dropdown-options hidden" id="echoSetDropdownOptions"></div>
+                                        </div>
+                                        <select id="echoSetKey" class="hidden"></select>
+                                    </div>
+
+                                    <div class="form-field">
+                                        <label>Echo Type</label>
+                                        <div class="custom-dropdown searchable" id="echoTypeDropdownWrapper">
+                                            <input id="echoTypeSearchInput" class="dropdown-selected" type="text"
+                                                placeholder="Select Echo Type" autocomplete="off"
+                                                aria-haspopup="listbox" aria-expanded="false" />
+                                            <div class="dropdown-options hidden" id="echoTypeDropdownOptions"
+                                                role="listbox"></div>
+                                        </div>
+                                        <select id="echoTypeKey" class="hidden"></select>
+                                    </div>
+
+
+                                </div>
+
 
                                 <!-- Cost bonus preview -->
                                 <div id="echoCostBonus" class="echo-cost-bonus"></div>
@@ -385,69 +410,97 @@
 
                                     <!-- Sub 1 -->
                                     <div class="modal__row">
+                                        <!-- Sub 1 key (custom dropdown) -->
                                         <div class="custom-dropdown modal-dropdown" id="echoSub1DropdownWrapper">
                                             <div class="dropdown-selected" id="echoSub1DropdownSelected">Select Sub 1
                                             </div>
                                             <div class="dropdown-options hidden" id="echoSub1DropdownOptions"></div>
                                         </div>
                                         <select id="echoSub1Key" class="hidden"></select>
-                                        <select id="echoSub1Val">
-                                            <option value="">Select Value</option>
-                                        </select>
+
+                                        <!-- Sub 1 value (custom dropdown) -->
+                                        <div class="custom-dropdown modal-dropdown" id="echoSub1ValWrapper">
+                                            <div class="dropdown-selected" id="echoSub1ValSelected">Select Value</div>
+                                            <div class="dropdown-options hidden" id="echoSub1ValOptions"></div>
+                                        </div>
+                                        <select id="echoSub1Val" class="hidden"></select>
                                     </div>
 
                                     <!-- Sub 2 -->
                                     <div class="modal__row">
+                                        <!-- Sub 2 key -->
                                         <div class="custom-dropdown modal-dropdown" id="echoSub2DropdownWrapper">
                                             <div class="dropdown-selected" id="echoSub2DropdownSelected">Select Sub 2
                                             </div>
                                             <div class="dropdown-options hidden" id="echoSub2DropdownOptions"></div>
                                         </div>
                                         <select id="echoSub2Key" class="hidden"></select>
-                                        <select id="echoSub2Val">
-                                            <option value="">Select Value</option>
-                                        </select>
+
+                                        <!-- Sub 2 value -->
+                                        <div class="custom-dropdown modal-dropdown" id="echoSub2ValWrapper">
+                                            <div class="dropdown-selected" id="echoSub2ValSelected">Select Value</div>
+                                            <div class="dropdown-options hidden" id="echoSub2ValOptions"></div>
+                                        </div>
+                                        <select id="echoSub2Val" class="hidden"></select>
                                     </div>
 
                                     <!-- Sub 3 -->
                                     <div class="modal__row">
+                                        <!-- Sub 3 key -->
                                         <div class="custom-dropdown modal-dropdown" id="echoSub3DropdownWrapper">
                                             <div class="dropdown-selected" id="echoSub3DropdownSelected">Select Sub 3
                                             </div>
                                             <div class="dropdown-options hidden" id="echoSub3DropdownOptions"></div>
                                         </div>
                                         <select id="echoSub3Key" class="hidden"></select>
-                                        <select id="echoSub3Val">
-                                            <option value="">Select Value</option>
-                                        </select>
+
+                                        <!-- Sub 3 value -->
+                                        <div class="custom-dropdown modal-dropdown" id="echoSub3ValWrapper">
+                                            <div class="dropdown-selected" id="echoSub3ValSelected">Select Value</div>
+                                            <div class="dropdown-options hidden" id="echoSub3ValOptions"></div>
+                                        </div>
+                                        <select id="echoSub3Val" class="hidden"></select>
                                     </div>
 
                                     <!-- Sub 4 -->
                                     <div class="modal__row">
+                                        <!-- Sub 4 key -->
                                         <div class="custom-dropdown modal-dropdown" id="echoSub4DropdownWrapper">
                                             <div class="dropdown-selected" id="echoSub4DropdownSelected">Select Sub 4
                                             </div>
                                             <div class="dropdown-options hidden" id="echoSub4DropdownOptions"></div>
                                         </div>
                                         <select id="echoSub4Key" class="hidden"></select>
-                                        <select id="echoSub4Val">
-                                            <option value="">Select Value</option>
-                                        </select>
+
+                                        <!-- Sub 4 value -->
+                                        <div class="custom-dropdown modal-dropdown" id="echoSub4ValWrapper">
+                                            <div class="dropdown-selected" id="echoSub4ValSelected">Select Value</div>
+                                            <div class="dropdown-options hidden" id="echoSub4ValOptions"></div>
+                                        </div>
+                                        <select id="echoSub4Val" class="hidden"></select>
                                     </div>
 
                                     <!-- Sub 5 -->
                                     <div class="modal__row">
+                                        <!-- Sub 5 key -->
                                         <div class="custom-dropdown modal-dropdown" id="echoSub5DropdownWrapper">
                                             <div class="dropdown-selected" id="echoSub5DropdownSelected">Select Sub 5
                                             </div>
                                             <div class="dropdown-options hidden" id="echoSub5DropdownOptions"></div>
                                         </div>
                                         <select id="echoSub5Key" class="hidden"></select>
-                                        <select id="echoSub5Val">
-                                            <option value="">Select Value</option>
-                                        </select>
+
+                                        <!-- Sub 5 value -->
+                                        <div class="custom-dropdown modal-dropdown" id="echoSub5ValWrapper">
+                                            <div class="dropdown-selected" id="echoSub5ValSelected">Select Value</div>
+                                            <div class="dropdown-options hidden" id="echoSub5ValOptions"></div>
+                                        </div>
+                                        <select id="echoSub5Val" class="hidden"></select>
                                     </div>
                                 </div>
+
+
+
                             </div>
 
                             <!-- Footer -->

@@ -116,9 +116,8 @@ html {
     position: absolute;
     top: auto;
     /* override any default */
-    bottom: 100%;
-    /* open upwards */
-    margin-top: 0;
+
+    margin-top: 5px;
     margin-bottom: 5px;
     /* spacing between selected and options */
     width: 100%;
@@ -506,6 +505,7 @@ label {
     display: flex;
     width: 18.5625rem;
     padding: 1rem;
+    flex: 1 0 0;
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
@@ -1101,4 +1101,113 @@ select.echo-cost {
 .radio input[type="radio"] {
     accent-color: #fff;
     /* optional; modern browsers */
+}
+
+/* Echo tiles → 2-column grid */
+.echo-tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    /* tweak to taste */
+}
+
+/* (optional) keep single column on small screens */
+@media (max-width: 640px) {
+    .echo-tiles {
+        grid-template-columns: 1fr;
+    }
+
+    .echo-tiles .echo-tile:nth-child(5) {
+        grid-column: auto;
+        /* back to normal on narrow screens */
+    }
+}
+
+/* smaller line under the echo name */
+.echo-tile__subtitle {
+    font-size: 0.85rem;
+    /* smaller than your .echo-tile__title */
+    opacity: 0.85;
+    margin-top: 2px;
+}
+
+/* Left column: show only the grid, hide name/image/rarity header */
+.left .details h1,
+/* "Resonator Details" title */
+.left .details {
+    /* image + name + rarity row */
+    display: none !important;
+}
+
+/* Optional: tighten spacing now that the header is gone */
+.left .details .details-grid {
+    margin-top: 0;
+}
+
+/* Radio group container */
+.radio-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Hide the real input */
+.radio-group input[type="radio"] {
+    display: none;
+}
+
+/* Style the label like a button */
+.radio-group .radio {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    user-select: none;
+}
+
+/* Hover/active states */
+.radio-group .radio:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.radio-group input[type="radio"]:checked+span {
+    background: var(--color1, #444);
+    border-color: var(--color1, #888);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2) inset;
+}
+
+.form-row.inline {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row.inline>div {
+    flex: 1;
+}
+
+.custom-dropdown.searchable input.dropdown-selected {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font-size: 0.9rem;
+    cursor: text;
+}
+
+.custom-dropdown.searchable input.dropdown-selected:focus {
+    outline: none;
+    border-color: var(--color1, #888);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+#echoSetBonuses {
+    width: 100%;
+    /* shown as grid when weapon selected */
 }
