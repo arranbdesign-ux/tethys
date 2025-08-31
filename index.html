@@ -171,18 +171,7 @@
                     <div class="resonator">
                         <!-- Bottom Stat Details -->
                         <div class="resonator-wrapper">
-                            <!-- Details Wrapper for Stats -->
-                            <div class="resonator-details">
-                                <!-- Resonator Score -->
-                                <div class="resonator-score">
-                                    <h3>Overall Score</h3>
-                                    <div class="resonator-score__score">
-                                        <h1>SS</h1>
-                                        <h1>46.4</h1>
-                                    </div>
-                                </div>
 
-                            </div>
                             <!-- All Calculated Stats -->
                             <div class="resonator-stats">
 
@@ -316,6 +305,11 @@
                         <div class="echo-tiles" id="echoTiles">
                             <!-- 5 tiles/buttons rendered by JS -->
                         </div>
+                        <!-- ADD: Echo Set Bonuses panel -->
+                        <div class="details" id="echoSetBonuses">
+                            <h1>Echo Set Bonuses</h1>
+                            <div id="echoSetBonusesList"></div>
+                        </div>
                     </div>
 
 
@@ -335,15 +329,34 @@
 
                             <!-- Body -->
                             <div class="modal__body">
+                                <!-- ADD: Echo Set dropdown -->
+                                <div class="form-row">
+                                    <label>Echo Set</label>
+                                    <div class="custom-dropdown" id="echoSetDropdownWrapper">
+                                        <div class="dropdown-selected" id="echoSetDropdownSelected"><span>Select Echo
+                                                Set</span></div>
+                                        <div class="dropdown-options hidden" id="echoSetDropdownOptions"></div>
+                                    </div>
+                                    <select id="echoSetKey" class="hidden"></select>
+                                </div>
+
                                 <!-- Cost -->
                                 <div class="modal__section">
                                     <label for="echoCost">Cost</label>
-                                    <select id="echoCost" class="echo-select">
-                                        <option value="4">4 Cost</option>
-                                        <option value="3">3 Cost</option>
-                                        <option value="1">1 Cost</option>
-                                    </select>
+                                    <!-- CHANGE: cost selector now radios -->
+                                    <div class="radio-group" id="echoCostGroup">
+                                        <label class="radio"><input type="radio" name="echoCost" value="4"> 4
+                                            Cost</label>
+                                        <label class="radio"><input type="radio" name="echoCost" value="3"> 3
+                                            Cost</label>
+                                        <label class="radio"><input type="radio" name="echoCost" value="1"> 1
+                                            Cost</label>
+                                    </div>
+
                                 </div>
+
+                                <!-- Cost bonus preview -->
+                                <div id="echoCostBonus" class="echo-cost-bonus"></div>
 
                                 <!-- Main Stat -->
                                 <div class="modal__section">
@@ -362,8 +375,8 @@
                                     </div>
                                 </div>
 
-                                <!-- Cost bonus preview -->
-                                <div id="echoCostBonus" class="echo-cost-bonus"></div>
+
+
 
 
                                 <!-- Sub Stats -->
@@ -378,7 +391,9 @@
                                             <div class="dropdown-options hidden" id="echoSub1DropdownOptions"></div>
                                         </div>
                                         <select id="echoSub1Key" class="hidden"></select>
-                                        <input type="number" id="echoSub1Val" class="echo-num" placeholder="Value">
+                                        <select id="echoSub1Val">
+                                            <option value="">Select Value</option>
+                                        </select>
                                     </div>
 
                                     <!-- Sub 2 -->
@@ -389,7 +404,9 @@
                                             <div class="dropdown-options hidden" id="echoSub2DropdownOptions"></div>
                                         </div>
                                         <select id="echoSub2Key" class="hidden"></select>
-                                        <input type="number" id="echoSub2Val" class="echo-num" placeholder="Value">
+                                        <select id="echoSub2Val">
+                                            <option value="">Select Value</option>
+                                        </select>
                                     </div>
 
                                     <!-- Sub 3 -->
@@ -400,7 +417,9 @@
                                             <div class="dropdown-options hidden" id="echoSub3DropdownOptions"></div>
                                         </div>
                                         <select id="echoSub3Key" class="hidden"></select>
-                                        <input type="number" id="echoSub3Val" class="echo-num" placeholder="Value">
+                                        <select id="echoSub3Val">
+                                            <option value="">Select Value</option>
+                                        </select>
                                     </div>
 
                                     <!-- Sub 4 -->
@@ -411,7 +430,9 @@
                                             <div class="dropdown-options hidden" id="echoSub4DropdownOptions"></div>
                                         </div>
                                         <select id="echoSub4Key" class="hidden"></select>
-                                        <input type="number" id="echoSub4Val" class="echo-num" placeholder="Value">
+                                        <select id="echoSub4Val">
+                                            <option value="">Select Value</option>
+                                        </select>
                                     </div>
 
                                     <!-- Sub 5 -->
@@ -422,7 +443,9 @@
                                             <div class="dropdown-options hidden" id="echoSub5DropdownOptions"></div>
                                         </div>
                                         <select id="echoSub5Key" class="hidden"></select>
-                                        <input type="number" id="echoSub5Val" class="echo-num" placeholder="Value">
+                                        <select id="echoSub5Val">
+                                            <option value="">Select Value</option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>

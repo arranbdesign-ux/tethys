@@ -139,6 +139,168 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     ];
 
+    // ADD: Echo sets with conditional bonuses. Fill in with your real data.
+    const ECHO_SETS = {
+        // example id -> { name, icon, bonuses: [{count, stats:[{key,value}, ...]}] }
+        // counts are "at least" (>=)
+        "freezingfrost": {
+            name: "Freezing Frost",
+            icon: "images/sets/freezing-frost.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "glaciodmg", value: 10 }] },
+                { count: 5, stats: [{ key: "glaciodmg", value: 30 }] }
+            ]
+        },
+        "moltenrift": {
+            name: "Molten Rift",
+            icon: "images/sets/molten-rift.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "fusiondmg", value: 10 }] },
+                { count: 5, stats: [{ key: "fusiondmg", value: 30 }] }
+            ]
+        },
+        "voidthunder": {
+            name: "Void Thunder",
+            icon: "images/sets/void-thunder.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "electrodmg", value: 10 }] },
+                { count: 5, stats: [{ key: "electrodmg", value: 30 }] }
+            ]
+        },
+        "sierragale": {
+            name: "Sierra Gale",
+            icon: "images/sets/sierra-gale.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "aerodmg", value: 10 }] },
+                { count: 5, stats: [{ key: "aerodmg", value: 30 }] }
+            ]
+        },
+        "celestiallight": {
+            name: "Celestial Light",
+            icon: "images/sets/celestial-light.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "spectrodmg", value: 10 }] },
+                { count: 5, stats: [{ key: "spectrodmg", value: 30 }] }
+            ]
+        },
+        "havoceclipse": {
+            name: "Havoc Eclipse",
+            icon: "images/sets/havoc-eclipse.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "havocdmg", value: 10 }] },
+                { count: 5, stats: [{ key: "havocdmg", value: 30 }] }
+            ]
+        },
+        "rejuvinatingglow": {
+            name: "Rejuvinating Glow",
+            icon: "images/sets/rejuvinating-glow.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "healing", value: 10 }] },
+            ]
+        },
+        "moonlitclouds": {
+            name: "Moonlit Clouds",
+            icon: "images/sets/moonlit-clouds.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "er", value: 10 }] },
+            ]
+        },
+        "lingeringtunes": {
+            name: "Lingering Tunes",
+            icon: "images/sets/lingering-tunes.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "atkp", value: 10 }] },
+                { count: 5, stats: [{ key: "atkp", value: 20 }] }
+            ]
+        },
+        "frostyresolve": {
+            name: "Frosty Resolve",
+            icon: "images/sets/frosty-resolve.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "skilldmg", value: 10 }] },
+                { count: 5, stats: [{ key: "glaciodmg", value: 50 }, { key: "skilldmg", value: 18 }] }
+            ]
+        },
+        "eternalradiance": {
+            name: "Eternal Radiance",
+            icon: "images/sets/eternal-radiance.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "spectrodmg", value: 10 }] },
+                { count: 5, stats: [{ key: "cr", value: 20 }, { key: "spectrodmg", value: 15 }] }
+            ]
+        },
+        "midnightveil": {
+            name: "Midnight Veil",
+            icon: "images/sets/midnight-veil.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "havocdmg", value: 10 }] },
+            ]
+        },
+        "empyreananthem": {
+            name: "Empyrean Anthem",
+            icon: "images/sets/empyrean-anthem.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "er", value: 10 }] },
+                { count: 5, stats: [{ key: "atkp", value: 20 },] }
+            ]
+        },
+        "tidebreakingcourage": {
+            name: "Tidebreaking Courage",
+            icon: "images/sets/tidebreaking-courage.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "er", value: 10 }] },
+                {
+                    count: 5, stats: [{ key: "atkp", value: 15 }, { key: "aerodmg", value: 30 },
+                    { key: "electrodmg", value: 30 },
+                    { key: "fusiondmg", value: 30 },
+                    { key: "glaciodmg", value: 30 },
+                    { key: "havocdmg", value: 30 },
+                    { key: "spectrodmg", value: 30 }]
+                }
+            ]
+        },
+        "gustsofwelkin": {
+            name: "Gusts of Welkin",
+            icon: "images/sets/gusts-of-welkin.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "aerodmg", value: 10 }] },
+                { count: 5, stats: [{ key: "aerodmg", value: 30 }] }
+            ]
+        },
+        "windwardpilgrimage": {
+            name: "Windward Pilgrimage",
+            icon: "images/sets/windward-pilgrimage.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "aerodmg", value: 10 }] },
+                { count: 5, stats: [{ key: "cr", value: 10 }, { key: "aerodmg", value: 30 }] }
+            ]
+        },
+        "flamingclawprint": {
+            name: "Flaming Clawprint",
+            icon: "images/sets/flaming-clawprint.webp",
+            bonuses: [
+                { count: 2, stats: [{ key: "fusiondmg", value: 10 }] },
+                { count: 5, stats: [{ key: "fusiondmg", value: 15 }, { key: "libdmg", value: 20 }] }
+            ]
+        },
+        "dreamofthelost": {
+            name: "Dream of the Lost",
+            icon: "images/sets/dream-of-the-lost.webp",
+            bonuses: [
+                { count: 3, stats: [{ key: "cr", value: 20 }] },
+            ]
+        },
+        "crownofvalor": {
+            name: "Crown of Valor",
+            icon: "images/sets/crown-of-valor.webp",
+            bonuses: [
+                { count: 3, stats: [{ key: "atkp", value: 30 }, { key: "cd", value: 20 }] },
+            ]
+        },
+        // add more...
+    };
+
+
     // --- Helpers --------------------------------------------------------------
     function labelFor(key) { return STAT_LABELS[key] || key.toUpperCase(); }
     function iconFor(key) { return statIcons[key] || "images/stats/unknown.png"; }
@@ -167,6 +329,179 @@ document.addEventListener("DOMContentLoaded", () => {
         return { label, chevron };
     }
 
+
+    // ADD: render a panel that shows each set used, counts, and which bonuses are active
+    function renderEchoSetBonusesPanel() {
+        const list = document.getElementById("echoSetBonusesList");
+        if (!list) return;
+        list.innerHTML = "";
+
+        // count set usage
+        const counts = {};
+        currentEchoes.forEach(e => { if (e?.setId) counts[e.setId] = (counts[e.setId] || 0) + 1; });
+
+        // nothing selected
+        const setIds = Object.keys(counts);
+        if (!setIds.length) {
+            const p = document.createElement("p");
+            p.className = "light";
+            p.textContent = "No sets selected.";
+            list.appendChild(p);
+            return;
+        }
+
+        setIds.forEach(setId => {
+            const def = ECHO_SETS[setId];
+            if (!def) return;
+            const used = counts[setId];
+
+            const row = document.createElement("div");
+            row.className = "saved-item"; // reuse a nice pill style
+
+            // left: icon + name
+            const head = document.createElement("div");
+            head.className = "saved-item__header";
+
+            const img = document.createElement("img");
+            img.className = "saved-item__profile";
+            img.src = def.icon;
+            img.alt = def.name;
+
+            const title = document.createElement("h2");
+            title.textContent = `${def.name} — ${used}/5`;
+
+            head.appendChild(img);
+            head.appendChild(title);
+
+            // right: bonuses (active vs inactive)
+            const bonusesWrap = document.createElement("div");
+            bonusesWrap.className = "weapon-stats"; // small chips row
+
+            (def.bonuses || []).forEach(b => {
+                const chip = document.createElement("div");
+                chip.className = "stat-chip";
+                if (used >= b.count) {
+                    // active
+                } else {
+                    chip.style.opacity = 0.5; // visually muted
+                }
+
+                const tag = document.createElement("h3");
+                tag.textContent = `${b.count}-Set: `;
+
+                chip.appendChild(tag);
+
+                // show each stat granted at this tier
+                b.stats.forEach(s => {
+                    const ic = document.createElement("img");
+                    ic.className = "stat-icon small";
+                    ic.src = iconFor(s.key);
+                    ic.alt = labelFor(s.key);
+
+                    const txt = document.createElement("span");
+                    const isPct = PCT_KEYS.includes(s.key);
+                    txt.textContent = `${isPct ? s.value + "%" : s.value} ${labelFor(s.key)}`;
+
+                    chip.appendChild(ic);
+                    chip.appendChild(txt);
+                });
+
+                bonusesWrap.appendChild(chip);
+            });
+
+            row.appendChild(head);
+            row.appendChild(bonusesWrap);
+            list.appendChild(row);
+        });
+    }
+
+
+    // ADD: init the echo set dropdown once
+    function initEchoSetDropdown() {
+        const selectedDiv = document.getElementById("echoSetDropdownSelected");
+        const optionsDiv = document.getElementById("echoSetDropdownOptions");
+        const hiddenSel = document.getElementById("echoSetKey");
+        if (!selectedDiv || !optionsDiv || !hiddenSel) return;
+        if (selectedDiv.dataset.filled) return;
+
+        setupChevron(selectedDiv);
+        hiddenSel.innerHTML = "";
+        optionsDiv.innerHTML = "";
+
+        Object.entries(ECHO_SETS).forEach(([id, set]) => {
+            // hidden <option>
+            const opt = document.createElement("option");
+            opt.value = id;
+            opt.textContent = set.name;
+            hiddenSel.appendChild(opt);
+
+            // visible option row
+            const row = document.createElement("div");
+            row.className = "dropdown-option";
+            row.dataset.value = id;
+
+            const img = document.createElement("img");
+            img.src = set.icon;
+            img.alt = set.name;
+
+            const span = document.createElement("span");
+            span.textContent = set.name;
+
+            row.appendChild(img);
+            row.appendChild(span);
+            row.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const label = selectedDiv.querySelector(".dropdown-label");
+                if (label) {
+                    label.innerHTML = "";
+                    label.appendChild(img.cloneNode());
+                    label.appendChild(document.createTextNode(set.name));
+                }
+                optionsDiv.classList.add("hidden");
+                selectedDiv.classList.remove("open");
+                hiddenSel.value = id;
+                hiddenSel.dispatchEvent(new Event("change"));
+            });
+
+            optionsDiv.appendChild(row);
+        });
+
+        selectedDiv.addEventListener("click", (e) => {
+            e.stopPropagation();
+            // close others
+            document.querySelectorAll(".dropdown-selected.open").forEach(el => { if (el !== selectedDiv) el.classList.remove("open"); });
+            document.querySelectorAll(".dropdown-options:not(.hidden)").forEach(el => { if (el !== optionsDiv) el.classList.add("hidden"); });
+            // toggle this
+            optionsDiv.classList.toggle("hidden");
+            selectedDiv.classList.toggle("open");
+        });
+
+        selectedDiv.dataset.filled = "1";
+    }
+
+    // ADD: update the visible label programmatically
+    function setEchoSetDropdownLabel(setId) {
+        const selectedDiv = document.getElementById("echoSetDropdownSelected");
+        if (!selectedDiv) return;
+        const label = selectedDiv.querySelector(".dropdown-label");
+        if (!label) return;
+
+        if (!setId) {
+            label.innerHTML = "<span>Select Echo Set</span>";
+            return;
+        }
+        const set = ECHO_SETS[setId];
+        if (!set) { label.innerHTML = "<span>Select Echo Set</span>"; return; }
+
+        const img = document.createElement("img");
+        img.src = set.icon;
+        img.alt = set.name;
+        label.innerHTML = "";
+        label.appendChild(img);
+        label.appendChild(document.createTextNode(set.name));
+    }
+
+
     // Percent-suffixed keys
     const PCT_KEYS = ["atkp", "hpp", "defp", "cr", "cd", "er", "basicdmg", "skilldmg", "heavydmg", "libdmg", "havocdmg", "healing"];
     const WEAPON_PERCENT_KEYS = ["atkp", "hpp", "defp", "cr", "cd", "er"];
@@ -175,7 +510,200 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof value !== "number") return String(value);
         return WEAPON_PERCENT_KEYS.includes(key) ? `${value}%` : `${value}`;
     }
+
     function parseNumber(v) { const n = Number(v); return Number.isFinite(n) ? n : 0; }
+
+    // ADD: radio helpers for echo cost
+    function getSelectedEchoCost() {
+        const el = document.querySelector('input[name="echoCost"]:checked');
+        return el ? parseInt(el.value, 10) : 4; // default to 4 if none
+    }
+    function setSelectedEchoCost(cost) {
+        const el = document.querySelector(`input[name="echoCost"][value="${cost}"]`);
+        if (el) el.checked = true;
+    }
+    function onEchoCostChange(handler) {
+        document.querySelectorAll('input[name="echoCost"]').forEach(r =>
+            r.addEventListener('change', handler)
+        );
+    }
+
+
+    // ADD: main stat fixed values per echo cost (fill these with real numbers)
+    const MAIN_STAT_VALUES = {
+        1: {
+            // 1-cost allowed: hpp, atkp, defp
+            hpp: 22.8,   // TODO
+            atkp: 18.0,  // TODO
+            defp: 18.0   // TODO
+        },
+        3: {
+            // 3-cost allowed: hpp, atkp, defp, er, elemental dmg
+            hpp: 30, atkp: 30, defp: 38, er: 32,     // TODOs
+            aerodmg: 30, electrodmg: 30, fusiondmg: 30, glaciodmg: 30, havocdmg: 30, spectrodmg: 30 // TODOs
+        },
+        4: {
+            // 4-cost allowed: hpp, atkp, defp, cr, cd, healing
+            hpp: 33.0, atkp: 33.0, defp: 41.5, cr: 22,    // example you gave
+            cd: 44, healing: 26 // TODOs
+        }
+    };
+
+    // ADD: per-substat 8-tier value tables (fill in the TODOs)
+    const SUBSTAT_VALUES = {
+        // % base stats
+        atkp: [6.4, 7.1, 7.9, 8.6, 9.4, 10.1, 10.9, 11.6],
+        hpp: [6.4, 7.1, 7.9, 8.6, 9.4, 10.1, 10.9, 11.6],
+        defp: [8.1, 9.0, 10.0, 10.9, 11.8, 12.8, 13.8, 14.7],
+
+        // Crits & ER (%)
+        cr: [6.3, 6.9, 7.5, 8.1, 8.7, 9.3, 9.9, 10.5],
+        cd: [12.6, 13.8, 15.0, 16.2, 17.4, 18.6, 19.8, 21.0],
+        er: [/* TODO */],
+
+        // Elemental DMG (%)
+        aerodmg: [6.4, 7.1, 7.9, 8.6, 9.4, 10.1, 10.9, 11.6],
+        electrodmg: [6.4, 7.1, 7.9, 8.6, 9.4, 10.1, 10.9, 11.6],
+        fusiondmg: [6.4, 7.1, 7.9, 8.6, 9.4, 10.1, 10.9, 11.6],
+        glaciodmg: [6.4, 7.1, 7.9, 8.6, 9.4, 10.1, 10.9, 11.6],
+        havocdmg: [6.4, 7.1, 7.9, 8.6, 9.4, 10.1, 10.9, 11.6],
+        spectrodmg: [6.4, 7.1, 7.9, 8.6, 9.4, 10.1, 10.9, 11.6],
+
+        // Flats (if rolls exist in WuWa’s relics)
+        atk: [30, 40, 50, 60],
+        hp: [320, 360, 390, 430, 470, 510, 540, 580],
+        def: [40, 50, 60, 70],
+
+        // Other DMG bonuses (%), if applicable as substats in WuWa
+        basicdmg: [6.4, 7.1, 7.9, 8.6, 9.4, 10.1, 10.9, 11.6],
+        skilldmg: [6.4, 7.1, 7.9, 8.6, 9.4, 10.1, 10.9, 11.6],
+        heavydmg: [6.4, 7.1, 7.9, 8.6, 9.4, 10.1, 10.9, 11.6],
+        libdmg: [6.4, 7.1, 7.9, 8.6, 9.4, 10.1, 10.9, 11.6],
+        healing: [6.8, 7.6, 8.4, 9.2, 10, 10.8, 11.6, 12.4]
+    };
+
+    // ADD: allowed main stat keys per cost
+    const ALLOWED_MAIN_BY_COST = {
+        1: ["hpp", "atkp", "defp"],
+        3: ["hpp", "atkp", "defp", "er", "aerodmg", "electrodmg", "fusiondmg", "glaciodmg", "havocdmg", "spectrodmg"],
+        4: ["hpp", "atkp", "defp", "cr", "cd", "healing"]
+    };
+
+    // Sub stats cannot roll elemental damage bonuses
+    const ALLOWED_SUBSTAT_KEYS = Object.keys(statIcons).filter(k =>
+        !["aerodmg", "electrodmg", "fusiondmg", "glaciodmg", "havocdmg", "spectrodmg"].includes(k)
+    );
+
+    // ADD: your preferred display order for sub stats
+    const SUBSTAT_ORDER = [
+        "cr", "cd",
+        "atkp", "hpp", "defp",
+        "er",
+        "atk", "hp", "def",
+        "basicdmg", "skilldmg", "heavydmg", "libdmg",
+        "healing"
+    ];
+
+    // ADD: apply order to the allowed sub stat keys (elementals already excluded)
+    const ORDERED_SUBSTAT_KEYS = [
+        // ordered intersection
+        ...SUBSTAT_ORDER.filter(k => ALLOWED_SUBSTAT_KEYS.includes(k)),
+        // any remaining allowed keys not listed above (safety)
+        ...ALLOWED_SUBSTAT_KEYS.filter(k => !SUBSTAT_ORDER.includes(k))
+    ];
+
+
+    function getAllowedMainKeys(cost) {
+        return ALLOWED_MAIN_BY_COST[cost] || [];
+    }
+
+    // ADD: build <option> list for a substat value select
+    function buildSubValueOptionsHTML(key, selectedVal = "") {
+        const values = SUBSTAT_VALUES[key] || [];
+        const opts = ['<option value="">Select Value</option>'];
+        for (const v of values) {
+            const valStr = String(v);
+            const sel = (String(selectedVal) === valStr) ? ' selected' : '';
+            opts.push(`<option value="${valStr}"${sel}>${valStr}</option>`);
+        }
+        return opts.join("");
+    }
+
+    // ADD: populate one sub's value <select> given its key
+    function populateSubValueSelect(idx, key, selectedVal = "") {
+        const sel = document.getElementById(`echoSub${idx}Val`);
+        if (!sel) return;
+        sel.innerHTML = buildSubValueOptionsHTML(key, selectedVal);
+    }
+
+    // ADD: recompute duplicate disabling across sub KEY dropdowns
+    function updateSubKeyDuplicateDisables() {
+        // Collect chosen sub keys (ignoring blanks)
+        const chosen = new Map(); // key -> count
+        for (let i = 1; i <= 5; i++) {
+            const k = document.getElementById(`echoSub${i}Key`)?.value || "";
+            if (!k) continue;
+            chosen.set(k, (chosen.get(k) || 0) + 1);
+        }
+
+        for (let i = 1; i <= 5; i++) {
+            const keySel = document.getElementById(`echoSub${i}Key`);
+            const dropSel = document.getElementById(`echoSub${i}DropdownOptions`); // custom list (if present)
+            if (!keySel) continue;
+
+            const current = keySel.value;
+
+            // Disable any option that is already chosen by another sub (allow the current one)
+            // We don't consider the main stat here; subs can match main once.
+            // For the native <select> (hidden), we disable <option>s.
+            Array.from(keySel.options).forEach(opt => {
+                if (!opt.value) { opt.disabled = false; return; } // allow blank
+                const count = chosen.get(opt.value) || 0;
+                const isThisOpt = (opt.value === current);
+                opt.disabled = (!isThisOpt && count >= 1);
+            });
+
+            // If you're using the custom options panel, mirror the disabled state
+            if (dropSel) {
+                Array.from(dropSel.children).forEach(divOpt => {
+                    const val = divOpt?.dataset?.value || "";
+                    if (!val) { divOpt.classList.remove("disabled"); return; }
+                    const count = chosen.get(val) || 0;
+                    const isThisOpt = (val === current);
+                    if (!isThisOpt && count >= 1) divOpt.classList.add("disabled");
+                    else divOpt.classList.remove("disabled");
+                });
+            }
+        }
+    }
+
+    // ADD: when a sub KEY changes, repopulate that sub's VALUE select and update duplicate blocks
+    function onSubKeyChangeFactory(idx) {
+        return function () {
+            const key = document.getElementById(`echoSub${idx}Key`)?.value || "";
+            const currentVal = document.getElementById(`echoSub${idx}Val`)?.value || "";
+            populateSubValueSelect(idx, key, currentVal);
+            updateSubKeyDuplicateDisables();
+        };
+    }
+
+
+    // ADD: set main value based on cost + main key; make input read-only
+    function setMainStatValueFromSelection() {
+        const mainKeyEl = document.getElementById("echoMainKey");
+        const mainValEl = document.getElementById("echoMainVal");
+        if (!mainKeyEl || !mainValEl) return;
+
+        const cost = getSelectedEchoCost(); // <-- radios
+        const key = mainKeyEl.value;
+        const v = (MAIN_STAT_VALUES?.[cost] ?? {})[key];
+
+        mainValEl.value = (typeof v === "number") ? String(v) : "";
+        mainValEl.readOnly = true;
+        mainValEl.title = "Main stat value is auto-set by cost & stat";
+    }
+
+
 
     // ADD: WuWa-style integer floor
     function floorInt(x) { return Math.floor(Number(x) || 0); }
@@ -210,12 +738,36 @@ document.addEventListener("DOMContentLoaded", () => {
         return ECHO_COST_BONUS[echo.cost] || [];
     }
 
+    // ADD: collect active set bonuses based on how many echoes use each set
+    function getActiveSetBonuses() {
+        // count set usage
+        const counts = {};
+        currentEchoes.forEach(e => {
+            if (e?.setId) counts[e.setId] = (counts[e.setId] || 0) + 1;
+        });
+
+        // gather bonuses whose threshold is met
+        const out = [];
+        Object.entries(counts).forEach(([setId, n]) => {
+            const def = ECHO_SETS[setId];
+            if (!def || !Array.isArray(def.bonuses)) return;
+            def.bonuses.forEach(b => {
+                if (n >= b.count && Array.isArray(b.stats)) {
+                    out.push(...b.stats.map(s => ({ key: s.key, value: s.value })));
+                }
+            });
+        });
+        return out;
+    }
+
     // ADD: flatten user-entered stats + cost bonuses for all echoes
+    // CHANGE: include set bonuses into the flattened list you already return
     function getAllEchoBonuses() {
         const out = [];
         currentEchoes.forEach(e => {
             out.push(...composeEchoStats(e), ...costBonusesForEcho(e));
         });
+        out.push(...getActiveSetBonuses()); // <-- ADD
         return out;
     }
 
@@ -300,19 +852,123 @@ document.addEventListener("DOMContentLoaded", () => {
             selectedDiv.dataset.filled = "1";
         }
     }
-    function initEchoModalDropdowns() {
-        const keys = Object.keys(statIcons);
-        setupCustomDropdown("echoMainDropdownWrapper", "echoMainKey", "echoMainDropdownOptions", "echoMainDropdownSelected", keys);
-        for (let i = 1; i <= 5; i++) {
-            setupCustomDropdown(`echoSub${i}DropdownWrapper`, `echoSub${i}Key`, `echoSub${i}DropdownOptions`, `echoSub${i}DropdownSelected`, keys);
+
+    // ADD: rebuild a custom dropdown's options list (for MAIN stat only)
+    function rebuildCustomDropdown(selectedId, optionsId, hiddenSelectId, keys) {
+        const selectedDiv = document.getElementById(selectedId);
+        const optionsDiv = document.getElementById(optionsId);
+        const hiddenSel = document.getElementById(hiddenSelectId);
+        if (!selectedDiv || !optionsDiv || !hiddenSel) return;
+
+        // Clear + repopulate hidden select & option DIVs
+        hiddenSel.innerHTML = "";
+        optionsDiv.innerHTML = "";
+
+        keys.forEach((k) => {
+            const opt = document.createElement("option");
+            opt.value = k;
+            opt.textContent = labelFor(k);
+            hiddenSel.appendChild(opt);
+
+            const optDiv = document.createElement("div");
+            optDiv.classList.add("dropdown-option");
+            optDiv.dataset.value = k;
+
+            const img = document.createElement("img");
+            img.src = iconFor(k);
+            img.alt = labelFor(k);
+
+            const span = document.createElement("span");
+            span.textContent = labelFor(k);
+
+            optDiv.appendChild(img);
+            optDiv.appendChild(span);
+
+            optDiv.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const label = selectedDiv.querySelector(".dropdown-label");
+                if (label) {
+                    label.innerHTML = "";
+                    label.appendChild(img.cloneNode());
+                    label.appendChild(document.createTextNode(labelFor(k)));
+                }
+                optionsDiv.classList.add("hidden");
+                selectedDiv.classList.remove("open");
+                hiddenSel.value = k;
+                hiddenSel.dispatchEvent(new Event("change"));
+            });
+
+            optionsDiv.appendChild(optDiv);
+        });
+
+        // Ensure chevron exists
+        setupChevron(selectedDiv);
+    }
+
+
+    // ADD: refresh MAIN stat dropdown according to cost
+    function refreshMainDropdownForCost(cost, preferKey = "") {
+        const allowed = getAllowedMainKeys(cost);
+        if (!allowed.length) return;
+
+        rebuildCustomDropdown("echoMainDropdownSelected", "echoMainDropdownOptions", "echoMainKey", allowed);
+
+        const mainKeyEl = document.getElementById("echoMainKey");
+        if (!mainKeyEl) return;
+
+        // If preferKey is valid, select it; otherwise leave blank
+        if (preferKey && allowed.includes(preferKey)) {
+            mainKeyEl.value = preferKey;
+            setCustomDropdownLabel("echoMainDropdownSelected", preferKey);
+            setMainStatValueFromSelection();
+        } else {
+            mainKeyEl.value = "";
+            setCustomDropdownLabel("echoMainDropdownSelected", ""); // shows "Select Main Stat"
+            document.getElementById("echoMainVal").value = "";
         }
     }
+
+
+
+
+    function initEchoModalDropdowns() {
+        const keysForMain = Object.keys(statIcons); // main stays full set; cost rules filter later
+        setupCustomDropdown(
+            "echoMainDropdownWrapper",
+            "echoMainKey",
+            "echoMainDropdownOptions",
+            "echoMainDropdownSelected",
+            keysForMain
+        );
+
+        for (let i = 1; i <= 5; i++) {
+            setupCustomDropdown(
+                `echoSub${i}DropdownWrapper`,
+                `echoSub${i}Key`,
+                `echoSub${i}DropdownOptions`,
+                `echoSub${i}DropdownSelected`,
+                ORDERED_SUBSTAT_KEYS // <-- ordered & filtered
+            );
+        }
+    }
+
+
+
     function setCustomDropdownLabel(selectedId, valueKey) {
         const selectedDiv = document.getElementById(selectedId);
         if (!selectedDiv) return;
         const label = selectedDiv.querySelector(".dropdown-label");
         if (!label) return;
-        if (!valueKey) { label.innerHTML = "<span>Select</span>"; return; }
+        if (!valueKey) {
+            if (selectedId.includes("Main")) {
+                label.innerHTML = "<span>Select Main Stat</span>";
+            } else if (selectedId.includes("Sub")) {
+                label.innerHTML = "<span>Select Sub Stat</span>";
+            } else {
+                label.innerHTML = "<span>Select</span>";
+            }
+            return;
+        }
         const img = document.createElement("img");
         img.src = iconFor(valueKey);
         img.alt = labelFor(valueKey);
@@ -375,7 +1031,27 @@ document.addEventListener("DOMContentLoaded", () => {
                     const valEl = document.createElement("span"); valEl.className = "stat-chip__value";
                     valEl.textContent = PCT_KEYS.includes(s.key) ? `${parseNumber(s.value)}%` : `${parseNumber(s.value)}`;
                     chip.appendChild(ic); chip.appendChild(nameEl); chip.appendChild(valEl); stats.appendChild(chip);
+
                 });
+                // ADD inside the 'else' branch that renders an existing echo:
+                if (data.setId && ECHO_SETS[data.setId]) {
+                    const setRow = document.createElement("div");
+                    setRow.className = "echo-tile__set";
+
+                    const sImg = document.createElement("img");
+                    sImg.className = "stat-icon small";
+                    sImg.src = ECHO_SETS[data.setId].icon;
+                    sImg.alt = ECHO_SETS[data.setId].name;
+
+                    const sName = document.createElement("span");
+                    sName.className = "light";
+                    sName.textContent = ECHO_SETS[data.setId].name;
+
+                    setRow.appendChild(sImg);
+                    setRow.appendChild(sName);
+                    meta.appendChild(setRow);
+                }
+
 
                 meta.appendChild(title); meta.appendChild(stats);
             }
@@ -384,6 +1060,7 @@ document.addEventListener("DOMContentLoaded", () => {
             tile.addEventListener("click", () => openEchoModal(slot));
             wrap.appendChild(tile);
         }
+
     }
 
     // Modal open/close/save -----------------------------------------------------
@@ -394,12 +1071,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Try to initialize custom dropdowns (if modal uses custom structure)
         initEchoModalDropdowns();
+        // ADD
+        initEchoSetDropdown();
+
 
         const data = currentEchoes[slot - 1] || { cost: 4, main: { key: "", value: "" }, subs: [] };
 
-        // Values into fields (hidden selects always exist in our pattern)
-        const costEl = document.getElementById("echoCost");
-        if (costEl) costEl.value = String(data.cost ?? 4);
+        setSelectedEchoCost(data.cost ?? 4);
 
         const mainKeyEl = document.getElementById("echoMainKey");
         const mainValEl = document.getElementById("echoMainVal");
@@ -419,11 +1097,33 @@ document.addEventListener("DOMContentLoaded", () => {
             setCustomDropdownLabel(`echoSub${i}DropdownSelected`, data.subs?.[i - 1]?.key || "");
         }
 
-        // ADD: show + live-update cost bonus preview
-        renderEchoCostBonusPreview(document.getElementById("echoCost").value);
-        document.getElementById("echoCost").onchange = (e) => {
-            renderEchoCostBonusPreview(e.target.value);
-        };
+
+
+        // After restoring sub keys/values + setting custom labels:
+        for (let i = 1; i <= 5; i++) {
+            const k = document.getElementById(`echoSub${i}Key`)?.value || "";
+            const v = document.getElementById(`echoSub${i}Val`)?.value || "";
+            populateSubValueSelect(i, k, v);
+        }
+        updateSubKeyDuplicateDisables();
+
+
+
+        // ADD: set echo set dropdown from saved value
+        const setSel = document.getElementById("echoSetKey");
+        if (setSel) setSel.value = data.setId || "";
+        setEchoSetDropdownLabel(data.setId || "");
+
+
+
+        // ADD: restrict MAIN stat options by cost, then auto-set value
+        const currentCost = getSelectedEchoCost();
+        refreshMainDropdownForCost(currentCost, document.getElementById("echoMainKey").value);
+
+        // CHANGE: show + live-update the cost bonus preview for radios
+        renderEchoCostBonusPreview(currentCost);
+
+
 
         const title = document.getElementById("echoModalTitle");
         if (title) title.textContent = `Edit Echo ${slot}`;
@@ -431,6 +1131,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const modal = document.getElementById("echoModal");
         modal?.classList.add("open");
         modal?.setAttribute("aria-hidden", "false");
+
+
+
+
     }
 
     function closeEchoModal() {
@@ -444,29 +1148,41 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!activeEchoSlot) return;
         const slot = activeEchoSlot;
 
-        const cost = parseInt(document.getElementById("echoCost")?.value || "0", 10) || 0;
+        const cost = getSelectedEchoCost(); // radios
         const mainKey = document.getElementById("echoMainKey")?.value || "";
         const mainVal = parseNumber(document.getElementById("echoMainVal")?.value || 0);
-
+        const setId = document.getElementById("echoSetKey")?.value || "";
         const subs = [];
+        const seen = new Set(); // enforce no-dup among subs
         for (let i = 1; i <= 5; i++) {
             const k = document.getElementById(`echoSub${i}Key`)?.value || "";
-            const v = parseNumber(document.getElementById(`echoSub${i}Val`)?.value || 0);
-            if (k) subs.push({ key: k, value: v });
+            const vStr = document.getElementById(`echoSub${i}Val`)?.value || "";
+            if (!k && !vStr) continue;            // both empty -> skip
+            if (!k || !vStr) {                     // one is missing -> simple guard
+                alert(`Sub ${i}: pick both a stat and a value.`);
+                return;
+            }
+            if (seen.has(k)) {                     // dup among subs
+                alert(`Duplicate sub stat "${labelFor(k)}" is not allowed.`);
+                return;
+            }
+            seen.add(k);
+            subs.push({ key: k, value: parseNumber(vStr) });
         }
 
-        currentEchoes[slot - 1] = { cost, main: { key: mainKey, value: mainVal }, subs };
+        currentEchoes[slot - 1] = { cost, setId, main: { key: mainKey, value: mainVal }, subs };
 
         renderEchoCost();
-        if (currentCharacter) {
-            renderMainStatsFrom(currentCharacter, currentWeapon, getAllEchoBonuses());
-        }
+        if (currentCharacter) renderMainStatsFrom(currentCharacter, currentWeapon, getAllEchoBonuses());
         renderEchoTiles();
+        renderEchoSetBonusesPanel();
+
         closeEchoModal();
     }
 
+
     function clearEchoInModal() {
-        const costEl = document.getElementById("echoCost"); if (costEl) costEl.value = "4";
+        setSelectedEchoCost(4);
         const mainKeyEl = document.getElementById("echoMainKey"); if (mainKeyEl) mainKeyEl.value = "";
         const mainValEl = document.getElementById("echoMainVal"); if (mainValEl) mainValEl.value = "";
         for (let i = 1; i <= 5; i++) {
@@ -478,6 +1194,19 @@ document.addEventListener("DOMContentLoaded", () => {
         for (let i = 1; i <= 5; i++) {
             setCustomDropdownLabel(`echoSub${i}DropdownSelected`, "");
         }
+
+        // in clearEchoInModal()
+        for (let i = 1; i <= 5; i++) {
+            const valSel = document.getElementById(`echoSub${i}Val`);
+            if (valSel) valSel.innerHTML = '<option value="">Select Value</option>';
+        }
+        updateSubKeyDuplicateDisables();
+        // ADD: clear echo set choice
+        const setSel = document.getElementById("echoSetKey");
+        if (setSel) setSel.value = "";
+        setEchoSetDropdownLabel("");
+
+
     }
 
     (function initEchoModalWiring() {
@@ -486,11 +1215,31 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("echoModalCancel")?.addEventListener("click", closeEchoModal);
         document.getElementById("echoModalClose")?.addEventListener("click", closeEchoModal);
         document.getElementById("echoModalClear")?.addEventListener("click", clearEchoInModal);
+        document.getElementById("echoMainKey")?.addEventListener("change", setMainStatValueFromSelection);
         modal?.querySelector("[data-close]")?.addEventListener("click", closeEchoModal);
         document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal?.classList.contains("open")) closeEchoModal(); });
+        onEchoCostChange(() => {
+            if (!activeEchoSlot) return; // only react while modal is open
+            const newCost = getSelectedEchoCost();
+            refreshMainDropdownForCost(newCost, document.getElementById("echoMainKey").value);
+            renderEchoCostBonusPreview(newCost);
+        });
+        // ADD: wire sub KEY change handlers once
+        (function initSubKeyChangeHandlers() {
+            for (let i = 1; i <= 5; i++) {
+                const keySel = document.getElementById(`echoSub${i}Key`);
+                if (keySel && !keySel.dataset.subKeyWired) {
+                    keySel.addEventListener("change", onSubKeyChangeFactory(i));
+                    keySel.dataset.subKeyWired = "1";
+                }
+            }
+        })();
+
     })();
 
-    function resetEchoBuilders() { currentEchoes = [null, null, null, null, null]; renderEchoTiles(); renderEchoCost(); }
+    function resetEchoBuilders() {
+        currentEchoes = [null, null, null, null, null]; renderEchoTiles(); renderEchoCost(); renderEchoSetBonusesPanel();
+    }
 
     // --- Stats computation -----------------------------------------------------
     const PERCENT_TO_BASE = { atkp: "atk", hpp: "hp", defp: "def" };
@@ -719,6 +1468,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         clearWeaponDetailsGrid();
         initStatIcons();
+        renderEchoSetBonusesPanel();
+
         resetEchoBuilders();
     }
 
@@ -820,6 +1571,8 @@ document.addEventListener("DOMContentLoaded", () => {
         clearWeaponDetailsGrid();
         populateWeaponDropdown(char);
         resetEchoBuilders();
+        renderEchoSetBonusesPanel();
+
         renderMainStatsFrom(currentCharacter, null, []);
     });
 
