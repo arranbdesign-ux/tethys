@@ -303,12 +303,150 @@
 
                 <section class="right">
 
-                </section>
+                    <div class="details-echoes" id="echoesPanel">
+                        <div class="echoes-header">
+                            <h1>Echoes</h1>
+                            <!-- Optional cost bar (if you already added it, keep yours) -->
+                            <div id="echoCostBar">
+                                <h3>Total Cost: <span id="echoCostVal">0</span> / 12</h3>
+                            </div>
+                        </div>
 
+
+                        <div class="echo-tiles" id="echoTiles">
+                            <!-- 5 tiles/buttons rendered by JS -->
+                        </div>
+                    </div>
+
+
+                    <!-- Modal root (place near end of body) -->
+                    <!-- Echo Modal -->
+                    <div class="modal" id="echoModal" aria-hidden="true">
+                        <div class="modal__overlay" data-close></div>
+
+                        <div class="modal__content" role="dialog" aria-modal="true" aria-labelledby="echoModalTitle">
+                            <!-- Header -->
+                            <div class="modal__header">
+                                <h2 id="echoModalTitle">Edit Echo</h2>
+                                <button class="modal__close" id="echoModalClose" aria-label="Close">
+                                    &times;
+                                </button>
+                            </div>
+
+                            <!-- Body -->
+                            <div class="modal__body">
+                                <!-- Cost -->
+                                <div class="modal__section">
+                                    <label for="echoCost">Cost</label>
+                                    <select id="echoCost" class="echo-select">
+                                        <option value="4">4 Cost</option>
+                                        <option value="3">3 Cost</option>
+                                        <option value="1">1 Cost</option>
+                                    </select>
+                                </div>
+
+                                <!-- Main Stat -->
+                                <div class="modal__section">
+                                    <label>Main Stat</label>
+                                    <div class="modal__row">
+                                        <!-- Custom dropdown wrapper -->
+                                        <div class="custom-dropdown modal-dropdown" id="echoMainDropdownWrapper">
+                                            <div class="dropdown-selected" id="echoMainDropdownSelected">Select Main
+                                                Stat</div>
+                                            <div class="dropdown-options hidden" id="echoMainDropdownOptions"></div>
+                                        </div>
+                                        <!-- Hidden select used by JS -->
+                                        <select id="echoMainKey" class="hidden"></select>
+                                        <!-- Value -->
+                                        <input type="number" id="echoMainVal" class="echo-num" placeholder="Value">
+                                    </div>
+                                </div>
+
+                                <!-- Cost bonus preview -->
+                                <div id="echoCostBonus" class="echo-cost-bonus"></div>
+
+
+                                <!-- Sub Stats -->
+                                <div class="modal__section">
+                                    <label>Sub Stats</label>
+
+                                    <!-- Sub 1 -->
+                                    <div class="modal__row">
+                                        <div class="custom-dropdown modal-dropdown" id="echoSub1DropdownWrapper">
+                                            <div class="dropdown-selected" id="echoSub1DropdownSelected">Select Sub 1
+                                            </div>
+                                            <div class="dropdown-options hidden" id="echoSub1DropdownOptions"></div>
+                                        </div>
+                                        <select id="echoSub1Key" class="hidden"></select>
+                                        <input type="number" id="echoSub1Val" class="echo-num" placeholder="Value">
+                                    </div>
+
+                                    <!-- Sub 2 -->
+                                    <div class="modal__row">
+                                        <div class="custom-dropdown modal-dropdown" id="echoSub2DropdownWrapper">
+                                            <div class="dropdown-selected" id="echoSub2DropdownSelected">Select Sub 2
+                                            </div>
+                                            <div class="dropdown-options hidden" id="echoSub2DropdownOptions"></div>
+                                        </div>
+                                        <select id="echoSub2Key" class="hidden"></select>
+                                        <input type="number" id="echoSub2Val" class="echo-num" placeholder="Value">
+                                    </div>
+
+                                    <!-- Sub 3 -->
+                                    <div class="modal__row">
+                                        <div class="custom-dropdown modal-dropdown" id="echoSub3DropdownWrapper">
+                                            <div class="dropdown-selected" id="echoSub3DropdownSelected">Select Sub 3
+                                            </div>
+                                            <div class="dropdown-options hidden" id="echoSub3DropdownOptions"></div>
+                                        </div>
+                                        <select id="echoSub3Key" class="hidden"></select>
+                                        <input type="number" id="echoSub3Val" class="echo-num" placeholder="Value">
+                                    </div>
+
+                                    <!-- Sub 4 -->
+                                    <div class="modal__row">
+                                        <div class="custom-dropdown modal-dropdown" id="echoSub4DropdownWrapper">
+                                            <div class="dropdown-selected" id="echoSub4DropdownSelected">Select Sub 4
+                                            </div>
+                                            <div class="dropdown-options hidden" id="echoSub4DropdownOptions"></div>
+                                        </div>
+                                        <select id="echoSub4Key" class="hidden"></select>
+                                        <input type="number" id="echoSub4Val" class="echo-num" placeholder="Value">
+                                    </div>
+
+                                    <!-- Sub 5 -->
+                                    <div class="modal__row">
+                                        <div class="custom-dropdown modal-dropdown" id="echoSub5DropdownWrapper">
+                                            <div class="dropdown-selected" id="echoSub5DropdownSelected">Select Sub 5
+                                            </div>
+                                            <div class="dropdown-options hidden" id="echoSub5DropdownOptions"></div>
+                                        </div>
+                                        <select id="echoSub5Key" class="hidden"></select>
+                                        <input type="number" id="echoSub5Val" class="echo-num" placeholder="Value">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="modal__footer">
+                                <button class="btn btn--ghost" id="echoModalClear" type="button">Clear</button>
+                                <div class="spacer"></div>
+                                <button class="btn btn--secondary" id="echoModalCancel" type="button">Cancel</button>
+                                <button class="btn btn--primary" id="echoModalSave" type="button">Save</button>
+                            </div>
+                        </div>
+                    </div>
 
             </div>
 
+
+
+            </section>
+
+
         </div>
+
+    </div>
     </div>
 </body>
 
