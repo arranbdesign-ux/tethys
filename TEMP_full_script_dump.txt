@@ -141,92 +141,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return { label, chevron };
     }
 
-    // Persistence (cookies) ----------------------------------------------------
-    const COOKIE_NAME = "tethysState";
-
-    function getCookie(name) {
-        const parts = document.cookie.split("; ");
-        for (const part of parts) {
-            const [k, v] = part.split("=");
-            if (k === name) return decodeURIComponent(v || "");
-        }
-        return "";
-    }
-    function setCookie(name, value, maxAgeDays = 365) {
-        const maxAge = Math.floor(maxAgeDays * 24 * 60 * 60);
-        document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
-    }
-
-    function readState() {
-        try {
-            const raw = getCookie(COOKIE_NAME);
-            if (!raw) return { selectedCharName: null, chars: {} };
-            const parsed = JSON.parse(raw);
-            return { selectedCharName: null, chars: {}, ...parsed };
-        } catch { return { selectedCharName: null, chars: {} }; }
-    }
-    function writeState(state) {
-        try { setCookie(COOKIE_NAME, JSON.stringify(state)); } catch { /* noop */ }
-    }
-    function charKey(char) { return char?.name || ""; }
-    function ensureChar(state, key) {
-        if (!state.chars[key]) state.chars[key] = { weaponIndex: null, echoes: [null, null, null, null, null] };
-        return state.chars[key];
-    }
-    function persistSelectedChar(char) {
-        const st = readState(); st.selectedCharName = charKey(char); writeState(st);
-    }
-    function persistWeaponFor(char, weaponIndex) {
-        const st = readState(); const ck = charKey(char); const cst = ensureChar(st, ck); cst.weaponIndex = weaponIndex; writeState(st);
-    }
-    function persistEchoesFor(char, echoesArr) {
-        const st = readState(); const ck = charKey(char); const cst = ensureChar(st, ck); cst.echoes = echoesArr; writeState(st);
-    }
-    function applyWeaponSelectionLabel(character, weaponIndex) {
-        const list = weaponsByType[character.weaponType] || [];
-        const weapon = list[weaponIndex]; if (!weapon) return;
-        if (weaponSelectedUI.label) {
-            const img = document.createElement("img"); img.src = weapon.image; img.alt = weapon.name;
-            const span = document.createElement("span"); span.textContent = weapon.name;
-            weaponSelectedUI.label.innerHTML = ""; weaponSelectedUI.label.appendChild(img); weaponSelectedUI.label.appendChild(span);
-        }
-    }
-    function rehydrateForCharacter(character) {
-        const st = readState(); const cst = st.chars[charKey(character)]; if (!cst) return;
-        // weapon
-        if (typeof cst.weaponIndex === "number") {
-            weaponDropdownHidden.value = String(cst.weaponIndex);
-            weaponDropdownHidden.dispatchEvent(new Event("change"));
-            applyWeaponSelectionLabel(character, cst.weaponIndex);
-        }
-        // echoes
-        if (Array.isArray(cst.echoes) && cst.echoes.length === 5) {
-            currentEchoes = cst.echoes;
-            renderEchoTiles(); renderEchoCost(); renderEchoSetBonusesPanel();
-            if (currentCharacter) renderMainStatsFrom(currentCharacter, currentWeapon, getAllEchoBonuses());
-        }
-    }
-    function restoreOnLoad() {
-        const st = readState(); if (!st.selectedCharName) return;
-        const idx = (resonators || []).findIndex(c => c.name === st.selectedCharName);
-        if (idx < 0) return;
-        // Update visible label
-        const char = resonators[idx];
-        if (characterSelectedUI.label) {
-            const img = document.createElement("img"); img.src = char.profile || ""; img.alt = char.name;
-            const span = document.createElement("span"); span.textContent = char.name;
-            characterSelectedUI.label.innerHTML = ""; characterSelectedUI.label.appendChild(img); characterSelectedUI.label.appendChild(span);
-        }
-        characterDropdown.value = String(idx);
-        characterDropdown.dispatchEvent(new Event("change"));
-        // echo/weapon will be applied inside the change handler via rehydrateForCharacter
-    }
-
     // Percent formatting helpers
     const PCT_KEYS = ["atkp", "hpp", "defp", "cr", "cd", "er", "basicdmg", "skilldmg", "heavydmg", "libdmg", "havocdmg", "healing"];
     const WEAPON_PERCENT_KEYS = ["atkp", "hpp", "defp", "cr", "cd", "er"];
     function formatWeaponStatValue(key, value) {
-        if (value == null || value === "") return "â€”";
+        if (value == null || value === "") return "—";
         if (typeof value !== "number") return String(value);
         return WEAPON_PERCENT_KEYS.includes(key) ? `${value}%` : `${value}`;
     }
@@ -676,7 +595,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.main?.key) {
                     const chip = document.createElement("div"); chip.className = "stat-chip";
                     const ic = document.createElement("img"); ic.className = "stat-icon small"; ic.src = iconFor(data.main.key); ic.alt = labelFor(data.main.key);
-                    const nameEl = document.createElement("span"); nameEl.className = "stat-chip__name"; nameEl.textContent = `Main â€¢ ${labelFor(data.main.key)}`;
+                    const nameEl = document.createElement("span"); nameEl.className = "stat-chip__name"; nameEl.textContent = `Main • ${labelFor(data.main.key)}`;
                     const valEl = document.createElement("span"); valEl.className = "stat-chip__value";
                     valEl.textContent = PCT_KEYS.includes(data.main.key) ? `${parseNumber(data.main.value)}%` : `${parseNumber(data.main.value)}`;
                     chip.appendChild(ic); chip.appendChild(nameEl); chip.appendChild(valEl); stats.appendChild(chip);
@@ -716,7 +635,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Cost bonus preview
     function costBonusText(cost) {
         const arr = ECHO_COST_BONUS[cost] || []; if (!arr.length) return "No cost bonus";
-        return arr.map(b => `+${b.value} ${labelFor(b.key)}`).join("  â€¢  ");
+        return arr.map(b => `+${b.value} ${labelFor(b.key)}`).join("  •  ");
     }
     function renderEchoCostBonusPreview(costVal) {
         const el = document.getElementById("echoCostBonus"); if (!el) return;
@@ -735,7 +654,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const row = document.createElement("div"); row.className = "saved-item";
             const head = document.createElement("div"); head.className = "saved-item__header";
             const img = document.createElement("img"); img.className = "saved-item__profile"; img.src = def.icon; img.alt = def.name;
-            const title = document.createElement("h2"); title.textContent = `${def.name} â€” ${used}/5`;
+            const title = document.createElement("h2"); title.textContent = `${def.name} — ${used}/5`;
             head.appendChild(img); head.appendChild(title);
             const bonusesWrap = document.createElement("div"); bonusesWrap.className = "weapon-stats";
             (def.bonuses || []).forEach(b => {
@@ -867,7 +786,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const label = document.getElementById(`weaponStat${i}Label`);
             const value = document.getElementById(`weaponStat${i}Value`);
             const wrap = document.getElementById(`weaponStat${i}`);
-            if (icon) { icon.src = ""; icon.alt = ""; } if (label) label.textContent = "â€”"; if (value) value.textContent = "â€”"; if (wrap) wrap.style.display = "none";
+            if (icon) { icon.src = ""; icon.alt = ""; } if (label) label.textContent = "—"; if (value) value.textContent = "—"; if (wrap) wrap.style.display = "none";
         });
     }
     function renderWeaponDetailsGrid(weapon) {
@@ -992,8 +911,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const weapon = weaponsByType[currentCharacter.weaponType][weaponIndex];
         currentWeapon = weapon; populateWeaponDetails(weapon);
         renderMainStatsFrom(currentCharacter, currentWeapon, getAllEchoBonuses());
-        // Persist weapon selection per resonator
-        persistWeaponFor(currentCharacter, parseInt(weaponIndex, 10));
     });
 
     // Init
@@ -1018,9 +935,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.documentElement.style.setProperty("--color2-rgb", hexToRgb(char.color2));
         clearWeaponDetailsGrid(); populateWeaponDropdown(char); resetEchoBuilders(); renderEchoSetBonusesPanel();
         renderMainStatsFrom(currentCharacter, null, []);
-        // Persist selected resonator and rehydrate any saved build for it
-        persistSelectedChar(currentCharacter);
-        rehydrateForCharacter(currentCharacter);
     });
 
     // Character/weapon dropdown toggles
@@ -1034,9 +948,6 @@ document.addEventListener("DOMContentLoaded", () => {
             document.querySelectorAll(".dropdown-selected.open").forEach(el => el.classList.remove("open"));
         }
     });
-
-    // Attempt to restore previous session from cookies
-    restoreOnLoad();
 
     // --- Echo Modal: open/close/save ------------------------------------------
     function refreshMainDropdownForCost(cost, preferKey = "") {
@@ -1137,8 +1048,6 @@ document.addEventListener("DOMContentLoaded", () => {
         renderEchoCost();
         if (currentCharacter) renderMainStatsFrom(currentCharacter, currentWeapon, getAllEchoBonuses());
         renderEchoTiles(); renderEchoSetBonusesPanel();
-        // Persist echoes per resonator
-        if (currentCharacter) persistEchoesFor(currentCharacter, currentEchoes);
         closeEchoModal();
     }
 
@@ -1208,4 +1117,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Expose (optional)
     window._echoModal = { open: openEchoModal, close: closeEchoModal, save: saveEchoFromModal };
 });
+
+
 
