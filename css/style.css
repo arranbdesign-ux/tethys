@@ -3,6 +3,8 @@
     --color2: #373737;
     --color1-rgb: 72, 72, 72;
     --color2-rgb: 55, 55, 55;
+    /* Echo tile left column reserved width */
+    --echo-left: 7rem;
     /* Scrollbar defaults (dark-leaning to match site) */
     --scrollbar-track: rgba(255, 255, 255, 0.06);
     --scrollbar-thumb: rgba(255, 255, 255, 0.22);
@@ -93,6 +95,11 @@ html {
 * {
     box-sizing: border-box;
 
+}
+
+/* Global font to match site */
+body {
+    font-family: "PP Mori", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 }
 
 button,
@@ -964,23 +971,151 @@ select.echo-cost {
     content: none;
 }
 
+/* Echo tile content split */
+.echo-tile__content {
+    display: grid;
+    grid-template-columns: var(--echo-left) 1fr;
+    column-gap: var(--echo-gap);
+    align-items: start;
+}
+
+.echo-tile__left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.22);
+    padding-right: calc(var(--echo-gap) / 2);
+    margin-right: calc(var(--echo-gap) / 2);
+    position: relative;
+}
+
+/* Emphasize main stat chip in left column */
+.echo-tile__left .stat-chip {
+    background: transparent;
+    border: none;
+    padding: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+.echo-tile__left .stat-chip .stat-icon.small {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.echo-tile__left .stat-chip .stat-chip__value {
+    flex: 0 0 100%;
+    margin-left: 0;
+    font-size: 1.25rem;
+    font-weight: 900;
+    line-height: 1.05;
+}
+
+.echo-tile__left .stat-chip .stat-chip__name {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.echo-tile__right {
+    display: block;
+}
+
+/* Image inside left column */
 .echo-tile__thumb {
-    position: absolute;
-    inset: 0;
-    /* fill card edge-to-edge */
-    z-index: 0;
-    pointer-events: none;
-    /* allow clicks on tile */
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 4.25rem;
+    overflow: hidden;
+    border-radius: 0;
 }
 
 .echo-tile__thumb img {
+    width: 100%;
     height: 100%;
-    width: auto;
+    object-fit: cover;
     display: block;
-    /* fade from left 100% opacity to right 0% opacity */
-    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 70%);
-    mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 70%);
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%);
+    mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%);
 }
+
+/* Hide old top-left cost chip (replaced by left badges) */
+.echo-tile .echo-tile__cost { display: none; }
+
+/* Left badges (cost + set) */
+.echo-left-badges {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.echo-left-cost {
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 800;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+
+.echo-left-set {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 0.25rem;
+    display: block;
+}
+
+.echo-left-type {
+    position: absolute;
+    right: 0.4rem;
+    top: calc(0.4rem + 1.6rem + 0.35rem);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.375rem;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Main stat overlay bottom-right */
+.echo-main {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    padding: 0.45rem 0.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.0));
+    z-index: 1;
+    pointer-events: none;
+}
+
+.echo-main .stat-icon.small { width: 1.25rem; height: 1.25rem; }
+.echo-main .echo-main-value { color: #fff; font-weight: 900; font-size: 1.2rem; line-height: 1.05; }
+
+/* Hide the first chip (main) from right-side stats to avoid duplication */
+.echo-tile__stats .stat-chip:first-child { display: none; }
+
+/* Divider between substats and score in right column */
+.echo-divider { height: 1px; background: rgba(255, 255, 255, 0.12); margin: 0.5rem 0 0.35rem; }
 
 .echo-tile__cost {
     position: absolute;
@@ -1035,8 +1170,8 @@ select.echo-cost {
 
 /* Slightly larger icon inside the score chip */
 .echo-tile__score .stat-icon.small {
-    width: 1rem;
-    height: 1rem;
+    width: 1.25rem;
+    height: 1.25rem;
 }
 
 .echo-tile__score .score-left {
@@ -1055,30 +1190,34 @@ select.echo-cost {
 /* Prevent global value rule from pushing away the grade */
 .echo-tile__score .stat-chip__value {
     margin-left: 0;
+    font-size: 1rem;
+    font-weight: 800;
 }
 
 .echo-tile__score .score-grade {
     font-weight: 800;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
 }
 
-.echo-tile__divider {
-    height: 2px;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.2);
-    margin-top: 0.5rem;
-    margin-bottom: 0.4rem;
+/* Make the score title a bit larger without affecting others */
+.echo-tile__score .stat-chip__name {
+    font-size: 0.9rem;
+    font-weight: 700;
 }
 
-/* Add headroom when a main stat chip is being overlaid */
-.echo-tile__meta.has-main {
-    padding-top: 2.4rem;
-}
+/* Hide old horizontal divider; using vertical layout separator instead */
+.echo-tile__divider { display: none; }
+
+/* Slight headroom; main chip sits left */
+.echo-tile__meta.has-main { padding-top: 0.6rem; }
 
 /* Shift all echo content right when a type image is present */
-.echo-tile.has-thumb .echo-tile__meta {
-    padding-left: 6rem;
-}
+/* Reserve handled by content grid now */
+.echo-tile.has-thumb .echo-tile__meta { padding-left: 0; }
+
+/* Add vertical divider between left reserved area and right meta */
+/* Vertical divider now on left column border; disable pseudo */
+.echo-tile.has-thumb::after { content: none; }
 
 .echo-tile__title {
     font-weight: 600;
@@ -1088,10 +1227,15 @@ select.echo-cost {
     gap: 0.4rem;
 }
 
+/* Right-side substats: compact two-column grid */
 .echo-tile__stats {
-    display: flex;
-    gap: 0.375rem;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.375rem 0.5rem;
+}
+
+@media (max-width: 560px) {
+    .echo-tile__stats { grid-template-columns: 1fr; }
 }
 
 .echo-tile__stats .stat-chip {
@@ -1136,41 +1280,26 @@ select.echo-cost {
 }
 
 /* Elevate and pin the first (main) chip to the top-right when present */
-.echo-tile__meta.has-main .echo-tile__stats .stat-chip:first-child {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    z-index: 2;
-    /* remove background for a cleaner look */
-    background: transparent;
-    border: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    /* stack value below name/icon */
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: flex-end;
-    text-align: right;
-    max-width: 55%;
-}
+/* Main stat chip sits naturally in left column now */
+.echo-tile__meta.has-main .echo-tile__stats .stat-chip:first-child { position: relative; left: 0; right: 0; max-width: none; }
 
 .echo-tile__meta.has-main .echo-tile__stats .stat-chip:first-child .stat-chip__value {
     flex: 0 0 100%;
     margin-left: 0;
-    text-align: right;
-    font-size: 1rem;
-    font-weight: 700;
+    text-align: left;
+    font-size: 1.25rem;
+    font-weight: 900;
 }
 
 .echo-tile__meta.has-main .echo-tile__stats .stat-chip:first-child .stat-chip__name {
-    text-align: right;
+    text-align: left;
     font-size: 0.8rem;
     font-weight: 600;
 }
 
 .echo-tile__meta.has-main .echo-tile__stats .stat-chip:first-child .stat-icon.small {
-    width: 1.1rem;
-    height: 1.1rem;
+    width: 1.25rem;
+    height: 1.25rem;
 }
 
 .echo-tile__stats .stat-chip .stat-chip__name,
@@ -1464,22 +1593,12 @@ select.echo-cost {
 /* Echo tiles → 2-column grid */
 .echo-tiles {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 12px;
     /* tweak to taste */
 }
 
-/* (optional) keep single column on small screens */
-@media (max-width: 640px) {
-    .echo-tiles {
-        grid-template-columns: 1fr;
-    }
-
-    .echo-tiles .echo-tile:nth-child(5) {
-        grid-column: auto;
-        /* back to normal on narrow screens */
-    }
-}
+/* (previously used mobile override removed as layout is always 1-col) */
 
 /* smaller line under the echo name */
 .echo-tile__subtitle {
@@ -1487,6 +1606,227 @@ select.echo-cost {
     /* smaller than your .echo-tile__title */
     opacity: 0.85;
     margin-top: 2px;
+}
+
+/* Prototype Echo Card (two columns with divider) */
+#echoCardPrototype {
+    padding: 0 !important;
+    background: transparent !important;
+    border-radius: 0;
+    width: 100%;
+}
+
+.echo-card-proto {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    column-gap: 0.75rem;
+    align-items: stretch;
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.10);
+    border: none;
+    overflow: hidden;
+    width: 100%;
+    cursor: pointer;
+    transition: background .2s ease, box-shadow .2s ease, transform .12s ease;
+}
+
+.echo-card-proto.no-left {
+    grid-template-columns: 1fr;
+}
+
+.echo-card-proto:hover {
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    transform: translateY(-1px);
+}
+
+.echo-card-proto .proto-left {
+    padding: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.22);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.echo-card-proto .proto-thumb {
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 4.25rem;
+    border-radius: 0;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.echo-card-proto .proto-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    /* Fade from 100% opacity to 0% left → right */
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%);
+    mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%);
+}
+
+/* Top-right badges: cost + set icon */
+.echo-card-proto .proto-badges {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.echo-card-proto .proto-cost {
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 800;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+}
+
+.echo-card-proto .proto-set {
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 0.25rem;
+    display: block;
+}
+
+/* Echo type name label under badges */
+.echo-card-proto .proto-type {
+    position: absolute;
+    right: 0.4rem;
+    top: calc(0.4rem + 1.6rem + 0.35rem);
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: right;
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Main stat at the bottom of left column */
+.echo-card-proto .proto-main {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+    padding: 0.45rem 0.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.0));
+    z-index: 1;
+    pointer-events: none;
+    text-align: right;
+}
+
+.echo-card-proto .proto-main .stat-icon.small {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.echo-card-proto .proto-main .proto-main-value {
+    color: #fff;
+    font-weight: 900;
+    font-size: 1.2rem;
+    line-height: 1.05;
+}
+
+.echo-card-proto .proto-right {
+    padding: 0.5rem 0.75rem 0.75rem 0.25rem;
+}
+
+.echo-card-proto .proto-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.375rem 0.5rem;
+}
+
+/* Prototype: score without chip background/padding */
+.echo-card-proto .echo-tile__score {
+    margin-top: 0;
+    background: transparent;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+/* Prototype: divider element between substats and score */
+.echo-card-proto .proto-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 0.5rem 0 0.35rem;
+}
+
+@media (max-width: 560px) {
+    .echo-card-proto { grid-template-columns: 6rem 1fr; }
+    .echo-card-proto .proto-stats { grid-template-columns: 1fr; }
+}
+
+.echo-card-proto .proto-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.375rem;
+    border-radius: 0.375rem;
+    background: rgba(0, 0, 0, 0.35);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: #fff;
+    font-family: "PP Mori", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* Weighted gradient backgrounds by quartile (low→high) */
+.echo-card-proto .proto-chip.sub-tier-q1 {
+    background: linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(220, 38, 38, 0.28) 100%);
+    border-color: rgba(220, 38, 38, 0.45);
+}
+.echo-card-proto .proto-chip.sub-tier-q2 {
+    background: linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(249, 115, 22, 0.28) 100%);
+    border-color: rgba(249, 115, 22, 0.45);
+}
+.echo-card-proto .proto-chip.sub-tier-q3 {
+    background: linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(234, 179, 8, 0.28) 100%);
+    border-color: rgba(234, 179, 8, 0.45);
+}
+.echo-card-proto .proto-chip.sub-tier-q4 {
+    background: linear-gradient(90deg, rgba(0,0,0,0.35) 0%, rgba(34, 197, 94, 0.28) 100%);
+    border-color: rgba(34, 197, 94, 0.45);
+}
+
+/* Dim non-recommended substats */
+.echo-card-proto .proto-chip.not-recommended {
+    opacity: 0.3;
+}
+
+.echo-card-proto .proto-name {
+    font-size: 0.7rem;
+    opacity: 0.9;
+}
+
+.echo-card-proto .proto-value {
+    margin-left: auto;
+    font-weight: 700;
+    font-size: 0.85rem;
 }
 
 /* Left column: show only the grid, hide name/image/rarity header */

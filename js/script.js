@@ -288,6 +288,28 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Quartile helper for substat roll quality (q1..q4 low→high)
+    function substatQuartileClass(key, value) {
+        try {
+            const arr = (SUBSTAT_VALUES?.[key] || []).map(Number);
+            if (!arr.length) return "sub-tier-q2";
+            let i = arr.indexOf(Number(value));
+            if (i < 0) {
+                let bestI = 0, bestD = Infinity;
+                arr.forEach((v, j) => { const d = Math.abs(v - Number(value)); if (d < bestD) { bestD = d; bestI = j; } });
+                i = bestI;
+            }
+            const denom = Math.max(1, arr.length - 1);
+            const ratio = i / denom; // 0..1
+            if (ratio >= 0.75) return 'sub-tier-q4';      // highest → green
+            if (ratio >= 0.50) return 'sub-tier-q3';      // higher middle → yellow
+            if (ratio >= 0.25) return 'sub-tier-q2';      // lower middle → orange
+            return 'sub-tier-q1';                         // lowest → red
+        } catch (_) {
+            return 'sub-tier-q2';
+        }
+    }
+
     // Map a substat value to a 0..10 score based on its position in SUBSTAT_VALUES
     function substatValueScore(key, value) {
         const arr = (SUBSTAT_VALUES?.[key] || []).map(Number);
@@ -743,8 +765,112 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = currentEchoes[i];
 
             const tile = document.createElement("div");
-            tile.className = "echo-tile";
+            tile.className = "echo-card-proto"; // use prototype layout for live tiles
             tile.dataset.slot = String(slot);
+
+            // Build prototype-style card for this echo
+            {
+                const left = document.createElement('div'); left.className = 'proto-left';
+                const right = document.createElement('div'); right.className = 'proto-right';
+
+                const hasType = !!(data?.typeId && ECHO_TYPES[data.typeId]);
+                const hasSet = !!(data?.setId && ECHO_SETS[data.setId]);
+                const hasMain = !!(data?.main?.key);
+                const showLeft = hasType || hasSet || hasMain;
+
+                if (showLeft) {
+                    // Left: image (only show once a type is selected)
+                    if (hasType) {
+                        const thumbWrap = document.createElement('div'); thumbWrap.className = 'proto-thumb';
+                        const img = document.createElement('img');
+                        const t = ECHO_TYPES[data.typeId];
+                        img.src = t.thumb || t.icon || 'images/stats/unknown.png';
+                        img.alt = t.name || 'Echo';
+                        thumbWrap.appendChild(img);
+                        left.appendChild(thumbWrap);
+                    }
+
+                    // Top-right badges: cost + set
+                    const badges = document.createElement('div'); badges.className = 'proto-badges';
+                    const cost = document.createElement('div'); cost.className = 'proto-cost'; cost.textContent = String(data?.cost || 0);
+                    badges.appendChild(cost);
+                    if (hasSet) {
+                        const setImg = document.createElement('img'); setImg.className = 'proto-set'; setImg.src = ECHO_SETS[data.setId].icon; setImg.alt = (ECHO_SETS[data.setId].name || 'Set');
+                        badges.appendChild(setImg);
+                    }
+                    left.appendChild(badges);
+                    // Echo type name below badges (only if type selected)
+                    if (hasType) {
+                        const typeName = ECHO_TYPES[data.typeId]?.name || `Echo ${slot}`;
+                        const typeLbl = document.createElement('div'); typeLbl.className = 'proto-type'; typeLbl.textContent = typeName;
+                        left.appendChild(typeLbl);
+                    }
+
+                    // Bottom-right main stat overlay (icon + value only)
+                    if (hasMain) {
+                        const main = document.createElement('div'); main.className = 'proto-main';
+                        const ic = document.createElement('img'); ic.className = 'stat-icon small'; ic.src = iconFor(data.main.key); ic.alt = labelFor(data.main.key);
+                        const isPct = PCT_KEYS.includes(data.main.key);
+                        const val = document.createElement('span'); val.className = 'proto-main-value'; val.textContent = isPct ? `${parseNumber(data.main.value)}%` : `${parseNumber(data.main.value)}`;
+                        main.appendChild(ic); main.appendChild(val);
+                        left.appendChild(main);
+                    }
+                } else {
+                    // No left content to show
+                    tile.classList.add('no-left');
+                }
+
+                // Right: substats grid
+                const statsGrid = document.createElement('div'); statsGrid.className = 'proto-stats';
+                if (data && Array.isArray(data.subs)) {
+                    data.subs.forEach(s => {
+                        if (!s?.key) return;
+                        const chip = document.createElement('div'); chip.className = 'proto-chip';
+                        const sic = document.createElement('img'); sic.className = 'stat-icon small'; sic.src = iconFor(s.key); sic.alt = labelFor(s.key);
+                        const name = document.createElement('span'); name.className = 'proto-name'; name.textContent = labelFor(s.key);
+                        const val = document.createElement('span'); val.className = 'proto-value'; val.textContent = PCT_KEYS.includes(s.key) ? `${parseNumber(s.value)}%` : `${parseNumber(s.value)}`;
+                        // tier/weight class for gradient background
+                        chip.classList.add(substatQuartileClass(s.key, parseNumber(s.value)));
+                        // dim non-recommended substats if recommendations exist
+                        if (recSet && recSet.size) {
+                            if (recSet.has(s.key)) chip.classList.add('recommended');
+                            else chip.classList.add('not-recommended');
+                        }
+                        chip.appendChild(sic); chip.appendChild(name); chip.appendChild(val);
+                        statsGrid.appendChild(chip);
+                    });
+                }
+                right.appendChild(statsGrid);
+                // Divider and score
+                const divider = document.createElement('div'); divider.className = 'proto-divider'; right.appendChild(divider);
+                const scoreVal = data && currentCharacter ? Math.round(scoreEchoPiece(data, currentCharacter.name)) : 0;
+                const grade = gradeForScore(scoreVal);
+                const scoreRow = document.createElement('div'); scoreRow.className = 'echo-tile__score';
+                const sLeft = document.createElement('div'); sLeft.className = 'score-left';
+                const scoreIcon = document.createElement('img'); scoreIcon.className = 'stat-icon small'; scoreIcon.src = 'images/misc/score.webp'; scoreIcon.alt = 'Score';
+                const sLabel = document.createElement('span'); sLabel.className = 'stat-chip__name'; sLabel.textContent = 'Score';
+                sLeft.appendChild(scoreIcon); sLeft.appendChild(sLabel);
+                const sRight = document.createElement('div'); sRight.className = 'score-right';
+                const sVal = document.createElement('span'); sVal.className = 'stat-chip__value'; sVal.textContent = String(scoreVal);
+                const sGrade = document.createElement('span'); sGrade.className = 'score-grade'; sGrade.textContent = grade ? `(${grade})` : '';
+                sRight.appendChild(sVal); sRight.appendChild(sGrade);
+                scoreRow.appendChild(sLeft); scoreRow.appendChild(sRight);
+                right.appendChild(scoreRow);
+
+                // If empty, show hint text in right side
+                if (!data) {
+                    right.innerHTML = '';
+                    const empty = document.createElement('div'); empty.className = 'light'; empty.textContent = `Add Echo ${slot} — Click to set cost & stats`;
+                    empty.style.padding = '0.5rem 0.75rem';
+                    right.appendChild(empty);
+                }
+
+                if (showLeft) { tile.appendChild(left); }
+                tile.appendChild(right);
+                tile.addEventListener('click', () => { if (!currentCharacter) return; openEchoModal(slot); });
+                wrap.appendChild(tile);
+                continue;
+            }
 
             // Thumbnail: only show once an echo type has been selected
             let thumb = null;
@@ -783,7 +909,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 titleText.textContent = echoName;
                 title.appendChild(titleText);
 
-                meta.appendChild(title);
+                // meta.appendChild(title); // suppressed; show type on image instead
                 // Floating cost badge (top-left)
                 const costBadge = document.createElement("div");
                 costBadge.className = "echo-tile__cost";
@@ -799,7 +925,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const valEl = document.createElement("span"); valEl.className = "stat-chip__value";
                     valEl.textContent = PCT_KEYS.includes(data.main.key) ? `${parseNumber(data.main.value)}%` : `${parseNumber(data.main.value)}`;
                     // Normalize main chip label and tag meta for CSS placement
-                    try { nameEl.textContent = labelFor(data.main.key); } catch (_) {}
+                    try { nameEl.textContent = labelFor(data.main.key); } catch (_) { }
                     meta.classList.add('has-main');
                     chip.appendChild(ic); chip.appendChild(nameEl); chip.appendChild(valEl); stats.appendChild(chip);
                 }
@@ -820,13 +946,43 @@ document.addEventListener("DOMContentLoaded", () => {
                     chip.appendChild(ic); chip.appendChild(nameEl); chip.appendChild(valEl); stats.appendChild(chip);
                 });
 
-                // Set chip removed; set icon is shown inline with the title
-                // Removed echo type chip row under the set for a cleaner look
-                // Append stats, then a divider and a bottom-aligned score row
-                meta.appendChild(stats);
-                const divider = document.createElement('div');
-                divider.className = 'echo-tile__divider';
-                meta.appendChild(divider);
+                // Layout: left (image + main) | right (substats)
+                const content = document.createElement('div'); content.className = 'echo-tile__content';
+                const leftCol = document.createElement('div'); leftCol.className = 'echo-tile__left';
+                const rightCol = document.createElement('div'); rightCol.className = 'echo-tile__right';
+                // Left badges (cost + set) and echo type label
+                const badges = document.createElement('div'); badges.className = 'echo-left-badges';
+                const costChip = document.createElement('div'); costChip.className = 'echo-left-cost'; costChip.textContent = String(data.cost || 0);
+                badges.appendChild(costChip);
+                if (data.setId && ECHO_SETS[data.setId]?.icon) {
+                    const setImg = document.createElement('img'); setImg.className = 'echo-left-set'; setImg.src = ECHO_SETS[data.setId].icon; setImg.alt = (ECHO_SETS[data.setId].name || 'Set'); badges.appendChild(setImg);
+                }
+                leftCol.appendChild(badges);
+                const typeLbl = document.createElement('div'); typeLbl.className = 'echo-left-type'; typeLbl.textContent = echoName; leftCol.appendChild(typeLbl);
+
+                // move main chip to left
+                const mainChipEl = stats.firstElementChild || null;
+                if (mainChipEl) { leftCol.appendChild(mainChipEl); }
+
+                // image into left column if present
+                if (thumb) { leftCol.insertBefore(thumb, leftCol.firstChild || null); }
+                // Main stat overlay in left column
+                if (data.main?.key) {
+                    const mainWrap = document.createElement('div'); mainWrap.className = 'echo-main';
+                    const ic2 = document.createElement('img'); ic2.className = 'stat-icon small'; ic2.src = iconFor(data.main.key); ic2.alt = labelFor(data.main.key);
+                    const isPct2 = PCT_KEYS.includes(data.main.key);
+                    const val2 = document.createElement('span'); val2.className = 'echo-main-value'; val2.textContent = isPct2 ? `${parseNumber(data.main.value)}%` : `${parseNumber(data.main.value)}`;
+                    mainWrap.appendChild(ic2); mainWrap.appendChild(val2);
+                    leftCol.appendChild(mainWrap);
+                }
+
+                // right: remaining substat chips
+                rightCol.appendChild(stats);
+                content.appendChild(leftCol);
+                content.appendChild(rightCol);
+                meta.appendChild(content);
+
+                // bottom-aligned score row
                 const score = currentCharacter ? scoreEchoPiece(data, currentCharacter.name) : 0;
                 const grade = gradeForScore(score);
                 const badge = document.createElement("div");
@@ -842,10 +998,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 const scoreGrade = document.createElement('span'); scoreGrade.className = 'score-grade'; scoreGrade.textContent = grade ? `(${grade})` : '';
                 right.appendChild(scoreValue); right.appendChild(scoreGrade);
                 badge.appendChild(left); badge.appendChild(right);
-                meta.appendChild(badge);
+                // Divider between substats and score within right column
+                const rDivider = document.createElement('div'); rDivider.className = 'echo-divider'; rightCol.appendChild(rDivider);
+                rightCol.appendChild(badge);
             }
 
-            if (thumb) { tile.appendChild(thumb); tile.classList.add('has-thumb'); }
+            if (thumb) { tile.classList.add('has-thumb'); }
             tile.appendChild(meta);
             tile.addEventListener("click", () => { if (!currentCharacter) return; openEchoModal(slot); });
             wrap.appendChild(tile);
