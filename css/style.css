@@ -1492,5 +1492,97 @@ select.echo-cost {
 
 #echoSetBonuses {
     width: 100%;
-    /* shown as grid when weapon selected */
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+#echoSetBonuses h1 {
+    /* keep consistent heading style but ensure spacing */
+    margin-bottom: 0.25rem;
+}
+
+#echoSetBonusesList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+@media (max-width: 720px) {
+    #echoSetBonusesList {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* If there is only one card, let it span full width */
+#echoSetBonusesList>*:only-child {
+    grid-column: 1 / -1;
+}
+
+/* Avoid overflow clipping in grid items */
+#echoSetBonusesList>* {
+    min-width: 0;
+}
+
+/* Ensure each card fills its grid cell */
+#echoSetBonusesList>.saved-item {
+    width: 100%;
+    justify-self: stretch;
+}
+
+/* Let bonus chips wrap nicely inside each row */
+#echoSetBonuses .weapon-stats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+}
+
+/* Make bonus chips more distinct and readable */
+#echoSetBonuses .weapon-stats .stat-chip {
+    padding: 0.35rem 0.5rem;
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+#echoSetBonuses .weapon-stats .stat-chip h3 {
+    color: #fff;
+    opacity: 0.9;
+}
+
+#echoSetBonuses .weapon-stats .stat-chip.active {
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+#echoSetBonuses .weapon-stats .stat-chip.inactive {
+    background: rgba(255, 255, 255, 0.06);
+    opacity: 0.65;
+    filter: grayscale(75%);
+}
+
+/* Let the bonuses grid breathe across the full panel width */
+#echoSetBonusesList {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Slightly tighten the saved-item row in the bonuses panel */
+#echoSetBonuses .saved-item {
+    padding: 0.6rem 0.5rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    font-family: "PP Mori";
+    color: #fff;
+}
+
+/* Ensure all nested text in the cards is readable and consistent */
+#echoSetBonuses .saved-item * {
+    color: #fff;
+    font-family: "PP Mori";
 }
