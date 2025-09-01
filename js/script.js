@@ -587,6 +587,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const values = SUBSTAT_VALUES[key] || [];
             // Rebuild the custom value dropdown for this sub
             populateSubValueDropdown(idx, values, cur);
+            // Enable/disable value selector until a key is chosen
+            const wrap = document.getElementById(`echoSub${idx}ValWrapper`);
+            if (wrap) wrap.classList.toggle('disabled', !key);
             updateSubKeyDuplicateDisables();
         };
     }
@@ -632,23 +635,18 @@ document.addEventListener("DOMContentLoaded", () => {
             tile.className = "echo-tile";
             tile.dataset.slot = String(slot);
 
-            // Thumbnail from type -> set -> unknown
-            const thumb = document.createElement("div");
-            thumb.className = "echo-tile__thumb";
-            const ico = document.createElement("img");
-            let thumbSrc = "images/stats/unknown.png";
-            let thumbAlt = "Echo";
+            // Thumbnail: only show once an echo type has been selected
+            let thumb = null;
             if (data?.typeId && ECHO_TYPES[data.typeId]) {
                 const t = ECHO_TYPES[data.typeId];
-                thumbSrc = t.thumb || t.icon || thumbSrc;
-                thumbAlt = t.name || thumbAlt;
-            } else if (data?.setId && ECHO_SETS[data.setId]) {
-                const s = ECHO_SETS[data.setId];
-                thumbSrc = s.icon || thumbSrc;
-                thumbAlt = s.name || thumbAlt;
+                const thumbSrc = t.thumb || t.icon || "images/stats/unknown.png";
+                const thumbAlt = t.name || "Echo";
+                thumb = document.createElement("div");
+                thumb.className = "echo-tile__thumb";
+                const ico = document.createElement("img");
+                ico.src = thumbSrc; ico.alt = thumbAlt;
+                thumb.appendChild(ico);
             }
-            ico.src = thumbSrc; ico.alt = thumbAlt;
-            thumb.appendChild(ico);
 
             const meta = document.createElement("div");
             meta.className = "echo-tile__meta";
@@ -698,17 +696,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     const sName = document.createElement("span"); sName.className = "light"; sName.textContent = ECHO_SETS[data.setId].name;
                     setRow.appendChild(sImg); setRow.appendChild(sName); meta.appendChild(setRow);
                 }
-                if (data.typeId && ECHO_TYPES[data.typeId]) {
-                    const t = ECHO_TYPES[data.typeId]; const typeRow = document.createElement("div"); typeRow.className = "echo-tile__set";
-                    const tImg = document.createElement("img"); tImg.className = "stat-icon small"; tImg.src = t.icon; tImg.alt = t.name;
-                    const tName = document.createElement("span"); tName.className = "light"; tName.textContent = t.name;
-                    typeRow.appendChild(tImg); typeRow.appendChild(tName); meta.appendChild(typeRow);
-                }
+                // Removed echo type chip row under the set for a cleaner look
                 meta.appendChild(stats);
             }
 
-            tile.appendChild(thumb); tile.appendChild(meta);
-            tile.addEventListener("click", () => openEchoModal(slot));
+            if (thumb) { tile.appendChild(thumb); tile.classList.add('has-thumb'); }
+            tile.appendChild(meta);
+            tile.addEventListener("click", () => { if (!currentCharacter) return; openEchoModal(slot); });
             wrap.appendChild(tile);
         }
     }
@@ -720,7 +714,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     function renderEchoCostBonusPreview(costVal) {
         const el = document.getElementById("echoCostBonus"); if (!el) return;
-        el.textContent = `Cost bonus: ${costBonusText(parseInt(costVal, 10))}`;
+        const cost = parseInt(costVal, 10);
+        const arr = ECHO_COST_BONUS[cost] || [];
+        el.innerHTML = "";
+        const label = document.createElement("span"); label.className = "label"; label.textContent = "Cost bonus:";
+        el.appendChild(label);
+        if (!arr.length) { const none = document.createElement("span"); none.className = "light"; none.textContent = "None"; el.appendChild(none); return; }
+        arr.forEach(b => {
+            const chip = document.createElement("div"); chip.className = "cost-bonus-chip";
+            const ic = document.createElement("img"); ic.className = "stat-icon"; ic.src = iconFor(b.key); ic.alt = labelFor(b.key);
+            const isPct = PCT_KEYS.includes(b.key);
+            const txt = document.createElement("span"); txt.textContent = `${isPct ? b.value + "%" : b.value} ${labelFor(b.key)}`;
+            chip.appendChild(ic); chip.appendChild(txt);
+            el.appendChild(chip);
+        });
     }
 
     // Set bonuses (panel + active bonuses list)
@@ -945,6 +952,9 @@ document.addEventListener("DOMContentLoaded", () => {
         document.documentElement.style.setProperty("--color2-rgb", "55, 55, 55");
         if (characterSelectedUI.label) { characterSelectedUI.label.innerHTML = "<span>Select your resonator</span>"; }
         if (weaponSelectedUI.label) { weaponSelectedUI.label.innerHTML = "<span>Select Weapon</span>"; }
+        // Disable weapon selector and echo tiles until a character is chosen
+        weaponDropdownSelected?.classList.add('disabled');
+        const tiles = document.getElementById('echoTiles'); if (tiles) tiles.classList.add('disabled');
         clearWeaponDetailsGrid(); initStatIcons(); renderEchoSetBonusesPanel(); resetEchoBuilders();
     }
     function updateStats(char) {
@@ -1021,11 +1031,17 @@ document.addEventListener("DOMContentLoaded", () => {
         // Persist selected resonator and rehydrate any saved build for it
         persistSelectedChar(currentCharacter);
         rehydrateForCharacter(currentCharacter);
+        // Re-enable weapon selector and echo tiles
+        weaponDropdownSelected?.classList.remove('disabled');
+        const tiles = document.getElementById('echoTiles'); if (tiles) tiles.classList.remove('disabled');
     });
 
     // Character/weapon dropdown toggles
     dropdownSelected?.addEventListener("click", (e) => { e.stopPropagation(); dropdownOptions.classList.toggle("hidden"); dropdownSelected.classList.toggle("open"); });
-    weaponDropdownSelected?.addEventListener("click", (e) => { e.stopPropagation(); weaponDropdownOptions.classList.toggle("hidden"); weaponDropdownSelected.classList.toggle("open"); });
+    weaponDropdownSelected?.addEventListener("click", (e) => {
+        if (!currentCharacter || weaponDropdownSelected.classList.contains('disabled')) return;
+        e.stopPropagation(); weaponDropdownOptions.classList.toggle("hidden"); weaponDropdownSelected.classList.toggle("open");
+    });
 
     // Global outside click closes any dropdown
     document.addEventListener("click", (e) => {
@@ -1079,6 +1095,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const v = document.getElementById(`echoSub${i}Val`)?.value || "";
             const values = SUBSTAT_VALUES[k] || [];
             populateSubValueDropdown(i, values, v);   // <-- fixed to use k and custom dropdown
+            const wrap = document.getElementById(`echoSub${i}ValWrapper`);
+            if (wrap) wrap.classList.toggle('disabled', !k);
         }
         updateSubKeyDuplicateDisables();
 
@@ -1156,6 +1174,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const valOptions = document.getElementById(`echoSub${i}ValOptions`);
             if (valSelected) valSelected.innerHTML = '<div class="dropdown-label">Select Value</div>';
             if (valOptions) valOptions.innerHTML = "";
+            const wrap = document.getElementById(`echoSub${i}ValWrapper`); if (wrap) wrap.classList.add('disabled');
         }
         setCustomDropdownLabel("echoMainDropdownSelected", "");
         updateSubKeyDuplicateDisables();

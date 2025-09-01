@@ -236,6 +236,13 @@ html {
     cursor: pointer;
 }
 
+/* Disabled state for custom dropdown triggers */
+.dropdown-selected.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .dropdown-label {
     display: flex;
     align-items: center;
@@ -926,41 +933,67 @@ select.echo-cost {
     gap: 0.75rem;
 }
 
+/* Disabled echo grid when no character is selected */
+#echoTiles.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 .echo-tile {
     font-family: "PP Mori";
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 1rem;
+    padding: 0;
+    /* let the image fill edge-to-edge; add padding on meta */
     border-radius: 0.75rem;
     background: rgba(255, 255, 255, 0.10);
     cursor: pointer;
     transition: background .2s ease;
+    position: relative;
+    overflow: hidden;
+    color: #fff;
 }
 
 .echo-tile:hover {
     background: rgba(255, 255, 255, 0.16);
 }
 
+.echo-tile::before {
+    content: none;
+}
+
 .echo-tile__thumb {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.5rem;
-    background: rgba(0, 0, 0, .35);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: absolute;
+    inset: 0;
+    /* fill card edge-to-edge */
+    z-index: 0;
+    pointer-events: none;
+    /* allow clicks on tile */
 }
 
 .echo-tile__thumb img {
-    width: 1.5rem;
-    height: 1.5rem;
+    height: 100%;
+    width: auto;
+    display: block;
+    /* fade from left 100% opacity to right 0% opacity */
+    -webkit-mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 70%);
+    mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 70%);
 }
 
 .echo-tile__meta {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    position: relative;
+    z-index: 1;
+    padding: 1rem;
+    /* restore inner spacing for content */
+}
+
+/* Shift all echo content right when a type image is present */
+.echo-tile.has-thumb .echo-tile__meta {
+    padding-left: 6rem;
 }
 
 .echo-tile__title {
@@ -980,7 +1013,16 @@ select.echo-cost {
     gap: 0.4rem;
     padding: 0.25rem 0.375rem;
     border-radius: 0.375rem;
-    background: rgba(0, 0, 0, 0.30);
+    background: rgba(0, 0, 0, 0.35);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.echo-tile__stats .stat-chip .stat-chip__name,
+.echo-tile__stats .stat-chip .stat-chip__value,
+.echo-tile__stats .stat-chip span {
+    color: #fff;
 }
 
 .stat-chip .stat-icon.small {
@@ -1009,6 +1051,8 @@ select.echo-cost {
     position: fixed;
     inset: 0;
     display: none;
+    z-index: 1000;
+    /* ensure above page content */
 }
 
 .echo-cost-bonus {
@@ -1027,6 +1071,7 @@ select.echo-cost {
     inset: 0;
     background: rgba(0, 0, 0, .55);
     backdrop-filter: blur(2px);
+    z-index: 1000;
 }
 
 .modal__content {
@@ -1037,6 +1082,8 @@ select.echo-cost {
     border-radius: 1rem;
     padding: 1rem;
     box-shadow: 0 20px 60px rgba(0, 0, 0, .5);
+    z-index: 1001;
+    /* above overlay */
 }
 
 .modal__header {
@@ -1072,7 +1119,13 @@ select.echo-cost {
 
 .modal__row {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    /* a bit more room between dropdowns */
+}
+
+/* Add vertical spacing between consecutive rows in sections (affects sub stats list) */
+.modal__section .modal__row+.modal__row {
+    margin-top: 0.5rem;
 }
 
 .modal__subs {
@@ -1089,6 +1142,11 @@ select.echo-cost {
 }
 
 .modal__spacer {
+    flex: 1;
+}
+
+/* HTML uses `spacer` in footer; ensure it flexes */
+.modal__footer .spacer {
     flex: 1;
 }
 
@@ -1122,6 +1180,8 @@ select.echo-cost {
     border-radius: 0.5rem;
     border: none;
     cursor: pointer;
+    color: #fff;
+    transition: background-color .15s ease, box-shadow .15s ease, transform .02s ease;
 }
 
 .btn.primary {
@@ -1142,6 +1202,56 @@ select.echo-cost {
     background: transparent;
     color: #fff;
     opacity: .85;
+}
+
+/* BEM-style button variants used in modal footer */
+.btn--primary {
+    background: #22c55e;
+    /* green-500 */
+    color: #fff;
+}
+
+.btn--primary:hover {
+    background: #16a34a;
+    /* green-600 */
+}
+
+.btn--primary:active {
+    transform: translateY(1px);
+}
+
+.btn--secondary {
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.btn--secondary:hover {
+    background: rgba(0, 0, 0, 0.88);
+}
+
+.btn--secondary:active {
+    transform: translateY(1px);
+}
+
+.btn--ghost {
+    background: #b91c1c;
+    /* red-700 */
+    color: #fff;
+}
+
+.btn--ghost:hover {
+    background: #dc2626;
+    /* red-600 */
+}
+
+.btn--ghost:active {
+    transform: translateY(1px);
+}
+
+/* Make modal buttons align visually with compact inputs */
+.modal .btn {
+    height: 2.5rem;
 }
 
 /* ADD: simple inline radio group */
@@ -1273,6 +1383,94 @@ select.echo-cost {
 
 .form-row.inline>div {
     flex: 1;
+}
+
+/* Modal dropdown sizing tweaks */
+.modal .custom-dropdown .dropdown-selected {
+    height: 2.5rem;
+    padding: 0.4rem 0.6rem;
+}
+
+.modal .dropdown-selected img {
+    width: 2rem;
+    height: 2rem;
+}
+
+.modal .dropdown-label {
+    gap: 0.5rem;
+}
+
+.modal .dropdown-options {
+    max-height: 16rem;
+}
+
+.modal .dropdown-option {
+    padding: 0.65rem 0.75rem;
+}
+
+.modal .dropdown-option img {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.modal input.echo-num {
+    height: 2.5rem;
+}
+
+.modal .custom-dropdown.searchable input.dropdown-selected {
+    height: 2.5rem;
+    padding: 0.4rem 0.6rem;
+}
+
+/* Make sub-stat key/value dropdowns share the row and keep spacing */
+.modal .modal__row .modal-dropdown {
+    flex: 1;
+    min-width: 0;
+}
+
+.modal .modal__row .modal-dropdown+.modal-dropdown {
+    margin-left: 0;
+}
+
+/* Make substat value dropdown narrower than the key dropdown */
+.modal [id^="echoSub"][id$="ValWrapper"] {
+    flex: 0 0 9rem;
+    /* fixed, compact width for value selector */
+}
+
+/* Dim and disable value selector until a substat key is chosen */
+.modal .custom-dropdown.disabled {
+    opacity: 0.45;
+    pointer-events: none;
+    cursor: default;
+}
+
+/* Cost bonus styling: icon + white text */
+.echo-cost-bonus {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    color: #fff;
+    opacity: 1;
+}
+
+.echo-cost-bonus .label {
+    opacity: 0.9;
+}
+
+.echo-cost-bonus .cost-bonus-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.4rem;
+    border-radius: 0.375rem;
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.echo-cost-bonus .cost-bonus-chip .stat-icon {
+    width: 0.85rem;
+    height: 0.85rem;
 }
 
 .custom-dropdown.searchable input.dropdown-selected {
