@@ -112,6 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // External data hooks
     const ECHO_SETS = window.ECHO_SETS || {};
     const ECHO_TYPES = window.ECHO_TYPES || {};
+    const RECOMMENDED_SUBSTATS = window.RECOMMENDED_SUBSTATS || {};
     const MAIN_STAT_VALUES = window.MAIN_STAT_VALUES || {};
     const SUBSTAT_VALUES = window.SUBSTAT_VALUES || {};
 
@@ -261,6 +262,29 @@ document.addEventListener("DOMContentLoaded", () => {
         ...ALLOWED_SUBSTAT_KEYS.filter(k => !SUBSTAT_ORDER.includes(k))
     ];
 
+    // Tier helper for substat roll quality (low/mid/high)
+    function substatTierClass(key, value) {
+        try {
+            const arr = (SUBSTAT_VALUES?.[key] || []).map(Number);
+            if (!arr.length) return "sub-tier-mid";
+            const idx = arr.indexOf(Number(value));
+            const i = idx >= 0 ? idx : (() => {
+                // fallback: find nearest
+                let bestI = 0, bestD = Infinity;
+                arr.forEach((v, j) => { const d = Math.abs(v - Number(value)); if (d < bestD) { bestD = d; bestI = j; } });
+                return bestI;
+            })();
+            const L = arr.length;
+            const lowEnd = Math.floor(L / 3);
+            const highStart = Math.floor(2 * L / 3);
+            if (i < lowEnd) return "sub-tier-low";
+            if (i >= highStart) return "sub-tier-high";
+            return "sub-tier-mid";
+        } catch (_) {
+            return "sub-tier-mid";
+        }
+    }
+
     // Cost-based flats per echo
     const ECHO_COST_BONUS = { 4: [{ key: "atk", value: 150 }], 3: [{ key: "atk", value: 100 }], 1: [{ key: "hp", value: 2280 }] };
 
@@ -302,10 +326,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const hiddenId = `echoSub${idx}Val`;
         const optionsId = `echoSub${idx}ValOptions`;
         const selectedId = `echoSub${idx}ValSelected`;
+        const wrapId = `echoSub${idx}ValWrapper`;
 
         const hiddenSelect = document.getElementById(hiddenId);
         const optionsDiv = document.getElementById(optionsId);
         const selectedDiv = document.getElementById(selectedId);
+        const wrap = document.getElementById(wrapId);
         if (!hiddenSelect || !optionsDiv || !selectedDiv) return;
 
         hiddenSelect.innerHTML = "";
@@ -314,7 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Placeholder in hidden select
         const placeholderOpt = document.createElement("option");
         placeholderOpt.value = "";
-        placeholderOpt.textContent = "Select Value";
+        placeholderOpt.textContent = "—";
         hiddenSelect.appendChild(placeholderOpt);
 
         values.forEach(v => {
@@ -334,6 +360,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 const label = selectedDiv.querySelector(".dropdown-label");
                 if (label) label.textContent = valStr;
                 else selectedDiv.innerHTML = `<div class="dropdown-label">${valStr}</div>`;
+                // Add/update unit overlay for percent substats
+                let unitEl = selectedDiv.querySelector('.echo-unit');
+                if (!unitEl) { unitEl = document.createElement('span'); unitEl.className = 'echo-unit'; selectedDiv.appendChild(unitEl); }
+                if (wrap?.classList.contains('pct')) unitEl.textContent = '%'; else unitEl.textContent = '';
                 optionsDiv.classList.add("hidden");
                 selectedDiv.classList.remove("open");
                 hiddenSelect.value = valStr;
@@ -358,8 +388,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (selectedVal) {
             hiddenSelect.value = selectedVal;
             selectedDiv.innerHTML = `<div class="dropdown-label">${selectedVal}</div>`;
+            // Ensure unit overlay reflects pct status
+            let unitEl = selectedDiv.querySelector('.echo-unit');
+            if (!unitEl) { unitEl = document.createElement('span'); unitEl.className = 'echo-unit'; selectedDiv.appendChild(unitEl); }
+            if (wrap?.classList.contains('pct')) unitEl.textContent = '%'; else unitEl.textContent = '';
         } else {
-            selectedDiv.innerHTML = `<div class="dropdown-label">Select Value</div>`;
+            selectedDiv.innerHTML = `<div class="dropdown-label">—</div>`;
+            // Clear any unit overlay on empty
+            const unitEl = selectedDiv.querySelector('.echo-unit'); if (unitEl) unitEl.textContent = '';
         }
     }
 
@@ -546,7 +582,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Substat values (legacy select builder kept for safety)
     function buildSubValueOptionsHTML(key, selectedVal = "") {
         const values = SUBSTAT_VALUES[key] || [];
-        const opts = ['<option value="">Select Value</option>'];
+        const opts = ['<option value="">—</option>'];
         for (const v of values) {
             const s = String(v); const sel = (String(selectedVal) === s) ? ' selected' : '';
             opts.push(`<option value="${s}"${sel}>${s}</option>`);
@@ -589,7 +625,14 @@ document.addEventListener("DOMContentLoaded", () => {
             populateSubValueDropdown(idx, values, cur);
             // Enable/disable value selector until a key is chosen
             const wrap = document.getElementById(`echoSub${idx}ValWrapper`);
-            if (wrap) wrap.classList.toggle('disabled', !key);
+            if (wrap) {
+                wrap.classList.toggle('disabled', !key);
+                wrap.classList.toggle('pct', !!key && PCT_KEYS.includes(key));
+                // If value already selected, update unit overlay accordingly
+                const selectedDiv = document.getElementById(`echoSub${idx}ValSelected`);
+                const unitEl = selectedDiv?.querySelector('.echo-unit');
+                if (unitEl) unitEl.textContent = (wrap.classList.contains('pct') && cur) ? '%' : '';
+            }
             updateSubKeyDuplicateDisables();
         };
     }
@@ -598,12 +641,16 @@ document.addEventListener("DOMContentLoaded", () => {
     function setMainStatValueFromSelection() {
         const mainKeyEl = document.getElementById("echoMainKey");
         const mainValEl = document.getElementById("echoMainVal");
+        const mainUnitEl = document.getElementById("echoMainValUnit");
         if (!mainKeyEl || !mainValEl) return;
         const cost = getSelectedEchoCost();
         const key = mainKeyEl.value;
         const v = (MAIN_STAT_VALUES?.[cost] ?? {})[key];
         mainValEl.value = (typeof v === "number") ? String(v) : "";
         mainValEl.readOnly = true; mainValEl.title = "Main stat value is auto-set by cost & stat";
+        // Toggle inactive style until a main stat is chosen
+        mainValEl.classList.toggle('disabled', !key);
+        if (mainUnitEl) mainUnitEl.textContent = key && PCT_KEYS.includes(key) ? "%" : "";
     }
 
     // Echo modal state ----------------------------------------------------------
@@ -627,6 +674,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function renderEchoTiles() {
         const wrap = document.getElementById("echoTiles"); if (!wrap) return;
         wrap.innerHTML = "";
+        const recSet = new Set((currentCharacter && RECOMMENDED_SUBSTATS[currentCharacter?.name]) || []);
         for (let i = 0; i < 5; i++) {
             const slot = i + 1;
             const data = currentEchoes[i];
@@ -660,7 +708,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 const title = document.createElement("div");
                 title.className = "echo-tile__title";
                 const echoName = (data.typeId && ECHO_TYPES[data.typeId]?.name) || `Echo ${slot}`;
-                title.textContent = echoName;
+                // Prepend set icon (if any) to the echo title
+                if (data.setId && ECHO_SETS[data.setId]?.icon) {
+                    const setIcon = document.createElement("img");
+                    setIcon.className = "echo-set-icon";
+                    setIcon.src = ECHO_SETS[data.setId].icon;
+                    setIcon.alt = ECHO_SETS[data.setId].name || "Set";
+                    title.appendChild(setIcon);
+                }
+                const titleText = document.createElement("span");
+                titleText.textContent = echoName;
+                title.appendChild(titleText);
 
                 const sub = document.createElement("div");
                 sub.className = "echo-tile__subtitle";
@@ -677,6 +735,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     const nameEl = document.createElement("span"); nameEl.className = "stat-chip__name"; nameEl.textContent = `Main • ${labelFor(data.main.key)}`;
                     const valEl = document.createElement("span"); valEl.className = "stat-chip__value";
                     valEl.textContent = PCT_KEYS.includes(data.main.key) ? `${parseNumber(data.main.value)}%` : `${parseNumber(data.main.value)}`;
+                    // Normalize main chip label and tag meta for CSS placement
+                    try { nameEl.textContent = labelFor(data.main.key); } catch (_) {}
+                    meta.classList.add('has-main');
                     chip.appendChild(ic); chip.appendChild(nameEl); chip.appendChild(valEl); stats.appendChild(chip);
                 }
                 (data.subs || []).forEach(s => {
@@ -686,16 +747,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     const nameEl = document.createElement("span"); nameEl.className = "stat-chip__name"; nameEl.textContent = labelFor(s.key);
                     const valEl = document.createElement("span"); valEl.className = "stat-chip__value";
                     valEl.textContent = PCT_KEYS.includes(s.key) ? `${parseNumber(s.value)}%` : `${parseNumber(s.value)}`;
+                    // If recommendations exist for this resonator, mark recommended and dim others
+                    if (recSet.size) {
+                        if (recSet.has(s.key)) chip.classList.add('recommended');
+                        else chip.classList.add('not-recommended');
+                    }
+                    // Apply tier class based on value position in the allowed list for that substat key
+                    chip.classList.add(substatTierClass(s.key, parseNumber(s.value)));
                     chip.appendChild(ic); chip.appendChild(nameEl); chip.appendChild(valEl); stats.appendChild(chip);
                 });
 
-                // Set + Type rows
-                if (data.setId && ECHO_SETS[data.setId]) {
-                    const setRow = document.createElement("div"); setRow.className = "echo-tile__set";
-                    const sImg = document.createElement("img"); sImg.className = "stat-icon small"; sImg.src = ECHO_SETS[data.setId].icon; sImg.alt = ECHO_SETS[data.setId].name;
-                    const sName = document.createElement("span"); sName.className = "light"; sName.textContent = ECHO_SETS[data.setId].name;
-                    setRow.appendChild(sImg); setRow.appendChild(sName); meta.appendChild(setRow);
-                }
+                // Set chip removed; set icon is shown inline with the title
                 // Removed echo type chip row under the set for a cleaner look
                 meta.appendChild(stats);
             }
@@ -733,10 +795,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // Set bonuses (panel + active bonuses list)
     function renderEchoSetBonusesPanel() {
         const list = document.getElementById("echoSetBonusesList"); if (!list) return;
+        const panel = document.getElementById("echoSetBonuses");
         list.innerHTML = "";
         const counts = {}; currentEchoes.forEach(e => { if (e?.setId) counts[e.setId] = (counts[e.setId] || 0) + 1; });
         const setIds = Object.keys(counts);
-        if (!setIds.length) { const p = document.createElement("p"); p.className = "light"; p.textContent = "No sets selected."; list.appendChild(p); return; }
+        // Hide the entire panel if there are no sets selected
+        if (!setIds.length) {
+            if (panel) { panel.style.display = "none"; }
+            return;
+        } else {
+            if (panel) { panel.style.display = "flex"; }
+        }
         setIds.forEach(setId => {
             const def = ECHO_SETS[setId]; if (!def) return; const used = counts[setId];
             const row = document.createElement("div"); row.className = "saved-item";
@@ -744,10 +813,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const img = document.createElement("img"); img.className = "saved-item__profile"; img.src = def.icon; img.alt = def.name;
             const title = document.createElement("h2"); title.textContent = `${def.name} — ${used}/5`;
             head.appendChild(img); head.appendChild(title);
+            // Normalize title separator to avoid garbled characters
+            title.textContent = `${def.name} — ${used}/5`;
             const bonusesWrap = document.createElement("div"); bonusesWrap.className = "weapon-stats";
             (def.bonuses || []).forEach(b => {
                 const chip = document.createElement("div"); chip.className = "stat-chip";
-                if (used < b.count) chip.style.opacity = 0.5;
+                if (used < b.count) { chip.classList.add("inactive"); } else { chip.classList.add("active"); }
                 const tag = document.createElement("h3"); tag.textContent = `${b.count}-Set: `;
                 chip.appendChild(tag);
                 b.stats.forEach(s => {
@@ -838,6 +909,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const rarityImg = document.querySelector(".details-stars");
     const tierImg = document.querySelector("#resTiers .details-icon");
     const tierName = document.querySelector("#resTiers h2");
+    const resonatorBasicsGrid = document.querySelector('.saved .details-grid');
 
     const dropdownSelected = document.getElementById("dropdownSelected");
     const dropdownOptions = document.getElementById("dropdownOptions");
@@ -952,6 +1024,8 @@ document.addEventListener("DOMContentLoaded", () => {
         document.documentElement.style.setProperty("--color2-rgb", "55, 55, 55");
         if (characterSelectedUI.label) { characterSelectedUI.label.innerHTML = "<span>Select your resonator</span>"; }
         if (weaponSelectedUI.label) { weaponSelectedUI.label.innerHTML = "<span>Select Weapon</span>"; }
+        // Hide basic resonator info grid until a character is chosen
+        if (resonatorBasicsGrid) resonatorBasicsGrid.style.display = 'none';
         // Disable weapon selector and echo tiles until a character is chosen
         weaponDropdownSelected?.classList.add('disabled');
         const tiles = document.getElementById('echoTiles'); if (tiles) tiles.classList.add('disabled');
@@ -1022,6 +1096,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const charRarity = rarity[char.rarity]; const charTier = tier[char.tier];
         rarityImg.style.display = "block"; rarityImg.src = charRarity.image; rarityImg.alt = charRarity.name;
         tierImg.style.display = "block"; tierImg.src = charTier.image; tierImg.alt = charTier.name; tierName.textContent = charTier.name;
+        // Show the basic resonator info grid now that a character is selected
+        if (resonatorBasicsGrid) resonatorBasicsGrid.style.display = 'grid';
         document.documentElement.style.setProperty("--color1", char.color1);
         document.documentElement.style.setProperty("--color2", char.color2);
         document.documentElement.style.setProperty("--color1-rgb", hexToRgb(char.color1));
@@ -1062,7 +1138,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (preferKey && allowed.includes(preferKey)) {
             mainKeyEl.value = preferKey; setCustomDropdownLabel("echoMainDropdownSelected", preferKey); setMainStatValueFromSelection();
         } else {
-            mainKeyEl.value = ""; setCustomDropdownLabel("echoMainDropdownSelected", ""); document.getElementById("echoMainVal").value = "";
+            mainKeyEl.value = ""; setCustomDropdownLabel("echoMainDropdownSelected", "");
+            const mv = document.getElementById("echoMainVal"); if (mv) { mv.value = ""; mv.classList.add('disabled'); }
+            const mu = document.getElementById("echoMainValUnit"); if (mu) mu.textContent = "";
         }
     }
 
@@ -1077,7 +1155,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const mainKeyEl = document.getElementById("echoMainKey");
         const mainValEl = document.getElementById("echoMainVal");
         if (mainKeyEl) mainKeyEl.value = data.main?.key || "";
-        if (mainValEl) mainValEl.value = data.main?.value ?? "";
+        if (mainValEl) { mainValEl.value = data.main?.value ?? ""; mainValEl.classList.toggle('disabled', !(data.main?.key)); }
 
         for (let i = 1; i <= 5; i++) {
             const kEl = document.getElementById(`echoSub${i}Key`);
@@ -1096,7 +1174,14 @@ document.addEventListener("DOMContentLoaded", () => {
             const values = SUBSTAT_VALUES[k] || [];
             populateSubValueDropdown(i, values, v);   // <-- fixed to use k and custom dropdown
             const wrap = document.getElementById(`echoSub${i}ValWrapper`);
-            if (wrap) wrap.classList.toggle('disabled', !k);
+            if (wrap) {
+                wrap.classList.toggle('disabled', !k);
+                wrap.classList.toggle('pct', !!k && PCT_KEYS.includes(k));
+                const selectedDiv = document.getElementById(`echoSub${i}ValSelected`);
+                let unitEl = selectedDiv?.querySelector('.echo-unit');
+                if (!unitEl) { unitEl = document.createElement('span'); unitEl.className = 'echo-unit'; selectedDiv?.appendChild(unitEl); }
+                if (selectedDiv) unitEl.textContent = (wrap.classList.contains('pct') && v) ? '%' : '';
+            }
         }
         updateSubKeyDuplicateDisables();
 
@@ -1163,16 +1248,20 @@ document.addEventListener("DOMContentLoaded", () => {
     function clearEchoInModal() {
         setSelectedEchoCost(4);
         const mainKeyEl = document.getElementById("echoMainKey"); if (mainKeyEl) mainKeyEl.value = "";
-        const mainValEl = document.getElementById("echoMainVal"); if (mainValEl) mainValEl.value = "";
+        const mainValEl = document.getElementById("echoMainVal"); if (mainValEl) { mainValEl.value = ""; mainValEl.classList.add('disabled'); }
+        const mainUnitEl = document.getElementById("echoMainValUnit"); if (mainUnitEl) mainUnitEl.textContent = "";
         for (let i = 1; i <= 5; i++) {
             const kEl = document.getElementById(`echoSub${i}Key`); if (kEl) kEl.value = "";
             const vEl = document.getElementById(`echoSub${i}Val`); if (vEl) vEl.value = "";
-            const valSel = document.getElementById(`echoSub${i}Val`); if (valSel) valSel.innerHTML = '<option value="">Select Value</option>';
+            const valSel = document.getElementById(`echoSub${i}Val`); if (valSel) valSel.innerHTML = '<option value="">—</option>';
             setCustomDropdownLabel(`echoSub${i}DropdownSelected`, "");
             // also reset custom value dropdown label
             const valSelected = document.getElementById(`echoSub${i}ValSelected`);
             const valOptions = document.getElementById(`echoSub${i}ValOptions`);
-            if (valSelected) valSelected.innerHTML = '<div class="dropdown-label">Select Value</div>';
+            if (valSelected) {
+                valSelected.innerHTML = '<div class="dropdown-label">—</div>';
+                const unitEl = valSelected.querySelector('.echo-unit'); if (unitEl) unitEl.textContent = '';
+            }
             if (valOptions) valOptions.innerHTML = "";
             const wrap = document.getElementById(`echoSub${i}ValWrapper`); if (wrap) wrap.classList.add('disabled');
         }

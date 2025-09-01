@@ -87,6 +87,7 @@ body,
 html {
     margin: 0;
     padding: 0;
+    height: 100%;
 }
 
 * {
@@ -988,7 +989,15 @@ select.echo-cost {
     position: relative;
     z-index: 1;
     padding: 1rem;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
     /* restore inner spacing for content */
+}
+
+/* Add headroom when a main stat chip is being overlaid */
+.echo-tile__meta.has-main {
+    padding-top: 2.4rem;
 }
 
 /* Shift all echo content right when a type image is present */
@@ -999,6 +1008,9 @@ select.echo-cost {
 .echo-tile__title {
     font-weight: 600;
     color: #FFF;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
 .echo-tile__stats {
@@ -1017,6 +1029,71 @@ select.echo-cost {
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
     border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Recommended substat highlight ring */
+/* Dim non-recommended substats when recommendations are defined */
+.echo-tile__stats .stat-chip.not-recommended {
+    opacity: 1;
+    filter: none;
+}
+
+/* Recommended substats: subtle white glow and ring */
+.echo-tile__stats .stat-chip.recommended {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.85), 0 0 10px rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.85);
+}
+
+/* Roll quality coloring for substat chips */
+.echo-tile__stats .stat-chip.sub-tier-low {
+    background: rgba(220, 38, 38, 0.28); /* red-600 */
+    border-color: rgba(220, 38, 38, 0.45);
+}
+.echo-tile__stats .stat-chip.sub-tier-mid {
+    background: rgba(234, 179, 8, 0.28); /* amber-400 */
+    border-color: rgba(234, 179, 8, 0.45);
+}
+.echo-tile__stats .stat-chip.sub-tier-high {
+    background: rgba(34, 197, 94, 0.28); /* green-500 */
+    border-color: rgba(34, 197, 94, 0.45);
+}
+
+/* Elevate and pin the first (main) chip to the top-right when present */
+.echo-tile__meta.has-main .echo-tile__stats .stat-chip:first-child {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 2;
+    /* remove background for a cleaner look */
+    background: transparent;
+    border: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    /* stack value below name/icon */
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: flex-end;
+    text-align: right;
+    max-width: 55%;
+}
+
+.echo-tile__meta.has-main .echo-tile__stats .stat-chip:first-child .stat-chip__value {
+    flex: 0 0 100%;
+    margin-left: 0;
+    text-align: right;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.echo-tile__meta.has-main .echo-tile__stats .stat-chip:first-child .stat-chip__name {
+    text-align: right;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.echo-tile__meta.has-main .echo-tile__stats .stat-chip:first-child .stat-icon.small {
+    width: 1.1rem;
+    height: 1.1rem;
 }
 
 .echo-tile__stats .stat-chip .stat-chip__name,
@@ -1042,6 +1119,14 @@ select.echo-cost {
     /* push value to the right */
     font-weight: 600;
     font-size: 0.75rem;
+}
+
+/* Set icon shown inline with echo title */
+.echo-set-icon {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+    flex: 0 0 auto;
 }
 
 
@@ -1161,6 +1246,31 @@ select.echo-cost {
 
 .echo-input.echo-num:focus {
     outline: 2px solid rgba(255, 255, 255, .25);
+}
+
+/* Dim and disable-like style to mirror disabled dropdowns */
+.modal input.echo-num.disabled {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+/* Make input placeholder visible like dropdown placeholder */
+.modal input.echo-num::placeholder {
+    color: rgba(255, 255, 255, 0.9);
+    opacity: 1;
+}
+
+/* Unit label next to main value */
+.modal .echo-unit {
+    align-self: center;
+    margin-left: 0.25rem;
+    color: #fff;
+    opacity: 0.9;
+}
+
+/* Dim unit when main value is inactive */
+.modal input.echo-num.disabled+.echo-unit {
+    opacity: 0.45;
 }
 
 .echo-input.echo-select {
@@ -1432,10 +1542,45 @@ select.echo-cost {
     margin-left: 0;
 }
 
-/* Make substat value dropdown narrower than the key dropdown */
+/* Keep main value width and substat value width in sync */
+.modal {
+    --echo-value-width: 7rem;
+}
+
+/* Wrapper for main value so unit can sit inside the input visually */
+.modal .echo-value {
+    position: relative;
+    flex: 0 0 var(--echo-value-width);
+}
+
+#echoMainVal {
+    width: 100%;
+    padding-right: 1.4rem;
+}
+
+/* Make substat value dropdown match main value width */
 .modal [id^="echoSub"][id$="ValWrapper"] {
-    flex: 0 0 9rem;
-    /* fixed, compact width for value selector */
+    flex: 0 0 var(--echo-value-width);
+}
+
+/* When substat value is percentage, reserve space and overlay unit */
+.modal [id^="echoSub"][id$="ValWrapper"].pct .dropdown-selected {
+    position: relative;
+    padding-right: 1.4rem;
+}
+
+.modal [id^="echoSub"][id$="ValWrapper"] .dropdown-selected .echo-unit {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+.modal [id^="echoSub"][id$="ValWrapper"].disabled .dropdown-selected .echo-unit {
+    opacity: 0.45;
 }
 
 /* Dim and disable value selector until a substat key is chosen */
@@ -1443,6 +1588,27 @@ select.echo-cost {
     opacity: 0.45;
     pointer-events: none;
     cursor: default;
+}
+
+/* Unit label positioned inside the main value input (overlay) */
+.modal .echo-unit {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+/* Dim unit when main value is inactive */
+.modal input.echo-num.disabled+.echo-unit {
+    opacity: 0.45;
+}
+
+/* Keep placeholder legible when dimmed to match dropdown disabled */
+.modal input.echo-num.disabled::placeholder {
+    color: rgba(255, 255, 255, 1);
 }
 
 /* Cost bonus styling: icon + white text */
@@ -1496,7 +1662,8 @@ select.echo-cost {
     flex-direction: column;
     gap: 0.75rem;
     margin-top: 0.25rem;
-    padding-top: 0.5rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -1509,6 +1676,10 @@ select.echo-cost {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
+    justify-items: stretch;
+    align-items: stretch;
+    width: 100%;
+    justify-content: stretch;
 }
 
 @media (max-width: 720px) {
@@ -1531,6 +1702,7 @@ select.echo-cost {
 #echoSetBonusesList>.saved-item {
     width: 100%;
     justify-self: stretch;
+    align-self: stretch;
 }
 
 /* Let bonus chips wrap nicely inside each row */
@@ -1545,6 +1717,7 @@ select.echo-cost {
     padding: 0.35rem 0.5rem;
     border-radius: 0.5rem;
     background: rgba(255, 255, 255, 0.08);
+    font-size: 0.8rem;
 }
 
 #echoSetBonuses .weapon-stats .stat-chip h3 {
@@ -1585,4 +1758,30 @@ select.echo-cost {
 #echoSetBonuses .saved-item * {
     color: #fff;
     font-family: "PP Mori";
+}
+
+/* Layout scaffolding to enable internal scrolling of the right column */
+.content,
+.wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    display: flex;
+    gap: 0.5rem;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.left,
+.middle,
+.right {
+    min-height: 0;
+}
+
+/* Ensure right column scrolls internally rather than pushing the page */
+.right {
+    overflow-y: auto;
 }

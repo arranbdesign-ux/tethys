@@ -10,6 +10,10 @@
     <script defer src="js/data/echo-types.js"></script>
     <script defer src="js/data/echo-main-values.js"></script>
     <script defer src="js/data/echo-sub-values.js"></script>
+    <script defer src="js/data/recommended-substats.js"></script>
+
+    <!-- GSAP (GreenSock) animation library -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
     <!-- your main app -->
     <script defer src="js/script.js"></script>
@@ -396,7 +400,11 @@
                                         <!-- Hidden select used by JS -->
                                         <select id="echoMainKey" class="hidden"></select>
                                         <!-- Value -->
-                                        <input type="number" id="echoMainVal" class="echo-num" placeholder="Value">
+                                        <div class="echo-value">
+                                            <input type="number" id="echoMainVal" class="echo-input echo-num disabled"
+                                                placeholder="—">
+                                            <span id="echoMainValUnit" class="echo-unit"></span>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -420,7 +428,7 @@
 
                                         <!-- Sub 1 value (custom dropdown) -->
                                         <div class="custom-dropdown modal-dropdown" id="echoSub1ValWrapper">
-                                            <div class="dropdown-selected" id="echoSub1ValSelected">Select Value</div>
+                                            <div class="dropdown-selected" id="echoSub1ValSelected">—</div>
                                             <div class="dropdown-options hidden" id="echoSub1ValOptions"></div>
                                         </div>
                                         <select id="echoSub1Val" class="hidden"></select>
@@ -438,7 +446,7 @@
 
                                         <!-- Sub 2 value -->
                                         <div class="custom-dropdown modal-dropdown" id="echoSub2ValWrapper">
-                                            <div class="dropdown-selected" id="echoSub2ValSelected">Select Value</div>
+                                            <div class="dropdown-selected" id="echoSub2ValSelected">—</div>
                                             <div class="dropdown-options hidden" id="echoSub2ValOptions"></div>
                                         </div>
                                         <select id="echoSub2Val" class="hidden"></select>
@@ -456,7 +464,7 @@
 
                                         <!-- Sub 3 value -->
                                         <div class="custom-dropdown modal-dropdown" id="echoSub3ValWrapper">
-                                            <div class="dropdown-selected" id="echoSub3ValSelected">Select Value</div>
+                                            <div class="dropdown-selected" id="echoSub3ValSelected">—</div>
                                             <div class="dropdown-options hidden" id="echoSub3ValOptions"></div>
                                         </div>
                                         <select id="echoSub3Val" class="hidden"></select>
@@ -474,7 +482,7 @@
 
                                         <!-- Sub 4 value -->
                                         <div class="custom-dropdown modal-dropdown" id="echoSub4ValWrapper">
-                                            <div class="dropdown-selected" id="echoSub4ValSelected">Select Value</div>
+                                            <div class="dropdown-selected" id="echoSub4ValSelected">—</div>
                                             <div class="dropdown-options hidden" id="echoSub4ValOptions"></div>
                                         </div>
                                         <select id="echoSub4Val" class="hidden"></select>
@@ -492,7 +500,7 @@
 
                                         <!-- Sub 5 value -->
                                         <div class="custom-dropdown modal-dropdown" id="echoSub5ValWrapper">
-                                            <div class="dropdown-selected" id="echoSub5ValSelected">Select Value</div>
+                                            <div class="dropdown-selected" id="echoSub5ValSelected">—</div>
                                             <div class="dropdown-options hidden" id="echoSub5ValOptions"></div>
                                         </div>
                                         <select id="echoSub5Val" class="hidden"></select>
