@@ -113,6 +113,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const ECHO_SETS = window.ECHO_SETS || {};
     const ECHO_TYPES = window.ECHO_TYPES || {};
     const RECOMMENDED_SUBSTATS = window.RECOMMENDED_SUBSTATS || {};
+    const RECOMMENDED_MAIN_STATS = window.RECOMMENDED_MAIN_STATS || {};
+    const RECOMMENDED_WEIGHTS = window.RECOMMENDED_WEIGHTS || {};
+    const SCORE_GRADES = window.SCORE_GRADES || [];
     const MAIN_STAT_VALUES = window.MAIN_STAT_VALUES || {};
     const SUBSTAT_VALUES = window.SUBSTAT_VALUES || {};
 
@@ -283,6 +286,66 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (_) {
             return "sub-tier-mid";
         }
+    }
+
+    // Map a substat value to a 0..10 score based on its position in SUBSTAT_VALUES
+    function substatValueScore(key, value) {
+        const arr = (SUBSTAT_VALUES?.[key] || []).map(Number);
+        if (!arr.length) return 0;
+        // Find closest index if exact not found
+        let idx = arr.indexOf(Number(value));
+        if (idx < 0) {
+            let bestI = 0, bestD = Infinity;
+            arr.forEach((v, j) => { const d = Math.abs(v - Number(value)); if (d < bestD) { bestD = d; bestI = j; } });
+            idx = bestI;
+        }
+        const denom = Math.max(1, arr.length - 1);
+        return (idx / denom) * 10; // 0..10
+    }
+
+    function getRecommendedSubsFor(charName) {
+        const conf = RECOMMENDED_SUBSTATS[charName];
+        if (Array.isArray(conf)) return conf;
+        if (conf && Array.isArray(conf.subs)) return conf.subs;
+        return [];
+    }
+
+    function getRecommendedMainFor(charName) {
+        const arr = RECOMMENDED_MAIN_STATS[charName];
+        return Array.isArray(arr) ? arr : [];
+    }
+
+    function getWeightsFor(charName) {
+        const w = RECOMMENDED_WEIGHTS[charName] || {};
+        return (w && typeof w === 'object') ? w : {};
+    }
+
+    function scoreEchoPiece(piece, charName) {
+        if (!piece) return 0;
+        const recSubs = new Set(getRecommendedSubsFor(charName));
+        const weights = getWeightsFor(charName);
+        let subsScore = 0;
+        (piece.subs || []).forEach(s => {
+            if (!s?.key) return;
+            if (!recSubs.has(s.key)) return; // only recommended substats score
+            const base = substatValueScore(s.key, parseNumber(s.value)); // 0..10
+            const weight = Number.isFinite(weights[s.key]) ? Math.max(0, Number(weights[s.key])) : 1;
+            subsScore += Math.min(10, base * weight);
+        });
+        // Cap substats at 50 total
+        subsScore = Math.min(50, subsScore);
+        const recMain = new Set(getRecommendedMainFor(charName));
+        const mainScore = piece.main?.key && recMain.has(piece.main.key) ? 10 : 0;
+        return subsScore + mainScore; // 0..60
+    }
+
+    function gradeForScore(score) {
+        if (!Array.isArray(SCORE_GRADES) || !SCORE_GRADES.length) return "";
+        // assume sorted top-down; if not, sort by min desc for safety
+        const arr = [...SCORE_GRADES].sort((a, b) => (b.min ?? 0) - (a.min ?? 0));
+        const s = Number(score) || 0;
+        const found = arr.find(g => s >= (g.min ?? 0));
+        return (found && found.label) ? String(found.label) : "";
     }
 
     // Cost-based flats per echo
@@ -720,12 +783,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 titleText.textContent = echoName;
                 title.appendChild(titleText);
 
-                const sub = document.createElement("div");
-                sub.className = "echo-tile__subtitle";
-                sub.textContent = `${data.cost || 0} Cost`;
-
                 meta.appendChild(title);
-                meta.appendChild(sub);
+                // Floating cost badge (top-left)
+                const costBadge = document.createElement("div");
+                costBadge.className = "echo-tile__cost";
+                costBadge.textContent = String(data.cost || 0);
+                tile.appendChild(costBadge);
 
                 // Stats chips
                 const stats = document.createElement("div"); stats.className = "echo-tile__stats";
@@ -759,7 +822,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Set chip removed; set icon is shown inline with the title
                 // Removed echo type chip row under the set for a cleaner look
+                // Append stats, then a divider and a bottom-aligned score row
                 meta.appendChild(stats);
+                const divider = document.createElement('div');
+                divider.className = 'echo-tile__divider';
+                meta.appendChild(divider);
+                const score = currentCharacter ? scoreEchoPiece(data, currentCharacter.name) : 0;
+                const grade = gradeForScore(score);
+                const badge = document.createElement("div");
+                badge.className = "echo-tile__score";
+                // left: icon + label
+                const left = document.createElement('div'); left.className = 'score-left';
+                const scoreIcon = document.createElement("img"); scoreIcon.className = "stat-icon small"; scoreIcon.src = "images/misc/score.webp"; scoreIcon.alt = "Score";
+                const scoreLabel = document.createElement("span"); scoreLabel.className = "stat-chip__name"; scoreLabel.textContent = "Score";
+                left.appendChild(scoreIcon); left.appendChild(scoreLabel);
+                // right: number + letter grade
+                const right = document.createElement('div'); right.className = 'score-right';
+                const scoreValue = document.createElement("span"); scoreValue.className = "stat-chip__value"; scoreValue.textContent = String(Math.round(score));
+                const scoreGrade = document.createElement('span'); scoreGrade.className = 'score-grade'; scoreGrade.textContent = grade ? `(${grade})` : '';
+                right.appendChild(scoreValue); right.appendChild(scoreGrade);
+                badge.appendChild(left); badge.appendChild(right);
+                meta.appendChild(badge);
             }
 
             if (thumb) { tile.appendChild(thumb); tile.classList.add('has-thumb'); }
