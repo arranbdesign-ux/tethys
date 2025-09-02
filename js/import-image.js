@@ -6,9 +6,10 @@
     'crit dmg': 'cd', 'crit. dmg': 'cd', 'crit. dmg bonus': 'cd', 'crit dmg bonus': 'cd',
     'crit rate': 'cr', 'crit. rate': 'cr',
     'atk': 'atk', 'hp': 'hp', 'def': 'def',
-    'basic attack dmg bonus': 'basicdmg', 'basic atk dmg bonus': 'basicdmg', 'basic dmg bonus': 'basicdmg',
-    'resonance skill dmg bonus': 'skilldmg', 'skill dmg bonus': 'skilldmg', 'res. skill dmg bonus': 'skilldmg',
-    'heavy attack dmg bonus': 'heavydmg', 'heavy dmg bonus': 'heavydmg',
+    'basic attack dmg bonus': 'basicdmg', 'basic atk dmg bonus': 'basicdmg', 'basic dmg bonus': 'basicdmg', 'basic attack dmg': 'basicdmg', 'basic dmg': 'basicdmg',
+    'resonance skill dmg bonus': 'skilldmg', 'skill dmg bonus': 'skilldmg', 'res. skill dmg bonus': 'skilldmg', 'resonance skill dmg': 'skilldmg',
+    'resonance liberation dmg bonus': 'libdmg', 'liberation dmg bonus': 'libdmg', 'resonance liberation dmg': 'libdmg',
+    'heavy attack dmg bonus': 'heavydmg', 'heavy dmg bonus': 'heavydmg', 'heavy attack dmg': 'heavydmg',
     'energy regen': 'er', 'energy regeneration': 'er',
     'havoc dmg bonus': 'havocdmg', 'glacio dmg bonus': 'glaciodmg', 'aero dmg bonus': 'aerodmg', 'electro dmg bonus': 'electrodmg', 'spectro dmg bonus': 'spectrodmg', 'fusion dmg bonus': 'fusiondmg',
     'healing bonus': 'healing'
@@ -65,9 +66,11 @@
       const d = fpDistance(fp, sfp); if (d < bestSet.dist) bestSet = { id, dist: d };
     }
     // thresholds (empirical); if too far, drop
+    const tConf = Math.max(0, Math.min(1, 1 - (bestType.dist/3.0)));
+    const sConf = Math.max(0, Math.min(1, 1 - (bestSet.dist/3.0)));
     if (bestType.dist > 2.6) bestType.id = '';
     if (bestSet.dist > 2.6) bestSet.id = '';
-    return { typeId: bestType.id, setId: bestSet.id };
+    return { typeId: bestType.id, setId: bestSet.id, typeConf: tConf, setConf: sConf };
   }
 
   async function ocrRegion(imgCanvas){
@@ -91,9 +94,24 @@
   async function analyzeImageToEchoes(file){
     const img = await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=URL.createObjectURL(file); });
     const W = img.naturalWidth, H = img.naturalHeight;
-    // Tile strip (bottom ~40% of image)
-    const stripTop = Math.floor(H * 0.58), stripBottom = Math.floor(H * 0.98), stripHeight = stripBottom - stripTop;
+    // Try multiple candidate stripes and pick best by keyword presence
+    const candidates = [0.56, 0.58, 0.60];
+    let bestTop = Math.floor(H * 0.58), bestScore = -Infinity;
     const tileWidth = Math.floor(W / 5);
+    for (const topR of candidates) {
+      const top = Math.floor(H * topR), bottom = Math.floor(H * Math.min(topR + 0.40, 0.99));
+      const h = bottom - top;
+      let score = 0;
+      for (let i = 0; i < 5; i++) {
+        const x = Math.floor(i * tileWidth), y = top, w = (i===4? W - x : tileWidth), hh = h;
+        const tileCanvas = cropToCanvas(img, x, y, w, hh);
+        const text = await ocrRegion(tileCanvas);
+        const n = normText(text);
+        ['crit','rate','dmg','hp','atk','def','bonus','energy'].forEach(k => { if (n.includes(k)) score++; });
+      }
+      if (score > bestScore) { bestScore = score; bestTop = top; }
+    }
+    const stripTop = bestTop, stripBottom = Math.floor(H * 0.98), stripHeight = stripBottom - stripTop;
     const icons = await buildIconMatchers();
     const results = [];
     for (let i=0;i<5;i++){
@@ -102,7 +120,8 @@
       const text = await ocrRegion(tileCanvas);
       // Parse cost (small digit near top-right): try a small ROI
       const costCanvas = cropToCanvas(img, x + Math.floor(w*0.78), y + Math.floor(h*0.05), Math.floor(w*0.18), Math.floor(h*0.18));
-      let cost = parseInt(await ocrDigits(costCanvas), 10); if (!Number.isFinite(cost)) cost = 0;
+      const costRaw = await ocrDigits(costCanvas);
+      let cost = parseInt(costRaw, 10); if (!Number.isFinite(cost)) cost = 0;
 
       // Match type from big left art region
       const typeRect = { x: x + Math.floor(w*0.06), y: y + Math.floor(h*0.15), w: Math.floor(w*0.26), h: Math.floor(h*0.55) };
@@ -110,16 +129,22 @@
 
       // Extract main + subs
       const lines = (text||'').split(/\n+/).map(s=>s.trim()).filter(Boolean);
-      let main = null; const subs = [];
+      let main = null; let mainChosenBy = 'pct'; const subs = [];
       for (const ln of lines){
         const n = normText(ln);
         const key = mapLabelToKey(n);
         const val = parseNumberLike(ln);
         if (!key || val==null) continue;
-        if (!main && /%/.test(ln)) { main = { key, value: val }; continue; }
+        if (!main && /%/.test(ln)) { main = { key, value: val }; mainChosenBy = 'pct'; continue; }
         subs.push({ key, value: val });
       }
-      results.push({ cost, setId: matched.setId || '', typeId: matched.typeId || '', main: main || { key:'', value:0 }, subs });
+      if (!main && subs.length) { main = subs.shift(); mainChosenBy = 'fallback'; }
+      const mainConf = main ? (mainChosenBy === 'pct' ? 0.9 : 0.6) : 0.3;
+      const subsEnriched = subs.map(s => ({...s, conf: 0.85}));
+      const costConf = cost ? 0.95 : 0.4;
+      results.push({ cost, setId: matched.setId || '', typeId: matched.typeId || '', main: main || { key:'', value:0 }, subs,
+        conf: { cost: costConf, type: matched.typeConf || 0, set: matched.setConf || 0, main: mainConf, subs: subsEnriched.map(s=>s.conf) }
+      });
     }
     return results;
   }
@@ -127,4 +152,3 @@
   // Public API
   window.TethysImporter = { analyzeImageToEchoes };
 })();
-

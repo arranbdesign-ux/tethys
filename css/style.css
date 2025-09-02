@@ -1632,6 +1632,13 @@ select.echo-cost {
 .tray__body { padding: .75rem; overflow: auto; }
 .tray .echo-mini { grid-template-columns: 1fr; }
 
+/* Confidence highlighting */
+.conf-badge { display:inline-block; padding:0 .5rem; border-radius:.5rem; font-size:.75rem; margin-left:.4rem; opacity:.9; }
+.conf-low { background: rgba(185,28,28,.35); border:1px solid rgba(185,28,28,.65); }
+.conf-med { background: rgba(202,138,4,.35); border:1px solid rgba(202,138,4,.65); }
+.conf-high { background: rgba(34,197,94,.35); border:1px solid rgba(34,197,94,.65); }
+.preview-dim { opacity: .85; }
+
 /* ADD: simple inline radio group */
 .radio-group {
     display: flex;

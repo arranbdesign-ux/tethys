@@ -316,6 +316,7 @@
                                 <h3>Total Cost: <span id="echoCostVal">0</span> / 12</h3>
                             </div>
                             <div class="spacer" style="flex:1 1 auto"></div>
+                            <button class="btn btn--secondary" id="importEchoesBtn" type="button">Import Image</button>
                             <button class="btn btn--secondary" id="saveBuildBtn" type="button">Save Echoes</button>
                         </div>
 
@@ -342,7 +343,6 @@
                             <div class="modal__header">
                                 <h2 id="echoModalTitle">Edit Echo</h2>
                                 <button class="btn btn--secondary" id="echoModalInsertTrayBtn" type="button" style="margin-right:.5rem;">Insert Saved</button>
-                                <button class="btn btn--secondary" id="echoModalImportBtn" type="button" style="margin-right:.5rem;">Import Image</button>
                                 <button class="modal__close" id="echoModalClose" aria-label="Close">&times;</button>
                             </div>
 
@@ -557,6 +557,25 @@
         </div>
         <div class="tray__body">
             <div id="echoInsertTrayList" class="echo-mini"></div>
+        </div>
+    </div>
+    <!-- Import Preview Modal -->
+    <div class="modal" id="echoImportPreview" aria-hidden="true">
+        <div class="modal__overlay" data-close></div>
+        <div class="modal__content" role="dialog" aria-modal="true" aria-labelledby="echoImportPreviewTitle">
+            <div class="modal__header">
+                <h2 id="echoImportPreviewTitle">Import Preview</h2>
+                <button class="modal__close" id="echoImportPreviewClose" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p style="opacity:.85;">Review detected echoes. Low-confidence fields are highlighted; you can apply and edit after import if needed.</p>
+                <div id="importPreviewList" class="echo-mini"></div>
+            </div>
+            <div class="modal__footer">
+                <button class="btn btn--secondary" id="importCancelBtn" type="button">Cancel</button>
+                <div class="spacer"></div>
+                <button class="btn btn--primary" id="importApplyBtn" type="button">Replace & Save</button>
+            </div>
         </div>
     </div>
 </body>
