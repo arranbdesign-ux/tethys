@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tethys • Saved Builds</title>
+  <title>Tethys • Saved Echoes</title>
   <link rel="stylesheet" href="css/style.css" />
   <script defer src="js/data/echo-sets.js"></script>
   <script defer src="js/data/echo-types.js"></script>
@@ -24,30 +24,9 @@
       flex-direction: column;
       gap: 0.75rem;
     }
-    .build-card {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      padding: 0.75rem;
-      border-radius: 0.75rem;
-      background: rgba(255,255,255,0.08);
-    }
-    .build-card__head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-    }
-    .build-card__meta {
-      display: flex;
-      gap: 0.75rem;
-      align-items: center;
-      color: rgba(255,255,255,0.85);
-      font-size: .9rem;
-    }
     .echo-mini {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
       gap: 0.5rem;
     }
     .echo-mini__item {
@@ -88,8 +67,8 @@
         <div class="main" style="padding: 1rem;">
           <section class="left">
             <div class="saved">
-              <h1>Saved Builds</h1>
-              <div class="saved-list" id="savedBuildsList">
+              <h1>Saved Echoes</h1>
+              <div class="saved-list" id="savedEchoesList">
                 <!-- populated by js/saved.js -->
               </div>
             </div>
@@ -113,8 +92,8 @@
 
           <section class="right">
             <div class="details">
-              <h1>Build Preview</h1>
-              <div id="buildPreview" class="saved-builds"></div>
+              <h1>Echo Library</h1>
+              <div id="echoLibrary" class="saved-builds"></div>
             </div>
           </section>
         </div>
@@ -122,4 +101,3 @@
     </div>
   </body>
   </html>
-

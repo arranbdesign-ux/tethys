@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const listEl = document.getElementById('savedBuildsList');
-  const previewEl = document.getElementById('buildPreview');
-  const savedCountEl = document.getElementById('savedCount');
+  const listEl = document.getElementById('savedEchoesList');
+  const libraryEl = document.getElementById('echoLibrary');
 
   const STAT_LABELS = {
     atk: 'ATK', atkp: 'ATK%', cr: 'CRIT Rate', cd: 'CRIT DMG', er: 'Energy Regen', hpp: 'HP%', defp: 'DEF%',
@@ -24,11 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return { title: parts.join(' • '), main, subs, icon: window.ECHO_TYPES?.[e?.typeId]?.icon || '' };
   }
 
-  function renderPreview(build) {
-    if (!previewEl) return;
-    previewEl.innerHTML = '';
-    if (!build) return;
-    const echoes = Array.isArray(build.echoes) ? build.echoes : [];
+  function renderLibrary(echoes) {
+    if (!libraryEl) return;
+    libraryEl.innerHTML = '';
     const grid = document.createElement('div');
     grid.className = 'echo-mini';
     echoes.forEach((e, idx) => {
@@ -45,42 +42,23 @@ document.addEventListener('DOMContentLoaded', () => {
       item.appendChild(img); item.appendChild(textWrap);
       grid.appendChild(item);
     });
-    previewEl.appendChild(grid);
+    libraryEl.appendChild(grid);
   }
 
-  function renderList(builds) {
-    if (savedCountEl) savedCountEl.textContent = String(builds.length);
+  function renderList(echoes) {
     if (!listEl) return;
     listEl.innerHTML = '';
-    if (!builds.length) {
-      const empty = document.createElement('div');
-      empty.className = 'saved-item';
-      empty.textContent = 'No saved builds yet.';
-      listEl.appendChild(empty);
-      renderPreview(null);
-      return;
-    }
-    // newest first
-    const sorted = [...builds].sort((a,b) => (b.id || '').localeCompare(a.id || ''));
-    sorted.forEach((b, i) => {
-      const row = document.createElement('div'); row.className = 'saved-item';
-      const head = document.createElement('div'); head.className = 'saved-item__header';
-      const title = document.createElement('h2'); title.textContent = b.characterName ? `${b.characterName}` : 'Build';
-      const meta = document.createElement('div'); meta.className = 'weapon-stats';
-      const when = document.createElement('div'); when.className = 'stat-chip'; when.textContent = new Date(b.createdAt || Date.now()).toLocaleString();
-      const count = document.createElement('div'); count.className = 'stat-chip'; count.textContent = `${(b.echoes||[]).filter(Boolean).length}/5 Echoes`;
-      meta.appendChild(when); meta.appendChild(count);
-      head.appendChild(title);
-      row.appendChild(head); row.appendChild(meta);
-      row.addEventListener('click', () => renderPreview(b));
-      if (i === 0) { // default selection
-        setTimeout(() => renderPreview(b), 0);
-      }
-      listEl.appendChild(row);
-    });
+    const countRow = document.createElement('div');
+    countRow.className = 'saved-item';
+    const head = document.createElement('div'); head.className = 'saved-item__header';
+    const title = document.createElement('h2'); title.textContent = `Total Saved: ${echoes.length}`;
+    head.appendChild(title); countRow.appendChild(head);
+    listEl.appendChild(countRow);
   }
 
-  const builds = (window.TethysDB && window.TethysDB.readBuilds) ? window.TethysDB.readBuilds() : [];
-  renderList(builds);
+  const echoes = (window.TethysDB && window.TethysDB.readEchoes) ? window.TethysDB.readEchoes() : [];
+  // newest-ish first by id if present
+  const sorted = [...echoes].sort((a,b) => (String(b.id||'')).localeCompare(String(a.id||'')));
+  renderList(sorted);
+  renderLibrary(sorted);
 });
-

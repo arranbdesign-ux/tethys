@@ -1557,28 +1557,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // Expose (optional)
     window._echoModal = { open: openEchoModal, close: closeEchoModal, save: saveEchoFromModal };
 
-    // Save Echoes button -> persist current build to cookie DB
+    // Save Echoes button -> persist individual echoes to cookie DB (deduped)
     function saveCurrentBuild() {
         try {
-            const nonEmpty = (currentEchoes || []).filter(Boolean).length;
-            if (!nonEmpty) { alert('No echoes to save yet.'); return; }
-            const build = {
-                id: `b_${Date.now()}`,
-                createdAt: new Date().toISOString(),
-                characterName: currentCharacter?.name || null,
-                weaponName: currentWeapon?.name || null,
-                weaponType: currentCharacter?.weaponType || null,
-                echoes: JSON.parse(JSON.stringify(currentEchoes || []))
-            };
-            if (!window.TethysDB || typeof window.TethysDB.addBuild !== 'function') {
-                console.warn('TethysDB not available; cannot save build');
+            const pieces = (currentEchoes || []).filter(e => e && e.typeId && e.main && e.main.key);
+            if (!pieces.length) { alert('No echoes to save yet.'); return; }
+            if (!window.TethysDB || typeof window.TethysDB.addEchoes !== 'function') {
+                console.warn('TethysDB not available; cannot save echoes');
                 alert('Unable to save: storage is unavailable.');
                 return;
             }
-            window.TethysDB.addBuild(build);
-            alert('Echoes saved to Saved Builds.');
+            const { added, skipped } = window.TethysDB.addEchoes(pieces);
+            alert(`Saved ${added} new echo${added===1?'':'es'}${skipped?`, skipped ${skipped} duplicate${skipped===1?'':''}`:''}.`);
         } catch (e) {
-            console.error('Failed to save build', e);
+            console.error('Failed to save echoes', e);
             alert('Failed to save echoes.');
         }
     }
