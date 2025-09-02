@@ -1550,6 +1550,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 keySel.dataset.subKeyWired = "1";
             }
         }
+        // Insert tray wiring
+        document.getElementById('echoModalInsertTrayBtn')?.addEventListener('click', openEchoInsertTray);
+        document.getElementById('echoInsertTrayClose')?.addEventListener('click', closeEchoInsertTray);
     })();
 
     function resetEchoBuilders() { currentEchoes = [null, null, null, null, null]; renderEchoTiles(); renderEchoCost(); renderEchoSetBonusesPanel(); }
@@ -1603,5 +1606,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Try once on load
     setTimeout(applyClipboardEchoIfAny, 0);
+
+    // --- Insert Tray ----------------------------------------------------------
+    function closeEchoInsertTray() {
+        const tray = document.getElementById('echoInsertTray');
+        tray?.classList.remove('open');
+        tray?.setAttribute('aria-hidden', 'true');
+    }
+    function openEchoInsertTray() {
+        try {
+            const tray = document.getElementById('echoInsertTray');
+            const list = document.getElementById('echoInsertTrayList');
+            if (!tray || !list) return;
+            // build list
+            list.innerHTML = '';
+            const echoes = (window.TethysDB && window.TethysDB.readEchoes) ? window.TethysDB.readEchoes() : [];
+            const sorted = [...echoes].sort((a,b) => (String(b.id||'')).localeCompare(String(a.id||'')));
+            if (!sorted.length) {
+                const empty = document.createElement('div'); empty.style.opacity = '.85'; empty.textContent = 'No saved echoes yet.'; list.appendChild(empty);
+            } else {
+                sorted.forEach((e, idx) => { list.appendChild(buildTrayItem(e, idx)); });
+            }
+            tray.classList.add('open'); tray.setAttribute('aria-hidden', 'false');
+        } catch {}
+    }
+    function buildTrayItem(e, idx) {
+        const item = document.createElement('div'); item.className = 'echo-mini__item';
+        const img = document.createElement('img');
+        if (e?.typeId && ECHO_TYPES?.[e.typeId]?.icon) { img.src = ECHO_TYPES[e.typeId].icon; img.alt = ECHO_TYPES[e.typeId].name; }
+        else { img.alt = 'Echo'; }
+        const textWrap = document.createElement('div');
+        const title = document.createElement('div'); title.className = 'echo-mini__title';
+        const typeName = (e?.typeId && ECHO_TYPES?.[e.typeId]?.name) ? ECHO_TYPES[e.typeId].name : 'Echo';
+        const setName = (e?.setId && ECHO_SETS?.[e.setId]?.name) ? ECHO_SETS[e.setId].name : '';
+        title.textContent = `${typeName} • Cost ${e?.cost || 0}${setName ? ' • ' + setName : ''}`;
+        const main = document.createElement('div'); main.className = 'echo-mini__stats'; if (e?.main?.key) main.textContent = `${labelFor(e.main.key)} ${PCT_KEYS.includes(e.main.key) ? e.main.value + '%' : e.main.value}`; else main.textContent = 'No main stat';
+        const subs = document.createElement('div'); subs.className = 'echo-mini__stats'; subs.textContent = Array.isArray(e?.subs) ? e.subs.map(s => `${labelFor(s.key)} ${PCT_KEYS.includes(s.key) ? s.value + '%' : s.value}`).join(', ') : '';
+        item.appendChild(img); textWrap.appendChild(title); textWrap.appendChild(main); if (subs.textContent) textWrap.appendChild(subs); item.appendChild(textWrap);
+        item.style.cursor = 'pointer';
+        item.addEventListener('click', () => insertEchoIntoActiveSlot(e));
+        return item;
+    }
+    function insertEchoIntoActiveSlot(e) {
+        if (!activeEchoSlot) { alert('Open a specific Echo slot first.'); return; }
+        if (e?.typeId) {
+            const used = getUsedEchoTypeIds(activeEchoSlot);
+            if (used.has(e.typeId)) { alert('That echo type is already used in another slot.'); return; }
+        }
+        // apply
+        currentEchoes[activeEchoSlot - 1] = {
+            cost: Number(e.cost) || 0,
+            setId: e.setId || '',
+            typeId: e.typeId || '',
+            main: e.main ? { key: e.main.key, value: Number(e.main.value) || 0 } : { key: '', value: 0 },
+            subs: Array.isArray(e.subs) ? e.subs.map(s => ({ key: s.key, value: Number(s.value) || 0 })) : []
+        };
+        renderEchoCost(); renderEchoSetBonusesPanel(); renderEchoTiles();
+        // refresh the modal fields to reflect new echo
+        openEchoModal(activeEchoSlot);
+        closeEchoInsertTray();
+    }
 });
 

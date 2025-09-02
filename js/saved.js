@@ -50,20 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const title = document.createElement('div'); title.className = 'echo-mini__title'; title.textContent = s.title || `Echo ${idx+1}`;
         const main = document.createElement('div'); main.className = 'echo-mini__stats'; main.textContent = s.main;
         const subs = document.createElement('div'); subs.className = 'echo-mini__stats'; subs.textContent = s.subs;
-        // Controls: Insert + Delete
+        // Controls: Delete only (insertion moved to builder modal tray)
         const ctrl = document.createElement('div'); ctrl.style.marginTop = '.35rem';
-        const insertBtn = document.createElement('button'); insertBtn.className = 'btn btn--secondary'; insertBtn.textContent = 'Insert';
-        const delBtn = document.createElement('button'); delBtn.className = 'btn btn--ghost'; delBtn.style.marginLeft = '.4rem'; delBtn.textContent = 'Delete';
-        const slotWrap = document.createElement('span'); slotWrap.style.marginLeft = '.4rem';
-        slotWrap.style.display = 'none';
-        for (let i = 1; i <= 5; i++) {
-          const b = document.createElement('button'); b.className = 'btn'; b.style.height = '1.8rem'; b.style.padding = '0 .5rem'; b.textContent = String(i);
-          b.addEventListener('click', (ev) => { ev.stopPropagation(); insertIntoSlot(e, i); });
-          slotWrap.appendChild(b);
-        }
-        insertBtn.addEventListener('click', (ev) => { ev.stopPropagation(); slotWrap.style.display = (slotWrap.style.display === 'none') ? 'inline-flex' : 'none'; });
+        const delBtn = document.createElement('button'); delBtn.className = 'btn btn--ghost'; delBtn.textContent = 'Delete';
         delBtn.addEventListener('click', (ev) => { ev.stopPropagation(); deleteEcho(e); });
-        ctrl.appendChild(insertBtn); ctrl.appendChild(slotWrap); ctrl.appendChild(delBtn);
+        ctrl.appendChild(delBtn);
 
         textWrap.appendChild(title); textWrap.appendChild(main); if (s.subs) textWrap.appendChild(subs); textWrap.appendChild(ctrl);
         item.appendChild(img); item.appendChild(textWrap);
@@ -118,12 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderList(all);
     const gm = groupSel?.value || 'none';
     renderLibrary(sortEchoes(all, sortSel?.value || 'newest')); // renderLibrary handles grouping itself
-  }
-
-  function insertIntoSlot(echo, slot) {
-    if (!window.TethysDB || typeof window.TethysDB.writeClipboardEcho !== 'function') return;
-    window.TethysDB.writeClipboardEcho(echo, slot);
-    window.location.href = 'index.html#insert';
   }
 
   function deleteEcho(echo) {

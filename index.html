@@ -337,9 +337,8 @@
                             <!-- Header -->
                             <div class="modal__header">
                                 <h2 id="echoModalTitle">Edit Echo</h2>
-                                <button class="modal__close" id="echoModalClose" aria-label="Close">
-                                    &times;
-                                </button>
+                                <button class="btn btn--secondary" id="echoModalInsertTrayBtn" type="button" style="margin-right:.5rem;">Insert Saved</button>
+                                <button class="modal__close" id="echoModalClose" aria-label="Close">&times;</button>
                             </div>
 
                             <!-- Body -->
@@ -543,6 +542,16 @@
         </div>
 
     </div>
+    </div>
+    <!-- Echo Insert Tray (appears above modal on right) -->
+    <div class="tray" id="echoInsertTray" aria-hidden="true">
+        <div class="tray__header">
+            <h3>Saved Echoes</h3>
+            <button class="tray__close" id="echoInsertTrayClose" aria-label="Close">&times;</button>
+        </div>
+        <div class="tray__body">
+            <div id="echoInsertTrayList" class="echo-mini"></div>
+        </div>
     </div>
 </body>
 
