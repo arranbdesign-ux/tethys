@@ -1556,5 +1556,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Expose (optional)
     window._echoModal = { open: openEchoModal, close: closeEchoModal, save: saveEchoFromModal };
+
+    // Save Echoes button -> persist current build to cookie DB
+    function saveCurrentBuild() {
+        try {
+            const nonEmpty = (currentEchoes || []).filter(Boolean).length;
+            if (!nonEmpty) { alert('No echoes to save yet.'); return; }
+            const build = {
+                id: `b_${Date.now()}`,
+                createdAt: new Date().toISOString(),
+                characterName: currentCharacter?.name || null,
+                weaponName: currentWeapon?.name || null,
+                weaponType: currentCharacter?.weaponType || null,
+                echoes: JSON.parse(JSON.stringify(currentEchoes || []))
+            };
+            if (!window.TethysDB || typeof window.TethysDB.addBuild !== 'function') {
+                console.warn('TethysDB not available; cannot save build');
+                alert('Unable to save: storage is unavailable.');
+                return;
+            }
+            window.TethysDB.addBuild(build);
+            alert('Echoes saved to Saved Builds.');
+        } catch (e) {
+            console.error('Failed to save build', e);
+            alert('Failed to save echoes.');
+        }
+    }
+
+    document.getElementById('saveBuildBtn')?.addEventListener('click', saveCurrentBuild);
 });
 

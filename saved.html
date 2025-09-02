@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tethys • Saved Builds</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script defer src="js/data/echo-sets.js"></script>
+  <script defer src="js/data/echo-types.js"></script>
+  <script defer src="js/db.js"></script>
+  <script defer src="js/saved.js"></script>
+  <!-- Optional: animations lib kept consistent with index -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    /* Minor tweaks for saved page layout */
+    .saved-page {
+      display: grid;
+      grid-template-columns: 22rem 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+    .saved-builds {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .build-card {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      border-radius: 0.75rem;
+      background: rgba(255,255,255,0.08);
+    }
+    .build-card__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .build-card__meta {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      color: rgba(255,255,255,0.85);
+      font-size: .9rem;
+    }
+    .echo-mini {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+      gap: 0.5rem;
+    }
+    .echo-mini__item {
+      display: grid;
+      grid-template-columns: 2.2rem 1fr;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      background: rgba(255,255,255,0.06);
+    }
+    .echo-mini__item img { width: 2rem; height: 2rem; border-radius: .4rem; object-fit: cover; }
+    .echo-mini__title { font-weight: 600; }
+    .echo-mini__stats { opacity: .9; font-size: .9rem; }
+  </style>
+  </head>
+  <body>
+    <div class="content">
+      <div class="gradient1"></div>
+      <div class="gradient2"></div>
+      <div class="wrapper">
+        <!-- Navigation Bar -->
+        <nav class="nav">
+          <div class="logo" onclick="location.href='index.html'" style="cursor:pointer;">
+            <svg class="logo-icon" xmlns="http://www.w3.org/2000/svg" width="39" height="24" viewBox="0 0 39 24" fill="none">
+              <path d="M0 0L5.14286 0L25.7143 17.1429V24H0V0Z" fill="white" />
+              <path d="M25.7143 0H38.5714V24L25.7143 17.1429V0Z" fill="white" />
+            </svg>
+            <div class="logo-text">Tethys</div>
+          </div>
+          <div class="nav-links">
+            <a class="nav-btn" href="index.html" style="display:flex;align-items:center;gap:.4rem;text-decoration:none;color:#fff;">
+              <span>Builder</span>
+            </a>
+          </div>
+        </nav>
+
+        <div class="main" style="padding: 1rem;">
+          <section class="left">
+            <div class="saved">
+              <h1>Saved Builds</h1>
+              <div class="saved-list" id="savedBuildsList">
+                <!-- populated by js/saved.js -->
+              </div>
+            </div>
+          </section>
+
+          <section class="middle">
+            <img class="resonator-bg" src="images/backgrounds/placeholder-background.webp" alt="Background" />
+            <div class="resonator">
+              <div class="resonator-wrapper">
+                <div class="resonator-stats">
+                  <div class="resonator-stat">
+                    <div class="stat-chip">
+                      <h2 class="stat-name">Saved Echoes</h2>
+                    </div>
+                    <h2 id="savedCount">0</h2>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="right">
+            <div class="details">
+              <h1>Build Preview</h1>
+              <div id="buildPreview" class="saved-builds"></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </body>
+  </html>
+
