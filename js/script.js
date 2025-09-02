@@ -1568,6 +1568,35 @@ document.addEventListener("DOMContentLoaded", () => {
             finally { e.target.value = ''; }
         });
 
+        // ROI preview wiring
+        const roiBtn = document.getElementById('roiPreviewBtn');
+        const roiInput = document.getElementById('echoRoiInput');
+        roiBtn?.addEventListener('click', () => roiInput?.click());
+        let _roiFile = null;
+        roiInput?.addEventListener('change', async (e) => {
+            const file = e.target.files && e.target.files[0]; if (!file) return;
+            _roiFile = file;
+            try {
+                const canvas = document.getElementById('echoRoiCanvas');
+                const modal = document.getElementById('echoRoiPreview');
+                if (!canvas || !modal) return;
+                await window.TethysImporter.previewRois(file, canvas);
+                modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
+            } catch (err) { console.error('ROI preview error', err); alert('ROI preview failed. ' + (err?.message||'')); }
+            finally { e.target.value = ''; }
+        });
+        document.getElementById('echoRoiClose')?.addEventListener('click', () => closeRoiModal());
+        document.getElementById('roiCancelBtn')?.addEventListener('click', () => closeRoiModal());
+        document.querySelector('#echoRoiPreview .modal__overlay')?.addEventListener('click', () => closeRoiModal());
+        document.getElementById('roiAnalyzeBtn')?.addEventListener('click', async () => {
+            try {
+                if (!_roiFile) { closeRoiModal(); return; }
+                const echoes = await window.TethysImporter.analyzeImageToEchoes(_roiFile);
+                closeRoiModal();
+                showImportPreview(echoes);
+            } catch (err) { console.error('Analyze from ROI failed', err); alert('Import failed. ' + (err?.message||'')); }
+        });
+
         // Paste data wiring
         document.getElementById('pasteEchoesBtn')?.addEventListener('click', () => {
             const m = document.getElementById('echoPasteModal'); m?.classList.add('open'); m?.setAttribute('aria-hidden','false');
@@ -1726,6 +1755,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function closePasteModal(){ const m = document.getElementById('echoPasteModal'); m?.classList.remove('open'); m?.setAttribute('aria-hidden','true'); }
+
+    function closeRoiModal(){ const m = document.getElementById('echoRoiPreview'); m?.classList.remove('open'); m?.setAttribute('aria-hidden','true'); }
     function openEchoInsertTray() {
         try {
             const tray = document.getElementById('echoInsertTray');

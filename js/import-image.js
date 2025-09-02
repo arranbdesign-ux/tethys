@@ -186,6 +186,56 @@
     return results;
   }
 
+  async function previewRois(file, canvas){
+    const img = await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=URL.createObjectURL(file); });
+    const W = img.naturalWidth, H = img.naturalHeight;
+    // Reuse candidate scan to pick best strip
+    const candidates = [0.56, 0.58, 0.60, 0.62];
+    let bestTop = Math.floor(H * 0.58), bestScore = -Infinity;
+    const tileWidth = Math.floor(W / 5);
+    for (const topR of candidates) {
+      const top = Math.floor(H * topR), bottom = Math.floor(H * Math.min(topR + 0.40, 0.99));
+      const h = bottom - top;
+      let score = 0;
+      for (let i = 0; i < 5; i++) {
+        const x = Math.floor(i * tileWidth), y = top, w = (i===4? W - x : tileWidth), hh = h;
+        const tileCanvas = cropToCanvas(img, x, y, w, hh);
+        const text = await ocrRegion(tileCanvas);
+        const n = normText(text);
+        ['crit','rate','dmg','hp','atk','def','bonus','energy'].forEach(k => { if (n.includes(k)) score++; });
+      }
+      if (score > bestScore) { bestScore = score; bestTop = top; }
+    }
+    const stripTop = bestTop, stripBottom = Math.floor(H * 0.98), stripHeight = stripBottom - stripTop;
+
+    // Draw scaled to fit canvas width
+    const ctx = canvas.getContext('2d');
+    const maxW = canvas.clientWidth || 1200;
+    const scale = maxW / W;
+    canvas.width = Math.floor(W * scale);
+    canvas.height = Math.floor(H * scale);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    function drawRect(r, color){
+      ctx.strokeStyle = color; ctx.lineWidth = 2;
+      ctx.strokeRect(Math.floor(r.x*scale), Math.floor(r.y*scale), Math.floor(r.w*scale), Math.floor(r.h*scale));
+    }
+
+    for (let i=0;i<5;i++){
+      const x = Math.floor(i * tileWidth), y = stripTop, w = (i===4? W - x : tileWidth), h = stripHeight;
+      const tileRect = { x, y, w, h };
+      drawRect(tileRect, 'rgba(255, 99, 132, 0.95)'); // red
+      const typeRect = { x: x + Math.floor(w*0.06), y: y + Math.floor(h*0.15), w: Math.floor(w*0.26), h: Math.floor(h*0.55) };
+      const setRect  = { x: x + Math.floor(w*0.70), y: y + Math.floor(h*0.06), w: Math.floor(w*0.22), h: Math.floor(h*0.18) };
+      const costRect = { x: x + Math.floor(w*0.78), y: y + Math.floor(h*0.05), w: Math.floor(w*0.18), h: Math.floor(h*0.18) };
+      drawRect(typeRect, 'rgba(34, 197, 94, 0.95)');   // green
+      drawRect(setRect,  'rgba(168, 85, 247, 0.95)');  // purple
+      drawRect(costRect, 'rgba(234, 179, 8, 0.95)');   // yellow
+    }
+
+    return { width: W, height: H, stripTop };
+  }
+
   // Public API
   function normalizeKey(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
   function levenshtein(a,b){ a=normalizeKey(a); b=normalizeKey(b); const m=a.length,n=b.length; const dp=Array.from({length:m+1},(_,i)=>Array(n+1).fill(0)); for(let i=0;i<=m;i++) dp[i][0]=i; for(let j=0;j<=n;j++) dp[0][j]=j; for(let i=1;i<=m;i++){ for(let j=1;j<=n;j++){ const cost=a[i-1]===b[j-1]?0:1; dp[i][j]=Math.min(dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1]+cost); } } return dp[m][n]; }
@@ -216,5 +266,5 @@
     return out;
   }
 
-  window.TethysImporter = { analyzeImageToEchoes, parseAnnotated };
+  window.TethysImporter = { analyzeImageToEchoes, parseAnnotated, previewRois };
 })();

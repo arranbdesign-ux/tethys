@@ -317,6 +317,7 @@
                             </div>
                             <div class="spacer" style="flex:1 1 auto"></div>
                             <button class="btn btn--secondary" id="importEchoesBtn" type="button">Import Image</button>
+                            <button class="btn btn--secondary" id="roiPreviewBtn" type="button">Preview ROIs</button>
                             <button class="btn btn--secondary" id="pasteEchoesBtn" type="button">Paste Data</button>
                             <button class="btn btn--secondary" id="saveBuildBtn" type="button">Save Echoes</button>
                         </div>
@@ -550,6 +551,7 @@
     </div>
     </div>
     <input type="file" id="echoImportInput" accept="image/*" style="display:none;" />
+    <input type="file" id="echoRoiInput" accept="image/*" style="display:none;" />
     <!-- Echo Insert Tray (appears above modal on right) -->
     <div class="tray" id="echoInsertTray" aria-hidden="true">
         <div class="tray__header">
@@ -576,6 +578,25 @@
                 <button class="btn btn--secondary" id="importCancelBtn" type="button">Cancel</button>
                 <div class="spacer"></div>
                 <button class="btn btn--primary" id="importApplyBtn" type="button">Replace & Save</button>
+            </div>
+        </div>
+    </div>
+    <!-- ROI Preview Modal -->
+    <div class="modal" id="echoRoiPreview" aria-hidden="true">
+        <div class="modal__overlay" data-close></div>
+        <div class="modal__content" role="dialog" aria-modal="true" aria-labelledby="echoRoiTitle">
+            <div class="modal__header">
+                <h2 id="echoRoiTitle">ROI Preview (1920x1080)</h2>
+                <button class="modal__close" id="echoRoiClose" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal__body">
+                <div class="preview-dim" style="margin-bottom:.5rem;">Red: Tile • Green: Type • Purple: Set • Yellow: Cost</div>
+                <canvas id="echoRoiCanvas" style="width:100%;max-height:70vh;border:1px solid rgba(255,255,255,0.12);"></canvas>
+            </div>
+            <div class="modal__footer">
+                <button class="btn btn--secondary" id="roiCancelBtn" type="button">Close</button>
+                <div class="spacer"></div>
+                <button class="btn btn--primary" id="roiAnalyzeBtn" type="button">Run OCR</button>
             </div>
         </div>
     </div>
