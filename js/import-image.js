@@ -160,8 +160,9 @@
       let cost = parseInt(costRaw, 10); if (!Number.isFinite(cost)) cost = 0;
 
       // Match type from big left art region; set from a small badge region
-      const typeRect = { x: x + Math.floor(w*0.06), y: y + Math.floor(h*0.15), w: Math.floor(w*0.26), h: Math.floor(h*0.55) };
-      const setRect  = { x: x + Math.floor(w*0.70), y: y + Math.floor(h*0.06), w: Math.floor(w*0.22), h: Math.floor(h*0.18) };
+      // Tuned for 1920x1080 screenshots: shift type up a bit and widen; shift set left, narrow
+      const typeRect = { x: x + Math.floor(w*0.05), y: y + Math.floor(h*0.12), w: Math.floor(w*0.32), h: Math.floor(h*0.56) };
+      const setRect  = { x: x + Math.floor(w*0.66), y: y + Math.floor(h*0.06), w: Math.floor(w*0.17), h: Math.floor(h*0.18) };
       const matched = await matchTypeAndSet(img, typeRect, setRect, icons);
 
       // Extract main + subs
@@ -177,9 +178,19 @@
       }
       if (!main && subs.length) { main = subs.shift(); mainChosenBy = 'fallback'; }
       const mainConf = main ? (mainChosenBy === 'pct' ? 0.9 : 0.6) : 0.3;
-      const subsEnriched = subs.map(s => ({...s, conf: 0.85}));
+      // Remove guaranteed cost bonuses from subs to avoid interfering with recognition
+      function isGuaranteed(cost, s){
+        if (!s || typeof s.value !== 'number') return false;
+        const tol = 2; // small OCR tolerance
+        if (cost === 4 && s.key === 'atk' && Math.abs(s.value - 150) <= tol) return true;
+        if (cost === 3 && s.key === 'atk' && Math.abs(s.value - 100) <= tol) return true;
+        if (cost === 1 && s.key === 'hp'  && Math.abs(s.value - 2280) <= 20) return true; // larger tol for big number
+        return false;
+      }
+      const filteredSubs = subs.filter(s => !isGuaranteed(cost, s));
+      const subsEnriched = filteredSubs.map(s => ({...s, conf: 0.85}));
       const costConf = cost ? 0.95 : 0.4;
-      results.push({ cost, setId: matched.setId || '', typeId: matched.typeId || '', main: main || { key:'', value:0 }, subs,
+      results.push({ cost, setId: matched.setId || '', typeId: matched.typeId || '', main: main || { key:'', value:0 }, subs: filteredSubs,
         conf: { cost: costConf, type: matched.typeConf || 0, set: matched.setConf || 0, main: mainConf, subs: subsEnriched.map(s=>s.conf) }
       });
     }
@@ -225,8 +236,8 @@
       const x = Math.floor(i * tileWidth), y = stripTop, w = (i===4? W - x : tileWidth), h = stripHeight;
       const tileRect = { x, y, w, h };
       drawRect(tileRect, 'rgba(255, 99, 132, 0.95)'); // red
-      const typeRect = { x: x + Math.floor(w*0.06), y: y + Math.floor(h*0.15), w: Math.floor(w*0.26), h: Math.floor(h*0.55) };
-      const setRect  = { x: x + Math.floor(w*0.70), y: y + Math.floor(h*0.06), w: Math.floor(w*0.22), h: Math.floor(h*0.18) };
+      const typeRect = { x: x + Math.floor(w*0.05), y: y + Math.floor(h*0.12), w: Math.floor(w*0.32), h: Math.floor(h*0.56) };
+      const setRect  = { x: x + Math.floor(w*0.66), y: y + Math.floor(h*0.06), w: Math.floor(w*0.17), h: Math.floor(h*0.18) };
       const costRect = { x: x + Math.floor(w*0.78), y: y + Math.floor(h*0.05), w: Math.floor(w*0.18), h: Math.floor(h*0.18) };
       drawRect(typeRect, 'rgba(34, 197, 94, 0.95)');   // green
       drawRect(setRect,  'rgba(168, 85, 247, 0.95)');  // purple
