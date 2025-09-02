@@ -1564,7 +1564,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const echoes = await window.TethysImporter.analyzeImageToEchoes(file);
                 if (!Array.isArray(echoes) || !echoes.length) { alert('Could not read echoes from image.'); return; }
                 showImportPreview(echoes);
-            } catch (err) { console.error('Import failed', err); alert('Import failed.'); }
+            } catch (err) { console.error('Import failed', err); alert('Import failed. ' + (err && err.message ? err.message : '')); }
             finally { e.target.value = ''; }
         });
 

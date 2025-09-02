@@ -28,7 +28,16 @@
   }
 
   // Tiny fingerprint matcher (downsample + grayscale)
-  async function loadImage(url){ return new Promise((res,rej)=>{ const img = new Image(); img.crossOrigin='anonymous'; img.onload=()=>res(img); img.onerror=rej; img.src=url; }); }
+  async function loadImage(url){
+    return new Promise((res, rej) => {
+      const img = new Image();
+      // Only set crossOrigin for absolute URLs; same-origin assets don't need it
+      try { if (/^https?:\/\//i.test(url)) img.crossOrigin = 'anonymous'; } catch {}
+      img.onload = () => res(img);
+      img.onerror = (e) => rej(e);
+      img.src = url;
+    });
+  }
   function imageFP(img, sx, sy, sw, sh, size=24){
     const c = document.createElement('canvas'); c.width=size; c.height=size; const ctx=c.getContext('2d');
     ctx.drawImage(img, sx, sy, sw, sh, 0, 0, size, size);
@@ -42,29 +51,37 @@
   function fpDistance(a,b){ let s=0; for(let i=0;i<a.length && i<b.length;i++){ const d=a[i]-b[i]; s+=d*d; } return Math.sqrt(s/(Math.min(a.length,b.length)||1)); }
 
   async function buildIconMatchers(){
-    const typeEntries = Object.entries(window.ECHO_TYPES||{});
-    const setEntries = Object.entries(window.ECHO_SETS||{});
-    const typeImgs = await Promise.all(typeEntries.map(([id,t])=>loadImage(t.icon)));
-    const setImgs = await Promise.all(setEntries.map(([id,s])=>loadImage(s.icon)));
-    return { typeEntries, setEntries, typeImgs, setImgs };
+    const typeEntries = Object.entries(window.ECHO_TYPES||{}).filter(([,t])=>t && t.icon);
+    const setEntries = Object.entries(window.ECHO_SETS||{}).filter(([,s])=>s && s.icon);
+    const typeLoads = await Promise.allSettled(typeEntries.map(([id,t])=>loadImage(t.icon)));
+    const setLoads  = await Promise.allSettled(setEntries.map(([id,s])=>loadImage(s.icon)));
+    const typeBank = [];
+    const setBank = [];
+    typeLoads.forEach((r,i)=>{ if (r.status==='fulfilled') typeBank.push({ id: typeEntries[i][0], img: r.value }); });
+    setLoads.forEach((r,i)=>{ if (r.status==='fulfilled') setBank.push({ id: setEntries[i][0], img: r.value }); });
+    return { typeBank, setBank };
   }
 
   async function matchTypeAndSet(img, typeRect, setRect, icons){
-    const { typeEntries, setEntries, typeImgs, setImgs } = icons;
+    const { typeBank, setBank } = icons;
     const { x:tx,y:ty,w:tw,h:th } = typeRect;
     const tfp = imageFP(img, tx, ty, tw, th, 24);
     let bestType = { id: '', dist: Infinity };
-    for(let i=0;i<typeEntries.length;i++){
-      const id = typeEntries[i][0]; const tifp = imageFP(typeImgs[i], 0,0,typeImgs[i].naturalWidth, typeImgs[i].naturalHeight, 24);
-      const d = fpDistance(tfp, tifp); if (d < bestType.dist) bestType = { id, dist: d };
+    for(let i=0;i<typeBank.length;i++){
+      const id = typeBank[i].id; const imgEl = typeBank[i].img;
+      const tifp = imageFP(imgEl, 0, 0, imgEl.naturalWidth || imgEl.width, imgEl.naturalHeight || imgEl.height, 24);
+      const d = fpDistance(tfp, tifp);
+      if (d < bestType.dist) bestType = { id, dist: d };
     }
     // smaller ROI for set (top-right corner of tile)
     // the caller should provide a specific setRect per tile, but if absent, fallback to type rect
     let bestSet = { id: '', dist: Infinity };
-    for(let i=0;i<setEntries.length;i++){
-      const id = setEntries[i][0]; const sfp = imageFP(setImgs[i], 0,0,setImgs[i].naturalWidth, setImgs[i].naturalHeight, 24);
+    for(let i=0;i<setBank.length;i++){
+      const id = setBank[i].id; const imgEl = setBank[i].img;
+      const sfp = imageFP(imgEl, 0, 0, imgEl.naturalWidth || imgEl.width, imgEl.naturalHeight || imgEl.height, 24);
       const rf = (setRect ? imageFP(img, setRect.x, setRect.y, setRect.w, setRect.h, 24) : tfp);
-      const d = fpDistance(rf, sfp); if (d < bestSet.dist) bestSet = { id, dist: d };
+      const d = fpDistance(rf, sfp);
+      if (d < bestSet.dist) bestSet = { id, dist: d };
     }
     // thresholds (empirical); if too far, drop
     const tConf = Math.max(0, Math.min(1, 1 - (bestType.dist/3.0)));
@@ -130,6 +147,7 @@
       if (score > bestScore) { bestScore = score; bestTop = top; }
     }
     const stripTop = bestTop, stripBottom = Math.floor(H * 0.98), stripHeight = stripBottom - stripTop;
+    if (!window.Tesseract || !window.Tesseract.recognize) throw new Error('OCR engine not available');
     const icons = await buildIconMatchers();
     const results = [];
     for (let i=0;i<5;i++){
