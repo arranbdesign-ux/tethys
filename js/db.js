@@ -157,6 +157,35 @@
 
   function clearEchoes() { writeEchoes([]); }
 
+  function removeEcho(idOrPredicate) {
+    const arr = readEchoes();
+    let next;
+    if (typeof idOrPredicate === 'function') {
+      next = arr.filter(e => !idOrPredicate(e));
+    } else {
+      next = arr.filter(e => e.id !== idOrPredicate);
+    }
+    writeEchoes(next);
+    return next.length !== arr.length;
+  }
+
+  // Clipboard (echo + slot) ---------------------------------------------------
+  const CLIP_PREFIX = 'tethys_clip';
+  function writeClipboardEcho(echo, slot) {
+    const payload = { echo: normalizeEcho(echo), slot: Number(slot) || 1, ts: Date.now() };
+    try { setChunked(CLIP_PREFIX, JSON.stringify(payload)); } catch (_) {}
+    return payload;
+  }
+  function readClipboardEcho() {
+    try {
+      const raw = getChunked(CLIP_PREFIX);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (_) { return null; }
+  }
+  function clearClipboardEcho() { setChunked(CLIP_PREFIX, ''); }
+  function consumeClipboardEcho() { const v = readClipboardEcho(); clearClipboardEcho(); return v; }
+
   window.TethysDB = {
     readBuilds,
     writeBuilds,
@@ -167,5 +196,10 @@
     addEcho,
     addEchoes,
     clearEchoes,
+    removeEcho,
+    writeClipboardEcho,
+    readClipboardEcho,
+    clearClipboardEcho,
+    consumeClipboardEcho,
   };
 })();

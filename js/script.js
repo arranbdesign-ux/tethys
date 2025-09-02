@@ -1576,5 +1576,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     document.getElementById('saveBuildBtn')?.addEventListener('click', saveCurrentBuild);
+
+    // Consume clipboard echo (from Saved page) and insert into chosen slot
+    function applyClipboardEchoIfAny() {
+        if (!window.TethysDB || typeof window.TethysDB.consumeClipboardEcho !== 'function') return;
+        const payload = window.TethysDB.consumeClipboardEcho();
+        if (!payload || !payload.echo || !payload.slot) return;
+        const slot = Math.min(5, Math.max(1, Number(payload.slot) || 1));
+        const e = payload.echo;
+        // Prevent duplicate echo type across slots (builder enforces this)
+        if (e.typeId) {
+            const dupIdx = (currentEchoes || []).findIndex((x, i) => x?.typeId === e.typeId && (i + 1) !== slot);
+            if (dupIdx >= 0) {
+                alert('That echo type is already used in another slot.');
+                return;
+            }
+        }
+        currentEchoes[slot - 1] = e;
+        renderEchoCost();
+        renderEchoSetBonusesPanel();
+        renderEchoTiles();
+        if (currentCharacter) renderMainStatsFrom(currentCharacter, currentWeapon, getAllEchoBonuses());
+        // Optional: scroll to echo tiles
+        try { document.getElementById('echoTiles')?.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {}
+    }
+
+    // Try once on load
+    setTimeout(applyClipboardEchoIfAny, 0);
 });
 

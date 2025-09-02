@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   const listEl = document.getElementById('savedEchoesList');
   const libraryEl = document.getElementById('echoLibrary');
+  const groupSel = document.getElementById('groupMode');
+  const sortSel = document.getElementById('sortMode');
+  const clearBtn = document.getElementById('clearEchoesBtn');
 
   const STAT_LABELS = {
     atk: 'ATK', atkp: 'ATK%', cr: 'CRIT Rate', cd: 'CRIT DMG', er: 'Energy Regen', hpp: 'HP%', defp: 'DEF%',
@@ -26,23 +29,48 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderLibrary(echoes) {
     if (!libraryEl) return;
     libraryEl.innerHTML = '';
-    const grid = document.createElement('div');
-    grid.className = 'echo-mini';
-    echoes.forEach((e, idx) => {
-      const item = document.createElement('div'); item.className = 'echo-mini__item';
-      const img = document.createElement('img');
-      if (e?.typeId && window.ECHO_TYPES?.[e.typeId]?.icon) { img.src = window.ECHO_TYPES[e.typeId].icon; img.alt = window.ECHO_TYPES[e.typeId].name; }
-      else { img.alt = 'Echo'; }
-      const textWrap = document.createElement('div');
-      const s = summarizeEcho(e || {});
-      const title = document.createElement('div'); title.className = 'echo-mini__title'; title.textContent = s.title || `Echo ${idx+1}`;
-      const main = document.createElement('div'); main.className = 'echo-mini__stats'; main.textContent = s.main;
-      const subs = document.createElement('div'); subs.className = 'echo-mini__stats'; subs.textContent = s.subs;
-      textWrap.appendChild(title); textWrap.appendChild(main); if (s.subs) textWrap.appendChild(subs);
-      item.appendChild(img); item.appendChild(textWrap);
-      grid.appendChild(item);
+    const mode = (groupSel?.value || 'none');
+    const groups = groupEchoes(echoes, mode);
+
+    groups.forEach(g => {
+      if (mode !== 'none') {
+        const header = document.createElement('h3');
+        header.textContent = `${g.label} (${g.items.length})`;
+        libraryEl.appendChild(header);
+      }
+      const grid = document.createElement('div');
+      grid.className = 'echo-mini';
+      g.items.forEach((e, idx) => {
+        const item = document.createElement('div'); item.className = 'echo-mini__item';
+        const img = document.createElement('img');
+        if (e?.typeId && window.ECHO_TYPES?.[e.typeId]?.icon) { img.src = window.ECHO_TYPES[e.typeId].icon; img.alt = window.ECHO_TYPES[e.typeId].name; }
+        else { img.alt = 'Echo'; }
+        const textWrap = document.createElement('div');
+        const s = summarizeEcho(e || {});
+        const title = document.createElement('div'); title.className = 'echo-mini__title'; title.textContent = s.title || `Echo ${idx+1}`;
+        const main = document.createElement('div'); main.className = 'echo-mini__stats'; main.textContent = s.main;
+        const subs = document.createElement('div'); subs.className = 'echo-mini__stats'; subs.textContent = s.subs;
+        // Controls: Insert + Delete
+        const ctrl = document.createElement('div'); ctrl.style.marginTop = '.35rem';
+        const insertBtn = document.createElement('button'); insertBtn.className = 'btn btn--secondary'; insertBtn.textContent = 'Insert';
+        const delBtn = document.createElement('button'); delBtn.className = 'btn btn--ghost'; delBtn.style.marginLeft = '.4rem'; delBtn.textContent = 'Delete';
+        const slotWrap = document.createElement('span'); slotWrap.style.marginLeft = '.4rem';
+        slotWrap.style.display = 'none';
+        for (let i = 1; i <= 5; i++) {
+          const b = document.createElement('button'); b.className = 'btn'; b.style.height = '1.8rem'; b.style.padding = '0 .5rem'; b.textContent = String(i);
+          b.addEventListener('click', (ev) => { ev.stopPropagation(); insertIntoSlot(e, i); });
+          slotWrap.appendChild(b);
+        }
+        insertBtn.addEventListener('click', (ev) => { ev.stopPropagation(); slotWrap.style.display = (slotWrap.style.display === 'none') ? 'inline-flex' : 'none'; });
+        delBtn.addEventListener('click', (ev) => { ev.stopPropagation(); deleteEcho(e); });
+        ctrl.appendChild(insertBtn); ctrl.appendChild(slotWrap); ctrl.appendChild(delBtn);
+
+        textWrap.appendChild(title); textWrap.appendChild(main); if (s.subs) textWrap.appendChild(subs); textWrap.appendChild(ctrl);
+        item.appendChild(img); item.appendChild(textWrap);
+        grid.appendChild(item);
+      });
+      libraryEl.appendChild(grid);
     });
-    libraryEl.appendChild(grid);
   }
 
   function renderList(echoes) {
@@ -56,9 +84,63 @@ document.addEventListener('DOMContentLoaded', () => {
     listEl.appendChild(countRow);
   }
 
-  const echoes = (window.TethysDB && window.TethysDB.readEchoes) ? window.TethysDB.readEchoes() : [];
-  // newest-ish first by id if present
-  const sorted = [...echoes].sort((a,b) => (String(b.id||'')).localeCompare(String(a.id||'')));
-  renderList(sorted);
-  renderLibrary(sorted);
+  function valOr(arr, fallback) { return Array.isArray(arr) ? arr : (fallback || []); }
+
+  function sortEchoes(echoes, mode) {
+    const c = [...echoes];
+    const tname = e => (window.ECHO_TYPES?.[e.typeId]?.name || '').toLowerCase();
+    const sname = e => (window.ECHO_SETS?.[e.setId]?.name || '').toLowerCase();
+    const mname = e => (e?.main?.key ? (STAT_LABELS[e.main.key] || e.main.key) : '').toLowerCase();
+    if (mode === 'type') return c.sort((a,b) => tname(a).localeCompare(tname(b)) || (String(b.id||'')).localeCompare(String(a.id||'')));
+    if (mode === 'set')  return c.sort((a,b) => sname(a).localeCompare(sname(b)) || (String(b.id||'')).localeCompare(String(a.id||'')));
+    if (mode === 'main') return c.sort((a,b) => mname(a).localeCompare(mname(b)) || (String(b.id||'')).localeCompare(String(a.id||'')));
+    // newest
+    return c.sort((a,b) => (String(b.id||'')).localeCompare(String(a.id||'')));
+  }
+
+  function groupEchoes(echoes, mode) {
+    const items = sortEchoes(echoes, sortSel?.value || 'newest');
+    if (mode === 'type') {
+      const map = new Map();
+      items.forEach(e => { const k = e.typeId || ''; const label = window.ECHO_TYPES?.[k]?.name || 'Unknown Type'; (map.get(k) || map.set(k, { key:k, label, items:[]}).get(k)).items.push(e); });
+      return Array.from(map.values()).sort((a,b) => a.label.localeCompare(b.label));
+    }
+    if (mode === 'set') {
+      const map = new Map();
+      items.forEach(e => { const k = e.setId || ''; const label = window.ECHO_SETS?.[k]?.name || (k ? 'Unknown Set' : 'No Set'); (map.get(k) || map.set(k, { key:k, label, items:[]}).get(k)).items.push(e); });
+      return Array.from(map.values()).sort((a,b) => a.label.localeCompare(b.label));
+    }
+    return [{ key:'', label:'All', items }];
+  }
+
+  function refresh() {
+    const all = (window.TethysDB && window.TethysDB.readEchoes) ? window.TethysDB.readEchoes() : [];
+    renderList(all);
+    const gm = groupSel?.value || 'none';
+    renderLibrary(sortEchoes(all, sortSel?.value || 'newest')); // renderLibrary handles grouping itself
+  }
+
+  function insertIntoSlot(echo, slot) {
+    if (!window.TethysDB || typeof window.TethysDB.writeClipboardEcho !== 'function') return;
+    window.TethysDB.writeClipboardEcho(echo, slot);
+    window.location.href = 'index.html#insert';
+  }
+
+  function deleteEcho(echo) {
+    if (!window.TethysDB || typeof window.TethysDB.removeEcho !== 'function') return;
+    if (!confirm('Delete this saved echo?')) return;
+    window.TethysDB.removeEcho(echo.id);
+    refresh();
+  }
+
+  groupSel?.addEventListener('change', refresh);
+  sortSel?.addEventListener('change', refresh);
+  clearBtn?.addEventListener('click', () => {
+    if (!window.TethysDB || typeof window.TethysDB.clearEchoes !== 'function') return;
+    if (!confirm('Clear all saved echoes?')) return;
+    window.TethysDB.clearEchoes();
+    refresh();
+  });
+
+  refresh();
 });

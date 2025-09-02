@@ -68,6 +68,23 @@
           <section class="left">
             <div class="saved">
               <h1>Saved Echoes</h1>
+              <div class="saved-controls" style="display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;">
+                <label style="opacity:.9;">Group</label>
+                <select id="groupMode" class="btn" style="height:2rem; background: rgba(255,255,255,.10);">
+                  <option value="none">None</option>
+                  <option value="type">Type</option>
+                  <option value="set">Set</option>
+                </select>
+                <label style="opacity:.9;">Sort</label>
+                <select id="sortMode" class="btn" style="height:2rem; background: rgba(255,255,255,.10);">
+                  <option value="newest">Newest</option>
+                  <option value="type">Type</option>
+                  <option value="set">Set</option>
+                  <option value="main">Main Stat</option>
+                </select>
+                <div class="spacer" style="flex:1 1 auto"></div>
+                <button id="clearEchoesBtn" class="btn btn--ghost" type="button">Clear All</button>
+              </div>
               <div class="saved-list" id="savedEchoesList">
                 <!-- populated by js/saved.js -->
               </div>
