@@ -73,8 +73,24 @@
     return { typeId: bestType.id, setId: bestSet.id, typeConf: tConf, setConf: sConf };
   }
 
+  function enhanceForOCR(canvas){
+    // Simple grayscale + contrast boost
+    const c = document.createElement('canvas'); c.width = canvas.width; c.height = canvas.height; const ctx = c.getContext('2d');
+    ctx.drawImage(canvas, 0, 0);
+    const img = ctx.getImageData(0,0,c.width,c.height); const d = img.data;
+    // grayscale
+    for (let i=0;i<d.length;i+=4){ const y = 0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]; d[i]=d[i+1]=d[i+2]=y; }
+    // contrast
+    const contrast = 1.35; // boost
+    const intercept = 128*(1-contrast);
+    for (let i=0;i<d.length;i+=4){ const v = Math.max(0, Math.min(255, d[i]*contrast + intercept)); d[i]=d[i+1]=d[i+2]=v; }
+    ctx.putImageData(img,0,0);
+    return c;
+  }
+
   async function ocrRegion(imgCanvas){
-    const dataUrl = imgCanvas.toDataURL('image/png');
+    const enhanced = enhanceForOCR(imgCanvas);
+    const dataUrl = enhanced.toDataURL('image/png');
     const { data: { text } } = await Tesseract.recognize(dataUrl, 'eng', {
       tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.%+\n '  
     });
@@ -82,7 +98,8 @@
   }
 
   async function ocrDigits(imgCanvas){
-    const dataUrl = imgCanvas.toDataURL('image/png');
+    const enhanced = enhanceForOCR(imgCanvas);
+    const dataUrl = enhanced.toDataURL('image/png');
     const { data: { text } } = await Tesseract.recognize(dataUrl, 'eng', {
       tessedit_char_whitelist: '0123456789'  
     });
@@ -95,7 +112,7 @@
     const img = await new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=URL.createObjectURL(file); });
     const W = img.naturalWidth, H = img.naturalHeight;
     // Try multiple candidate stripes and pick best by keyword presence
-    const candidates = [0.56, 0.58, 0.60];
+    const candidates = [0.56, 0.58, 0.60, 0.62];
     let bestTop = Math.floor(H * 0.58), bestScore = -Infinity;
     const tileWidth = Math.floor(W / 5);
     for (const topR of candidates) {

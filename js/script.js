@@ -1678,6 +1678,7 @@ document.addEventListener("DOMContentLoaded", () => {
         modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
         document.getElementById('echoImportPreviewClose')?.addEventListener('click', closeImportPreview, { once:true });
         document.getElementById('importCancelBtn')?.addEventListener('click', closeImportPreview, { once:true });
+        document.querySelector('#echoImportPreview .modal__overlay')?.addEventListener('click', closeImportPreview, { once:true });
         document.getElementById('importApplyBtn')?.addEventListener('click', applyImportPreview, { once:true });
     }
     function closeImportPreview(){ const m = document.getElementById('echoImportPreview'); m?.classList.remove('open'); m?.setAttribute('aria-hidden','true'); _importPreviewData = null; }

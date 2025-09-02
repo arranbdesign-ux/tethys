@@ -155,5 +155,12 @@ window.ECHO_SETS = {
             { count: 3, stats: [{ key: "atkp", value: 30 }, { key: "cd", value: 20 }] },
         ]
     },
+    "lawofharmony": {
+        name: "Law of Harmony",
+        icon: "images/sets/law-of-harmony.webp",
+        bonuses: [
+            { count: 3, stats: [{ key: "heavydmg", value: 30 }] },
+        ]
+    },
     // add more...
 };

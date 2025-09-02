@@ -235,7 +235,7 @@ window.ECHO_TYPES = {
         name: "Reminiscence: Fenrico",
         icon: "images/echoes/fenrico.webp",
         cost: 4,
-        sets: ["dreamofthelost"], // belongs to multiple sets
+        sets: ["dreamofthelost", "lawofharmony"], // belongs to multiple sets
         bonus: [
             { key: "aerodmg", value: 12 }, { key: "heavydmg", value: 12 }
         ]
@@ -445,7 +445,7 @@ window.ECHO_TYPES = {
         name: "Nightmare: Cyan-Feathered Heron",
         icon: "images/echoes/nightmare-cyan-heron.webp",
         cost: 3,
-        sets: [""], // belongs to multiple sets
+        sets: ["lawofharmony"], // belongs to multiple sets
         bonus: [
         ]
     },
@@ -485,7 +485,7 @@ window.ECHO_TYPES = {
         name: "Rage Against the Statue",
         icon: "images/echoes/rage.webp",
         cost: 3,
-        sets: ["eternalradiance", "gustsofwelkin"], // belongs to multiple sets
+        sets: ["eternalradiance", "gustsofwelkin", "lawofhamony"], // belongs to multiple sets
         bonus: [
         ]
     },
@@ -559,11 +559,507 @@ window.ECHO_TYPES = {
 
 
     // 1 COST ECHOES
+    "aeroDrake": {
+        name: "Aero Drake",
+        icon: "images/echoes/aero-drake.webp",
+        cost: 1,
+        sets: ["tidebreakingcourage", "gustsofwelkin", "flamingclawprint"],
+        bonus: [
+        ]
+    },
     "aeroPredator": {
         name: "Aero Predator",
         icon: "images/echoes/aero-predator.webp",
         cost: 1,
         sets: ["voidthunder", "sierragale"],
+        bonus: [
+        ]
+    },
+    "aeroPrism": {
+        name: "Aero Prism",
+        icon: "images/echoes/aero-prism.webp",
+        cost: 1,
+        sets: ["eternalradiance", "tidebreakingcourage"],
+        bonus: [
+        ]
+    },
+    "babyViridblazeSaurian": {
+        name: "Baby Viridblaze Saurian",
+        icon: "images/echoes/baby-viridblaze-saurian.webp",
+        cost: 1,
+        sets: ["moltenrift", "voidthunder", "lingeringtunes"],
+        bonus: [
+        ]
+    },
+    "calcifiedJunrock": {
+        name: "Calcified Junrock",
+        icon: "images/echoes/calcified-junrock.webp",
+        cost: 1,
+        sets: ["empyreananthem", "tidebreakingcourage", "crownofvalor"],
+        bonus: [
+        ]
+    },
+    "chestMimic": {
+        name: "Chest Mimic",
+        icon: "images/echoes/chest-mimic.webp",
+        cost: 1,
+        sets: ["empyreananthem", "midnightveil", "empyreananthem"],
+        bonus: [
+        ]
+    },
+    "chirpuff": {
+        name: "Chirpuff",
+        icon: "images/echoes/chirpuff.webp",
+        cost: 1,
+        sets: ["sierragale", "havoceclipse"],
+        bonus: [
+        ]
+    },
+    "headless": {
+        name: "Chop Chop: Headless",
+        icon: "images/echoes/headless.webp",
+        cost: 1,
+        sets: ["eternalradiance", "tidebreakingcourage"],
+        bonus: [
+        ]
+    },
+    "leftless": {
+        name: "Chop Chop: Leftless",
+        icon: "images/echoes/leftless.webp",
+        cost: 1,
+        sets: ["frostyresolve", "tidebreakingcourage"],
+        bonus: [
+        ]
+    },
+    "rightless": {
+        name: "Chop Chop: Rightless",
+        icon: "images/echoes/rightless.webp",
+        cost: 1,
+        sets: ["frostyresolve", "tidebreakingcourage"],
+        bonus: [
+        ]
+    },
+    "clangbang": {
+        name: "Clang Bang",
+        icon: "images/echoes/clangbang.webp",
+        cost: 1,
+        sets: ["freezingfrost", "celestiallight"],
+        bonus: [
+        ]
+    },
+    "cruisewing": {
+        name: "Cruisewing",
+        icon: "images/echoes/cruisewing.webp",
+        cost: 1,
+        sets: ["moonlitclouds", "celestiallight", "rejuvinatingglow"],
+        bonus: [
+        ]
+    },
+    "flesh": {
+        name: "Devotee's Flesh",
+        icon: "images/echoes/flesh.webp",
+        cost: 1,
+        sets: ["gustsofwelkin", "flamingclawprint", "windwardpilgrimage"],
+        bonus: [
+        ]
+    },
+    "diamondclaw": {
+        name: "Diamondclaw",
+        icon: "images/echoes/diamondclaw.webp",
+        cost: 1,
+        sets: ["moonlitclouds", "lingeringtunes"],
+        bonus: [
+        ]
+    },
+    "diggyDuggy": {
+        name: "Diggy Duggy",
+        icon: "images/echoes/diggy-duggy.webp",
+        cost: 1,
+        sets: ["eternalradiance", "tidebreakingcourage"],
+        bonus: [
+        ]
+    },
+    "cassowary": {
+        name: "Dwarf Cassowary",
+        icon: "images/echoes/cassowary.webp",
+        cost: 1,
+        sets: ["sierragale", "celestiallight"],
+        bonus: [
+        ]
+    },
+    "electroDrake": {
+        name: "Electro Drake",
+        icon: "images/echoes/electro-drake.webp",
+        cost: 1,
+        sets: ["midnightveil", "gustsofwelkin", "flamingclawprint"],
+        bonus: [
+        ]
+    },
+    "electroPredator": {
+        name: "Electro Predator",
+        icon: "images/echoes/electro-predator.webp",
+        cost: 1,
+        sets: ["moltenrift", "voidthunder"],
+        bonus: [
+        ]
+    },
+    "excarat": {
+        name: "Excarat",
+        icon: "images/echoes/excarat.webp",
+        cost: 1,
+        sets: ["freezingfrost", "havoceclipse"],
+        bonus: [
+        ]
+    },
+    "faeIgnis": {
+        name: "Fae Ignis",
+        icon: "images/echoes/fae-ignis.webp",
+        cost: 1,
+        sets: ["eternalradiance", "midnightveil", "dreamofthelost"],
+        bonus: [
+        ]
+    },
+    "fissionJunrock": {
+        name: "Fission Junrock",
+        icon: "images/echoes/fission-junrock.webp",
+        cost: 1,
+        sets: ["voidthunder", "rejuvinatingglow", "moonlitclouds"],
+        bonus: [
+        ]
+    },
+    "frostscourgeStalker": {
+        name: "Frostscourge Stalker",
+        icon: "images/echoes/frostscourge-stalker.webp",
+        cost: 1,
+        sets: ["eternalradiance", "midnightveil"],
+        bonus: [
+        ]
+    },
+    "fusionDrake": {
+        name: "Fusion Drake",
+        icon: "images/echoes/fusion-drake.webp",
+        cost: 1,
+        sets: ["flamingclawprint", "windwardpilgrimage"],
+        bonus: [
+        ]
+    },
+    "fusionDreadmane": {
+        name: "Fusion Dreadmane",
+        icon: "images/echoes/fusion-dreadmane.webp",
+        cost: 1,
+        sets: ["moltenrift", "rejuvinatingglow"],
+        bonus: [
+        ]
+    },
+    "fusionPrism": {
+        name: "Fusion Prism",
+        icon: "images/echoes/fusion-prism.webp",
+        cost: 1,
+        sets: ["freezingfrost", "moltenrift", "lingeringtunes"],
+        bonus: [
+        ]
+    },
+    "fusionWarrior": {
+        name: "Fusion Warrior",
+        icon: "images/echoes/fusion-warrior.webp",
+        cost: 1,
+        sets: ["moltenrift", "voidthunder", "sierragale"],
+        bonus: [
+        ]
+    },
+    "galescourgeStalker": {
+        name: "Galescourge Stalker",
+        icon: "images/echoes/galescourge-stalker.webp",
+        cost: 1,
+        sets: ["frostyresolve", "empyreananthem"],
+        bonus: [
+        ]
+    },
+    "glacioDrake": {
+        name: "Glacio Drake",
+        icon: "images/echoes/glacio-drake.webp",
+        cost: 1,
+        sets: ["gustsofwelkin", "windwardpilgrimage"],
+        bonus: [
+        ]
+    },
+    "glacioPredator": {
+        name: "Glacio Predator",
+        icon: "images/echoes/glacio-predator.webp",
+        cost: 1,
+        sets: ["freezingfrost", "celestiallight"],
+        bonus: [
+        ]
+    },
+    "glacioPrism": {
+        name: "Glacio Prism",
+        icon: "images/echoes/glacio-prism.webp",
+        cost: 1,
+        sets: ["freezingfrost", "havoceclipse", "moonlitclouds"],
+        bonus: [
+        ]
+    },
+    "goldenJunrock": {
+        name: "Golden Junrock",
+        icon: "images/echoes/golden-junrock.webp",
+        cost: 1,
+        sets: ["frostyresolve", "eternalradiance", "lawofharmony"],
+        bonus: [
+        ]
+    },
+    "gulpuff": {
+        name: "Gulpuff",
+        icon: "images/echoes/gulpuff.webp",
+        cost: 1,
+        sets: ["freezingfrost", "celestiallight"],
+        bonus: [
+        ]
+    },
+    "gulpuff": {
+        name: "Gulpuff",
+        icon: "images/echoes/gulpuff.webp",
+        cost: 1,
+        sets: ["freezingfrost", "celestiallight"],
+        bonus: [
+        ]
+    },
+    "havocDrake": {
+        name: "Havoc Drake",
+        icon: "images/echoes/havoc-drake.webp",
+        cost: 1,
+        sets: ["flamingclawprint", "windwardpilgrimage"],
+        bonus: [
+        ]
+    },
+    "havocPrism": {
+        name: "Havoc Prism",
+        icon: "images/echoes/havoc-prism.webp",
+        cost: 1,
+        sets: ["voidthunder", "celestiallight", "havoceclipse"],
+        bonus: [
+        ]
+    },
+    "havocWarrior": {
+        name: "Havoc Warrior",
+        icon: "images/echoes/havoc-warrior.webp",
+        cost: 1,
+        sets: ["celestiallight", "havoceclipse"],
+        bonus: [
+        ]
+    },
+    "hoartoise": {
+        name: "Hoartoise",
+        icon: "images/echoes/hoartoise.webp",
+        cost: 1,
+        sets: ["celestiallight", "freezingfrost"],
+        bonus: [
+        ]
+    },
+    "hocusPocus": {
+        name: "Hocus Pocus",
+        icon: "images/echoes/hocus-pocus.webp",
+        cost: 1,
+        sets: ["frostyresolve", "empyreananthem"],
+        bonus: [
+        ]
+    },
+    "hooscamp": {
+        name: "Hooscamp",
+        icon: "images/echoes/hooscamp.webp",
+        cost: 1,
+        sets: ["sierragale", "lingeringtunes"],
+        bonus: [
+        ]
+    },
+    "guardia": {
+        name: "La Guardia",
+        icon: "images/echoes/guardia.webp",
+        cost: 1,
+        sets: ["midnightveil", "gustsofwelkin", "flamingclawprint"],
+        bonus: [
+        ]
+    },
+    "lavaLarva": {
+        name: "Lava Larva",
+        icon: "images/echoes/lava-larva.webp",
+        cost: 1,
+        sets: ["moltenrift", "lingeringtunes"],
+        bonus: [
+        ]
+    },
+    "lottie": {
+        name: "Lottie Lost",
+        icon: "images/echoes/lottie.webp",
+        cost: 1,
+        sets: ["frostyresolve", "tidebreakingcourage"],
+        bonus: [
+        ]
+    },
+    "nightmareAeroPredator": {
+        name: "Nightmare: Aero Predator",
+        icon: "images/echoes/nightmare-aero-predator.webp",
+        cost: 1,
+        sets: ["crownofvalor"],
+        bonus: [
+        ]
+    },
+    "nightmareChirpuff": {
+        name: "Nightmare: Chirpuff",
+        icon: "images/echoes/nightmare-chirpuff.webp",
+        cost: 1,
+        sets: ["lawofharmony"],
+        bonus: [
+        ]
+    },
+    "nightmareElectroPredator": {
+        name: "Nightmare: Electro Predator",
+        icon: "images/echoes/nightmare-electro-predator.webp",
+        cost: 1,
+        sets: ["crownofvalor"],
+        bonus: [
+        ]
+    },
+    "nightmareGlacioPredator": {
+        name: "Nightmare: Glacio Predator",
+        icon: "images/echoes/nightmare-glacio-predator.webp",
+        cost: 1,
+        sets: ["dreamofthelost"],
+        bonus: [
+        ]
+    },
+    "nightmareGulpuff": {
+        name: "Nightmare: Gulpuff",
+        icon: "images/echoes/nightmare-gulpuff.webp",
+        cost: 1,
+        sets: ["lawofharmony"],
+        bonus: [
+        ]
+    },
+    "nightmareHavocWarrior": {
+        name: "Nightmare: Havoc Warrior",
+        icon: "images/echoes/nightmare-havoc-warrior.webp",
+        cost: 1,
+        sets: ["dreamofthelost"],
+        bonus: [
+        ]
+    },
+    "nightmareTambourinist": {
+        name: "Nightmare: Tambourinist",
+        icon: "images/echoes/nightmare-tambourinist.webp",
+        cost: 1,
+        sets: ["dreamofthelost"],
+        bonus: [
+        ]
+    },
+    "nimbus": {
+        name: "Nimbus Wraith",
+        icon: "images/echoes/nimbus.webp",
+        cost: 1,
+        sets: ["midnightveil", "empyreananthem"],
+        bonus: [
+        ]
+    },
+    "sabyrBoar": {
+        name: "Sabyr Boar",
+        icon: "images/echoes/boar.webp",
+        cost: 1,
+        sets: ["freezingfrost", "sierragale", "moonlitclouds"],
+        bonus: [
+        ]
+    },
+    "sacerdos": {
+        name: "Sacerdos",
+        icon: "images/echoes/sacerdos.webp",
+        cost: 1,
+        sets: ["gustsofwelkin", "flamingclawprint", "windwardpilgrimage"],
+        bonus: [
+        ]
+    },
+    "sagittario": {
+        name: "Sagittario",
+        icon: "images/echoes/sagittario.webp",
+        cost: 1,
+        sets: ["eternalradiance", "gustsofwelkin", "flamingclawprint"],
+        bonus: [
+        ]
+    },
+    "snipSnap": {
+        name: "Snip Snap",
+        icon: "images/echoes/snip-snap.webp",
+        cost: 1,
+        sets: ["moltenrift", "rejuvinatingglow", "lingeringtunes"],
+        bonus: [
+        ]
+    },
+    "spectroDrake": {
+        name: "Spectro Drake",
+        icon: "images/echoes/spectro-drake.webp",
+        cost: 1,
+        sets: ["flamingclawprint", "windwardpilgrimage"],
+        bonus: [
+        ]
+    },
+    "spectroPrism": {
+        name: "Spectro Prism",
+        icon: "images/echoes/spectro-prism.webp",
+        cost: 1,
+        sets: ["moltenrift", "voidthunder", "celestiallight"],
+        bonus: [
+        ]
+    },
+    "tick": {
+        name: "Tick Tack",
+        icon: "images/echoes/tick.webp",
+        cost: 1,
+        sets: ["havoceclipse", "rejuvinatingglow", "lingeringtunes"],
+        bonus: [
+        ]
+    },
+    "traffic": {
+        name: "Traffic Illuminator",
+        icon: "images/echoes/traffic.webp",
+        cost: 1,
+        sets: ["moltenrift", "voidthunder", "sierragale"],
+        bonus: [
+        ]
+    },
+    "vanguardJunrock": {
+        name: "Vanguard Junrock",
+        icon: "images/echoes/vanguard-junrock.webp",
+        cost: 1,
+        sets: ["rejuvinatingglow", "voidthunder", "lingeringtunes"],
+        bonus: [
+        ]
+    },
+    "voltscourgeStalker": {
+        name: "Voltscourge Stalker",
+        icon: "images/echoes/voltscourge.webp",
+        cost: 1,
+        sets: ["midnightveil", "empyreananthem"],
+        bonus: [
+        ]
+    },
+    "whiffWhaff": {
+        name: "Whiff Whaff",
+        icon: "images/echoes/whiff.webp",
+        cost: 1,
+        sets: ["sierragale", "rejuvinatingglow", "moonlitclouds"],
+        bonus: [
+        ]
+    },
+    "youngRoseshroom": {
+        name: "Young Roseshroom",
+        icon: "images/echoes/young-roseshroom.webp",
+        cost: 1,
+        sets: ["sierragale", "havoceclipse"],
+        bonus: [
+        ]
+    },
+    "zigZag": {
+        name: "Zig Zag",
+        icon: "images/echoes/zag.webp",
+        cost: 1,
+        sets: ["celestiallight", "moonlitclouds", "lingeringtunes"],
         bonus: [
         ]
     },
