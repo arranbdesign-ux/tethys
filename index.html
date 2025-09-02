@@ -317,6 +317,7 @@
                             </div>
                             <div class="spacer" style="flex:1 1 auto"></div>
                             <button class="btn btn--secondary" id="importEchoesBtn" type="button">Import Image</button>
+                            <button class="btn btn--secondary" id="pasteEchoesBtn" type="button">Paste Data</button>
                             <button class="btn btn--secondary" id="saveBuildBtn" type="button">Save Echoes</button>
                         </div>
 
@@ -575,6 +576,26 @@
                 <button class="btn btn--secondary" id="importCancelBtn" type="button">Cancel</button>
                 <div class="spacer"></div>
                 <button class="btn btn--primary" id="importApplyBtn" type="button">Replace & Save</button>
+            </div>
+        </div>
+    </div>
+    <!-- Paste Data Modal -->
+    <div class="modal" id="echoPasteModal" aria-hidden="true">
+        <div class="modal__overlay" data-close></div>
+        <div class="modal__content" role="dialog" aria-modal="true" aria-labelledby="echoPasteTitle">
+            <div class="modal__header">
+                <h2 id="echoPasteTitle">Paste Echo Data</h2>
+                <button class="modal__close" id="echoPasteClose" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal__body">
+                <p class="preview-dim">Paste annotated echoes (your format is fine). Example:<br>Echo 1:\nSlot: 1\nCost: 4\nSet: "dreamofthelost"\nType: "nightmareHecate"\nMain: "cd: 44.0"\nSub 1: "cr: 7.5" ...</p>
+                <textarea id="echoPasteTextarea" style="width:100%;min-height:16rem;background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.12);border-radius:.5rem;padding:.5rem;resize:vertical;"></textarea>
+                <div id="echoPasteErrors" style="margin-top:.5rem;color:#fca5a5;"></div>
+            </div>
+            <div class="modal__footer">
+                <button class="btn btn--secondary" id="echoPasteCancel" type="button">Cancel</button>
+                <div class="spacer"></div>
+                <button class="btn btn--primary" id="echoPasteParse" type="button">Preview</button>
             </div>
         </div>
     </div>

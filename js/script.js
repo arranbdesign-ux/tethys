@@ -1567,6 +1567,25 @@ document.addEventListener("DOMContentLoaded", () => {
             } catch (err) { console.error('Import failed', err); alert('Import failed.'); }
             finally { e.target.value = ''; }
         });
+
+        // Paste data wiring
+        document.getElementById('pasteEchoesBtn')?.addEventListener('click', () => {
+            const m = document.getElementById('echoPasteModal'); m?.classList.add('open'); m?.setAttribute('aria-hidden','false');
+        });
+        document.getElementById('echoPasteClose')?.addEventListener('click', () => closePasteModal());
+        document.querySelector('#echoPasteModal .modal__overlay')?.addEventListener('click', () => closePasteModal());
+        document.getElementById('echoPasteCancel')?.addEventListener('click', () => closePasteModal());
+        document.getElementById('echoPasteParse')?.addEventListener('click', () => {
+            const ta = document.getElementById('echoPasteTextarea'); const errEl = document.getElementById('echoPasteErrors'); if (!ta) return;
+            errEl.textContent = '';
+            try {
+                if (!window.TethysImporter || typeof window.TethysImporter.parseAnnotated !== 'function') { errEl.textContent = 'Parser unavailable.'; return; }
+                const arr = window.TethysImporter.parseAnnotated(ta.value||'');
+                if (!arr.length) { errEl.textContent = 'Could not parse any echoes.'; return; }
+                closePasteModal();
+                showImportPreview(arr);
+            } catch (e) { console.error(e); errEl.textContent = 'Failed to parse.'; }
+        });
     })();
 
     function resetEchoBuilders() { currentEchoes = [null, null, null, null, null]; renderEchoTiles(); renderEchoCost(); renderEchoSetBonusesPanel(); }
@@ -1684,7 +1703,10 @@ document.addEventListener("DOMContentLoaded", () => {
     function closeImportPreview(){ const m = document.getElementById('echoImportPreview'); m?.classList.remove('open'); m?.setAttribute('aria-hidden','true'); _importPreviewData = null; }
     function applyImportPreview(){
         const echoes = _importPreviewData || [];
-        const arr = [...echoes].slice(0,5); while (arr.length<5) arr.push(null);
+        // sort by slot if provided
+        const sorted = [...echoes].sort((a,b) => (a?.slot||0) - (b?.slot||0));
+        const arr = sorted.length ? sorted.slice(0,5) : [...echoes].slice(0,5);
+        while (arr.length<5) arr.push(null);
         currentEchoes = arr.map(e => e ? ({
             cost: Number(e.cost)||0, setId: e.setId||'', typeId: e.typeId||'',
             main: e.main?.key ? { key: e.main.key, value: Number(e.main.value)||0 } : { key:'', value:0 },
@@ -1702,6 +1724,8 @@ document.addEventListener("DOMContentLoaded", () => {
         closeImportPreview();
         alert('Echoes imported. Please review and adjust if needed.');
     }
+
+    function closePasteModal(){ const m = document.getElementById('echoPasteModal'); m?.classList.remove('open'); m?.setAttribute('aria-hidden','true'); }
     function openEchoInsertTray() {
         try {
             const tray = document.getElementById('echoInsertTray');

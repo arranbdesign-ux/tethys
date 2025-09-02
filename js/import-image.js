@@ -49,21 +49,22 @@
     return { typeEntries, setEntries, typeImgs, setImgs };
   }
 
-  async function matchTypeAndSet(img, rect, icons){
+  async function matchTypeAndSet(img, typeRect, setRect, icons){
     const { typeEntries, setEntries, typeImgs, setImgs } = icons;
-    const { x,y,w,h } = rect;
-    const fp = imageFP(img, x, y, w, h, 24);
+    const { x:tx,y:ty,w:tw,h:th } = typeRect;
+    const tfp = imageFP(img, tx, ty, tw, th, 24);
     let bestType = { id: '', dist: Infinity };
     for(let i=0;i<typeEntries.length;i++){
-      const id = typeEntries[i][0]; const tfp = imageFP(typeImgs[i], 0,0,typeImgs[i].naturalWidth, typeImgs[i].naturalHeight, 24);
-      const d = fpDistance(fp, tfp); if (d < bestType.dist) bestType = { id, dist: d };
+      const id = typeEntries[i][0]; const tifp = imageFP(typeImgs[i], 0,0,typeImgs[i].naturalWidth, typeImgs[i].naturalHeight, 24);
+      const d = fpDistance(tfp, tifp); if (d < bestType.dist) bestType = { id, dist: d };
     }
     // smaller ROI for set (top-right corner of tile)
     // the caller should provide a specific setRect per tile, but if absent, fallback to type rect
     let bestSet = { id: '', dist: Infinity };
     for(let i=0;i<setEntries.length;i++){
       const id = setEntries[i][0]; const sfp = imageFP(setImgs[i], 0,0,setImgs[i].naturalWidth, setImgs[i].naturalHeight, 24);
-      const d = fpDistance(fp, sfp); if (d < bestSet.dist) bestSet = { id, dist: d };
+      const rf = (setRect ? imageFP(img, setRect.x, setRect.y, setRect.w, setRect.h, 24) : tfp);
+      const d = fpDistance(rf, sfp); if (d < bestSet.dist) bestSet = { id, dist: d };
     }
     // thresholds (empirical); if too far, drop
     const tConf = Math.max(0, Math.min(1, 1 - (bestType.dist/3.0)));
@@ -140,9 +141,10 @@
       const costRaw = await ocrDigits(costCanvas);
       let cost = parseInt(costRaw, 10); if (!Number.isFinite(cost)) cost = 0;
 
-      // Match type from big left art region
+      // Match type from big left art region; set from a small badge region
       const typeRect = { x: x + Math.floor(w*0.06), y: y + Math.floor(h*0.15), w: Math.floor(w*0.26), h: Math.floor(h*0.55) };
-      const matched = await matchTypeAndSet(img, typeRect, icons);
+      const setRect  = { x: x + Math.floor(w*0.70), y: y + Math.floor(h*0.06), w: Math.floor(w*0.22), h: Math.floor(h*0.18) };
+      const matched = await matchTypeAndSet(img, typeRect, setRect, icons);
 
       // Extract main + subs
       const lines = (text||'').split(/\n+/).map(s=>s.trim()).filter(Boolean);
@@ -167,5 +169,34 @@
   }
 
   // Public API
-  window.TethysImporter = { analyzeImageToEchoes };
+  function normalizeKey(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+  function levenshtein(a,b){ a=normalizeKey(a); b=normalizeKey(b); const m=a.length,n=b.length; const dp=Array.from({length:m+1},(_,i)=>Array(n+1).fill(0)); for(let i=0;i<=m;i++) dp[i][0]=i; for(let j=0;j<=n;j++) dp[0][j]=j; for(let i=1;i<=m;i++){ for(let j=1;j<=n;j++){ const cost=a[i-1]===b[j-1]?0:1; dp[i][j]=Math.min(dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1]+cost); } } return dp[m][n]; }
+  function fuzzyFindId(table, input){ if(!input) return ''; const keys=Object.keys(table||{}); const full = keys.map(k=>({id:k,label:(table[k]?.name||k)}));
+    const norm = normalizeKey(input); let best={id:'',score:Infinity};
+    full.forEach(x=>{ const keyScore = levenshtein(x.id, norm); const nameScore = levenshtein(x.label||'', input); const s=Math.min(keyScore, nameScore); if(s<best.score) best={id:x.id,score:s}; });
+    return best.id; }
+
+  function parseAnnotated(text){
+    const out=[]; if(!text) return out;
+    const blocks = String(text).split(/\n\s*Echo\s+\d+\s*:/i).filter(Boolean);
+    const sets = window.ECHO_SETS||{}; const types = window.ECHO_TYPES||{};
+    blocks.forEach(block=>{
+      const grab = (label) => { const m = block.match(new RegExp(label+"\s*:\\s*(\"([^\"]+)\"|([^\n]+))","i")); return m? (m[2]||m[3]||'').trim() : ''; };
+      const slot = parseInt(grab('Slot'),10)||null;
+      const cost = parseInt(grab('Cost'),10)||0;
+      let setRaw = grab('Set'); let typeRaw = grab('Type');
+      const setId = sets[setRaw]?.name ? setRaw : fuzzyFindId(sets, setRaw);
+      const typeId = types[typeRaw]?.name ? typeRaw : fuzzyFindId(types, typeRaw);
+      const mainRaw = grab('Main');
+      const mainMatch = mainRaw.match(/([a-zA-Z]+)\s*[: ]\s*([\d.]+)/);
+      const main = mainMatch ? { key: normalizeKey(mainMatch[1]), value: Number(mainMatch[2]) } : { key:'', value:0 };
+      const subs=[];
+      const subRe = /Sub\s*\d+\s*:\s*(\"([^\"]+)\"|([^\n]+))/ig; let sm;
+      while ((sm = subRe.exec(block))){ const s = (sm[2]||sm[3]||'').trim(); const mm = s.match(/([a-zA-Z]+)\s*[: ]\s*([\d.]+)/); if(mm){ subs.push({ key: normalizeKey(mm[1]), value: Number(mm[2]) }); } }
+      out.push({ slot, cost, setId, typeId, main, subs });
+    });
+    return out;
+  }
+
+  window.TethysImporter = { analyzeImageToEchoes, parseAnnotated };
 })();
