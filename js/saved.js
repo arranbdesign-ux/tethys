@@ -47,7 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
         else { img.alt = 'Echo'; }
         const textWrap = document.createElement('div');
         const s = summarizeEcho(e || {});
-        const title = document.createElement('div'); title.className = 'echo-mini__title'; title.textContent = s.title || `Echo ${idx+1}`;
+      const title = document.createElement('div'); title.className = 'echo-mini__title';
+      const equipped = (e?.equippedBy ? ` • Equipped: ${e.equippedBy}${e.equippedSlot ? ' • Slot ' + e.equippedSlot : ''}` : '');
+      title.textContent = (s.title || `Echo ${idx+1}`) + equipped;
         const main = document.createElement('div'); main.className = 'echo-mini__stats'; main.textContent = s.main;
         const subs = document.createElement('div'); subs.className = 'echo-mini__stats'; subs.textContent = s.subs;
         // Controls: Delete only (insertion moved to builder modal tray)
@@ -114,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function deleteEcho(echo) {
     if (!window.TethysDB || typeof window.TethysDB.removeEcho !== 'function') return;
     if (!confirm('Delete this saved echo?')) return;
+    try { if (typeof window.TethysDB.unequipEchoById === 'function') window.TethysDB.unequipEchoById(echo.id); } catch {}
     window.TethysDB.removeEcho(echo.id);
     refresh();
   }

@@ -137,8 +137,8 @@
   function addEcho(echo) {
     const arr = readEchoes();
     const key = echoKey(echo);
-    const exists = arr.some(x => echoKey(x) === key);
-    if (exists) return { added: false, echo: normalizeEcho(echo) };
+    const existing = arr.find(x => echoKey(x) === key);
+    if (existing) return { added: false, echo: existing };
     const stored = { ...normalizeEcho(echo), id: `e_${Date.now()}_${Math.random().toString(36).slice(2, 7)}` };
     arr.push(stored);
     writeEchoes(arr);
@@ -186,6 +186,90 @@
   function clearClipboardEcho() { setChunked(CLIP_PREFIX, ''); }
   function consumeClipboardEcho() { const v = readClipboardEcho(); clearClipboardEcho(); return v; }
 
+  // Builder state helpers (mirror of script.js cookie) ------------------------
+  const BUILDER_COOKIE = 'tethysState';
+  function getCookie(name) {
+    const parts = (document.cookie || '').split('; ');
+    for (const p of parts) { const [k, v] = p.split('='); if (k === name) return decodeURIComponent(v || ''); }
+    return '';
+  }
+  function setCookie(name, value, maxAgeDays = DEFAULT_MAX_AGE_DAYS) {
+    const maxAge = Math.floor(maxAgeDays * 24 * 60 * 60);
+    document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
+  }
+  function readBuilderState() {
+    try {
+      const raw = getCookie(BUILDER_COOKIE);
+      const parsed = raw ? JSON.parse(raw) : {};
+      return { selectedCharName: null, chars: {}, ...parsed };
+    } catch { return { selectedCharName: null, chars: {} }; }
+  }
+  function writeBuilderState(state) { try { setCookie(BUILDER_COOKIE, JSON.stringify(state)); } catch {} }
+  function ensureCharState(state, charName) {
+    if (!state.chars[charName]) state.chars[charName] = { weaponIndex: null, echoes: [null, null, null, null, null] };
+    return state.chars[charName];
+  }
+
+  // Equipment binding ---------------------------------------------------------
+  function unequipEchoById(echoId) {
+    const arr = readEchoes();
+    const idx = arr.findIndex(e => e.id === echoId);
+    if (idx < 0) return false;
+    const e = arr[idx];
+    const prevBy = e.equippedBy || null; const prevSlot = e.equippedSlot || null;
+    e.equippedBy = null; e.equippedSlot = null;
+    writeEchoes(arr);
+    if (prevBy && prevSlot) {
+      const st = readBuilderState();
+      const cs = ensureCharState(st, prevBy);
+      const i = Math.max(1, Math.min(5, Number(prevSlot))) - 1;
+      // only clear if the slot currently holds this echo id
+      if (cs.echoes[i] && cs.echoes[i].id === echoId) cs.echoes[i] = null;
+      writeBuilderState(st);
+    }
+    return true;
+  }
+
+  function equipEchoTo(echoId, charName, slot) {
+    const arr = readEchoes();
+    const idx = arr.findIndex(e => e.id === echoId);
+    if (idx < 0) return null;
+    const slotIdx = Math.max(1, Math.min(5, Number(slot))) - 1;
+    const e = arr[idx];
+    // Clear previous equip for this echo
+    if (e.equippedBy && (e.equippedBy !== charName || e.equippedSlot !== (slotIdx + 1))) {
+      const stPrev = readBuilderState();
+      const csPrev = ensureCharState(stPrev, e.equippedBy);
+      const pi = Math.max(0, Math.min(4, Number(e.equippedSlot || 1) - 1));
+      if (csPrev.echoes[pi] && csPrev.echoes[pi].id === e.id) csPrev.echoes[pi] = null;
+      writeBuilderState(stPrev);
+    }
+    // If target slot currently holds another saved echo, un-equip it first
+    const st = readBuilderState();
+    const cs = ensureCharState(st, charName);
+    const prevAtTarget = cs.echoes[slotIdx];
+    if (prevAtTarget && prevAtTarget.id) {
+      // clear that echo's equip meta
+      const arr2 = readEchoes();
+      const j = arr2.findIndex(x => x.id === prevAtTarget.id);
+      if (j >= 0) { arr2[j].equippedBy = null; arr2[j].equippedSlot = null; writeEchoes(arr2); }
+    }
+    // Set equip on library entry
+    e.equippedBy = charName; e.equippedSlot = slotIdx + 1;
+    writeEchoes(arr);
+    // Write into builder state slot (include id so future clears work)
+    cs.echoes[slotIdx] = {
+      id: e.id,
+      cost: Number(e.cost) || 0,
+      setId: e.setId || '',
+      typeId: e.typeId || '',
+      main: e.main ? { key: String(e.main.key), value: Number(e.main.value) || 0 } : { key: '', value: 0 },
+      subs: Array.isArray(e.subs) ? e.subs.map(s => ({ key: String(s.key), value: Number(s.value) || 0 })) : []
+    };
+    writeBuilderState(st);
+    return { echo: arr[idx], charName, slot: slotIdx + 1 };
+  }
+
   window.TethysDB = {
     readBuilds,
     writeBuilds,
@@ -196,6 +280,8 @@
     addEcho,
     addEchoes,
     clearEchoes,
+    unequipEchoById,
+    equipEchoTo,
     removeEcho,
     writeClipboardEcho,
     readClipboardEcho,

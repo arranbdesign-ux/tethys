@@ -1570,8 +1570,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert('Unable to save: storage is unavailable.');
                 return;
             }
-            const { added, skipped } = window.TethysDB.addEchoes(pieces);
-            alert(`Saved ${added} new echo${added===1?'':'es'}${skipped?`, skipped ${skipped} duplicate${skipped===1?'':''}`:''}.`);
+            const res = window.TethysDB.addEchoes(pieces);
+            // Optionally bind equipped to this character+slot for consistency
+            try {
+                if (currentCharacter && typeof window.TethysDB.equipEchoTo === 'function' && Array.isArray(res.echoes)) {
+                    // Map original indexes to saved entries
+                    let iSaved = 0;
+                    for (let i = 0; i < currentEchoes.length; i++) {
+                        const ce = currentEchoes[i]; if (!ce || !ce.typeId || !ce.main?.key) continue;
+                        const saved = res.echoes[iSaved++];
+                        if (saved && saved.id) { window.TethysDB.equipEchoTo(saved.id, currentCharacter.name, i + 1); }
+                    }
+                }
+            } catch {}
+            alert(`Saved ${res.added} new echo${res.added===1?'':'es'}${res.skipped?`, skipped ${res.skipped} duplicate${res.skipped===1?'':''}`:''}.`);
         } catch (e) {
             console.error('Failed to save echoes', e);
             alert('Failed to save echoes.');
@@ -1639,7 +1651,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const title = document.createElement('div'); title.className = 'echo-mini__title';
         const typeName = (e?.typeId && ECHO_TYPES?.[e.typeId]?.name) ? ECHO_TYPES[e.typeId].name : 'Echo';
         const setName = (e?.setId && ECHO_SETS?.[e.setId]?.name) ? ECHO_SETS[e.setId].name : '';
-        title.textContent = `${typeName} • Cost ${e?.cost || 0}${setName ? ' • ' + setName : ''}`;
+        const equipped = (e?.equippedBy ? ` • Equipped: ${e.equippedBy} ${e.equippedSlot ? '• Slot ' + e.equippedSlot : ''}` : '');
+        title.textContent = `${typeName} • Cost ${e?.cost || 0}${setName ? ' • ' + setName : ''}${equipped}`;
         const main = document.createElement('div'); main.className = 'echo-mini__stats'; if (e?.main?.key) main.textContent = `${labelFor(e.main.key)} ${PCT_KEYS.includes(e.main.key) ? e.main.value + '%' : e.main.value}`; else main.textContent = 'No main stat';
         const subs = document.createElement('div'); subs.className = 'echo-mini__stats'; subs.textContent = Array.isArray(e?.subs) ? e.subs.map(s => `${labelFor(s.key)} ${PCT_KEYS.includes(s.key) ? s.value + '%' : s.value}`).join(', ') : '';
         item.appendChild(img); textWrap.appendChild(title); textWrap.appendChild(main); if (subs.textContent) textWrap.appendChild(subs); item.appendChild(textWrap);
@@ -1653,15 +1666,41 @@ document.addEventListener("DOMContentLoaded", () => {
             const used = getUsedEchoTypeIds(activeEchoSlot);
             if (used.has(e.typeId)) { alert('That echo type is already used in another slot.'); return; }
         }
-        // apply
-        currentEchoes[activeEchoSlot - 1] = {
-            cost: Number(e.cost) || 0,
-            setId: e.setId || '',
-            typeId: e.typeId || '',
-            main: e.main ? { key: e.main.key, value: Number(e.main.value) || 0 } : { key: '', value: 0 },
-            subs: Array.isArray(e.subs) ? e.subs.map(s => ({ key: s.key, value: Number(s.value) || 0 })) : []
-        };
+        // If library echo has an id, bind/equip it to this character+slot (and unequip from previous holder)
+        if (e && e.id && window.TethysDB && typeof window.TethysDB.equipEchoTo === 'function') {
+            const res = window.TethysDB.equipEchoTo(e.id, currentCharacter?.name || '', activeEchoSlot);
+            if (res && res.echo) {
+                // apply returned normalized echo (ensures id)
+                currentEchoes[activeEchoSlot - 1] = {
+                    id: res.echo.id,
+                    cost: Number(res.echo.cost) || 0,
+                    setId: res.echo.setId || '',
+                    typeId: res.echo.typeId || '',
+                    main: res.echo.main ? { key: res.echo.main.key, value: Number(res.echo.main.value) || 0 } : { key: '', value: 0 },
+                    subs: Array.isArray(res.echo.subs) ? res.echo.subs.map(s => ({ key: s.key, value: Number(s.value) || 0 })) : []
+                };
+            } else {
+                // fallback to local apply
+                currentEchoes[activeEchoSlot - 1] = {
+                    cost: Number(e.cost) || 0,
+                    setId: e.setId || '',
+                    typeId: e.typeId || '',
+                    main: e.main ? { key: e.main.key, value: Number(e.main.value) || 0 } : { key: '', value: 0 },
+                    subs: Array.isArray(e.subs) ? e.subs.map(s => ({ key: s.key, value: Number(s.value) || 0 })) : []
+                };
+            }
+        } else {
+            // no id → just apply locally
+            currentEchoes[activeEchoSlot - 1] = {
+                cost: Number(e.cost) || 0,
+                setId: e.setId || '',
+                typeId: e.typeId || '',
+                main: e.main ? { key: e.main.key, value: Number(e.main.value) || 0 } : { key: '', value: 0 },
+                subs: Array.isArray(e.subs) ? e.subs.map(s => ({ key: s.key, value: Number(s.value) || 0 })) : []
+            };
+        }
         renderEchoCost(); renderEchoSetBonusesPanel(); renderEchoTiles();
+        if (currentCharacter) persistEchoesFor(currentCharacter, currentEchoes);
         // refresh the modal fields to reflect new echo
         openEchoModal(activeEchoSlot);
         closeEchoInsertTray();
