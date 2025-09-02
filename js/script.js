@@ -1553,6 +1553,54 @@ document.addEventListener("DOMContentLoaded", () => {
         // Insert tray wiring
         document.getElementById('echoModalInsertTrayBtn')?.addEventListener('click', openEchoInsertTray);
         document.getElementById('echoInsertTrayClose')?.addEventListener('click', closeEchoInsertTray);
+        // Import image wiring
+        const importBtn = document.getElementById('echoModalImportBtn');
+        const importInput = document.getElementById('echoImportInput');
+        importBtn?.addEventListener('click', () => importInput?.click());
+        importInput?.addEventListener('change', async (e) => {
+            const file = e.target.files && e.target.files[0]; if (!file) return;
+            try {
+                if (!window.TethysImporter || typeof window.TethysImporter.analyzeImageToEchoes !== 'function') {
+                    alert('Importer not available.'); return;
+                }
+                const proceed = confirm('Importing will REPLACE current 5 echoes for this character and save them to your library. Continue?');
+                if (!proceed) return;
+                // UX: show a temporary status
+                const oldTitle = document.getElementById('echoModalTitle');
+                const prevTitle = oldTitle?.textContent; if (oldTitle) oldTitle.textContent = 'Analyzing image...';
+                const echoes = await window.TethysImporter.analyzeImageToEchoes(file);
+                if (oldTitle && prevTitle) oldTitle.textContent = prevTitle;
+                if (!Array.isArray(echoes) || echoes.length === 0) { alert('Could not read echoes from image.'); return; }
+                // normalize to exactly 5
+                const arr = [...echoes].slice(0,5);
+                while (arr.length < 5) arr.push(null);
+                currentEchoes = arr.map(e => e ? ({
+                    cost: Number(e.cost)||0,
+                    setId: e.setId||'',
+                    typeId: e.typeId||'',
+                    main: e.main?.key ? { key: e.main.key, value: Number(e.main.value)||0 } : { key:'', value:0 },
+                    subs: Array.isArray(e.subs) ? e.subs.filter(s=>s&&s.key).map(s=>({ key:s.key, value:Number(s.value)||0 })) : []
+                }) : null);
+                renderEchoCost(); renderEchoSetBonusesPanel(); renderEchoTiles();
+                if (currentCharacter) renderMainStatsFrom(currentCharacter, currentWeapon, getAllEchoBonuses());
+                // Save to library + bind
+                try {
+                    if (window.TethysDB && typeof window.TethysDB.addEchoes === 'function') {
+                        const res = window.TethysDB.addEchoes(currentEchoes.filter(Boolean));
+                        if (currentCharacter && typeof window.TethysDB.equipEchoTo === 'function' && Array.isArray(res.echoes)) {
+                            let iSaved = 0;
+                            for (let i = 0; i < currentEchoes.length; i++) {
+                                const ce = currentEchoes[i]; if (!ce) continue;
+                                const saved = res.echoes[iSaved++]; if (saved && saved.id) window.TethysDB.equipEchoTo(saved.id, currentCharacter.name, i+1);
+                            }
+                        }
+                    }
+                } catch {}
+                alert('Echoes imported. Please review and adjust if needed.');
+            } catch (err) {
+                console.error('Import failed', err); alert('Import failed.');
+            } finally { e.target.value = ''; }
+        });
     })();
 
     function resetEchoBuilders() { currentEchoes = [null, null, null, null, null]; renderEchoTiles(); renderEchoCost(); renderEchoSetBonusesPanel(); }
